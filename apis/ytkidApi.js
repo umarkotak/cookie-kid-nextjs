@@ -65,6 +65,14 @@ class YtkiddAPI {
     return this.Post(`/ytkidd/api/ai/chat`, authToken, h, params)
   }
 
+  async PostSignUp(authToken, h, params) {
+    return this.Post(`/ytkidd/api/user/sign_up`, authToken, h, params)
+  }
+
+  async PostSignIn(authToken, h, params) {
+    return this.Post(`/ytkidd/api/user/sign_in`, authToken, h, params)
+  }
+
   async GetComfyUIOutput(authToken, h, params) {
     return this.Get(`/ytkidd/api/comfy_ui/output`, authToken, h, params)
   }

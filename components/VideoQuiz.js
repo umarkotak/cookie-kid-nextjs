@@ -5,6 +5,8 @@ import YtVideo from '@/models/YtVideo'
 import { SettingsIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { Button } from './ui/button'
+import { Card, CardContent, CardHeader } from './ui/card'
 
 var MAX_WRONG_COUNT = 2
 var currenstAnswerCount = 0
@@ -99,61 +101,50 @@ export default function VideoQuiz({
   return (
     <div className={`${show ? "block" : "hidden"}`}>
       <div className={`w-full h-screen fixed top-0 left-0 backdrop-blur-md bg-black bg-opacity-80 z-20`} />
-      <div className='fixed top-6 left-0 right-0 mx-auto rounded-lg overflow-hidden bg-white h-4/5 max-w-lg w-full z-30'>
-        <div className='flex justify-between p-2 items-center bg-red-100'>
-          <div className='flex'>
-            <button className='py-2 px-3 rounded-md border border-black'>
-              Waktunya Quiz!!!
-            </button>
-          </div>
-          {allowDismiss &&
-            <div className='flex gap-2'>
-              <Link href="/setting">
-                <button
-                  className='p-2 bg-blue-400 rounded-md hover:bg-blue-500 w-10'
-                ><SettingsIcon /></button>
-              </Link>
-              <button
-                className='p-2 bg-red-400 rounded-md hover:bg-red-500 w-10'
-                onClick={()=>{setShow(false)}}
-              ><XIcon /></button>
+      <div className='fixed top-6 left-0 right-0 mx-auto rounded-lg overflow-hidden h-4/5 max-w-lg w-full z-50'>
+        <Card>
+          <CardHeader>
+            <div className='flex justify-between items-center'>
+              <Button variant="outline">Waktunya Quiz!!!</Button>
+              {allowDismiss &&
+                <div className='flex gap-2'>
+                  <Link href="/setting"><Button variant="outline"><SettingsIcon /></Button></Link>
+                  <Button onClick={()=>{setShow(false)}} variant="outline"><XIcon /></Button>
+                </div>
+              }
             </div>
-          }
-        </div>
-
-        <div>
-          <div id="box_title" className='flex justify-center text-lg mt-8'>
-            {activeQuizzes[quizCurrIndex]?.question_message}
-          </div>
-          <div id="box_question" className='flex justify-center text-lg mt-28'>
-            <span className='text-[110px] ' style={{fontFamily: "'Muli', sans-serif"}}>
-              {activeQuizzes[quizCurrIndex]?.question.value}
-            </span>
-          </div>
-          <div id="box_answer" className='grid grid-cols-2 mt-20 p-3 gap-4'>
-            {activeQuizzes[quizCurrIndex]?.answers.map((v, idx)=>(
-              <button
-                className={`text-2xl w-full p-2 rounded-lg hover:bg-green-300 ${selectedAnswerIdx == idx ? "bg-green-400" : "bg-blue-300"}`}
-                onClick={(e)=>{answerClick(e, idx)}}
-                key={`${idx}-${v.value}`}
-                style={{fontFamily: "'Muli', sans-serif"}}
-              >
-                {idx+1}
-              </button>
-            ))}
-          </div>
-          <div id="box_submit" className='flex justify-between items-center p-3'>
-            <div className='text-lg'>
-              Pertanyaan <span className='font-bold'>{quizCurrIndex+1}</span> Dari {activeQuizzes.length}
+          </CardHeader>
+          <CardContent>
+            <div id="box_title" className='flex justify-center text-lg mt-8'>
+              {activeQuizzes[quizCurrIndex]?.question_message}
             </div>
-            <button
-              className='p-3 rounded-lg bg-green-300 hover:bg-green-400'
-              onClick={()=>submitAnswer()}
-            >
-              <i className="fa-solid fa-check mr-2"></i> JAWAB
-            </button>
-          </div>
-        </div>
+            <div id="box_question" className='flex justify-center text-lg mt-28'>
+              <span className='text-[110px] ' style={{fontFamily: "'Muli', sans-serif"}}>
+                {activeQuizzes[quizCurrIndex]?.question.value}
+              </span>
+            </div>
+            <div id="box_answer" className='grid grid-cols-2 mt-20 p-3 gap-4'>
+              {activeQuizzes[quizCurrIndex]?.answers.map((v, idx)=>(
+                <Button
+                  variant={`${selectedAnswerIdx == idx ? "outline" : "default"}`}
+                  onClick={(e)=>{answerClick(e, idx)}}
+                  key={`${idx}-${v.value}`}
+                  style={{fontFamily: "'Muli', sans-serif"}}
+                >
+                  {idx+1}
+                </Button>
+              ))}
+            </div>
+            <div id="box_submit" className='flex justify-between items-center p-3'>
+              <div className='text-lg'>
+                Pertanyaan <span className='font-bold'>{quizCurrIndex+1}</span> Dari {activeQuizzes.length}
+              </div>
+              <Button onClick={()=>submitAnswer()}>
+                JAWAB
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

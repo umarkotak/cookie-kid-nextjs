@@ -34,15 +34,15 @@ export default function App({ Component, pageProps }) {
           </Head>
 
           <main className={roboto.className}>
-            {!pathName.startsWith("/student") && !pathName.startsWith("/admin") && <DefaultLayout>
+            {pathName && !pathName.startsWith("/student") && !pathName.startsWith("/admin") && <DefaultLayout>
               <Component {...pageProps} />
             </DefaultLayout>}
 
-            {pathName.startsWith("/student") && <StudentLayout>
+            {pathName && pathName.startsWith("/student") && <StudentLayout>
               <Component {...pageProps} />
             </StudentLayout>}
 
-            {pathName.startsWith("/admin") && <AdminLayout>
+            {pathName && pathName.startsWith("/admin") && <AdminLayout>
               <Component {...pageProps} />
             </AdminLayout>}
           </main>

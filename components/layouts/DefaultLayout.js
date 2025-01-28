@@ -21,9 +21,10 @@ import { Separator } from "@radix-ui/react-dropdown-menu"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../ui/breadcrumb"
 import { SidebarUser } from "./SidebarUser"
 import { ChangeThemeButton } from "../utils/ChangeThemeButton"
+import { usePathname } from "next/navigation"
 
 const items = [
-  { title: "Home", url: "#", icon: Home },
+  { title: "Home", url: "/home", icon: Home },
   { title: "Inbox", url: "#", icon: Inbox },
   { title: "Calendar", url: "#", icon: Calendar },
   { title: "Search", url: "#", icon: Search },
@@ -95,6 +96,7 @@ export function DefaultLayout({ children }) {
 }
 
 function SidebarMain({ children }) {
+  const pathName = usePathname()
   const {
     state,
     open,
@@ -104,6 +106,15 @@ function SidebarMain({ children }) {
     isMobile,
     toggleSidebar,
   } = useSidebar()
+
+  React.useEffect(() => {
+    if (pathName.startsWith("/watch")) {
+      setOpen(false)
+      return
+    }
+
+    setOpen(true)
+  }, [pathName])
 
   return(
     <div className={`${!isMobile ? open ? "w-[calc(100%-13rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>

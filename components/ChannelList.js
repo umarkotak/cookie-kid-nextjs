@@ -15,7 +15,7 @@ export default function ChannelList({ channelId, channelImageUrl, channelName })
         <Button variant="outline" size="">
           <Avatar className="h-6 w-6">
             <AvatarImage src={channelImageUrl} />
-            <AvatarFallback>Ck</AvatarFallback>
+            <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
           </Avatar>
           {channelName}
         </Button>

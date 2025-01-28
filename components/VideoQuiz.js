@@ -126,7 +126,7 @@ export default function VideoQuiz({
             <div id="box_answer" className='grid grid-cols-2 mt-20 p-3 gap-4'>
               {activeQuizzes[quizCurrIndex]?.answers.map((v, idx)=>(
                 <Button
-                  variant={`${selectedAnswerIdx == idx ? "outline" : "default"}`}
+                  variant={`${selectedAnswerIdx == idx ? "default" : "outline"}`}
                   onClick={(e)=>{answerClick(e, idx)}}
                   key={`${idx}-${v.value}`}
                   style={{fontFamily: "'Muli', sans-serif"}}

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Calendar, GraduationCap, Home, Inbox, Search, Settings, Slack, SlackIcon } from "lucide-react"
+import { Book, Bot, Calendar, GraduationCap, Home, Inbox, Joystick, Pencil, Search, Settings, Slack, SlackIcon, UserCheck } from "lucide-react"
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -25,10 +25,12 @@ import { usePathname } from "next/navigation"
 
 const items = [
   { title: "Home", url: "/home", icon: Home },
-  { title: "Inbox", url: "#", icon: Inbox },
-  { title: "Calendar", url: "#", icon: Calendar },
-  { title: "Search", url: "#", icon: Search },
-  { title: "Settings", url: "#", icon: Settings },
+  { title: "Channel", url: "/channels", icon: UserCheck },
+  { title: "Book", url: "/books", icon: Book },
+  { title: "Workbook", url: "/workbooks", icon: Pencil },
+  { title: "Sahabat AI", url: "/sahabat_ai", icon: Bot },
+  { title: "Game", url: "/games", icon: Joystick },
+  { title: "Setting", url: "/setting", icon: Settings },
 ]
 
 export function DefaultLayout({ children }) {
@@ -62,7 +64,7 @@ export function DefaultLayout({ children }) {
 
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>Application</SidebarGroupLabel>
+              <SidebarGroupLabel>Menu</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {items.map((item) => (
@@ -118,7 +120,8 @@ function SidebarMain({ children }) {
 
   return(
     <div className={`${!isMobile ? open ? "w-[calc(100%-13rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
-      <header className="sticky top-0 flex justify-between h-14 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 backdrop-blur-md z-50 bg-inherit">
+      {/* <header className="sticky top-0 flex justify-between h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 backdrop-blur-md z-50 bg-inherit"> */}
+      <header className="flex justify-between h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 backdrop-blur-md z-50 bg-inherit">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
         </div>

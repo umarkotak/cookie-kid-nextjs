@@ -165,7 +165,7 @@ export default function Watch() {
       <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} />
 
       <div className='w-full mr-4 mb-4'>
-        <div ref={videoPlayerDivRef} id="video-content" className={`sticky top-4 z-10 ${videoContainerClass(mobileMode, smallWebMode)}`}>
+        <div ref={videoPlayerDivRef} id="video-content" className={`z-10 ${videoContainerClass(mobileMode, smallWebMode)}`}>
           <div className={`relative overflow-hidden shadow-md ${mobileMode ? "" : "rounded-xl"}`}>
             <div style={{height: `${videoPlayerHeight}px`}}>
               <ReactPlayerCsr

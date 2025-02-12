@@ -32,7 +32,7 @@ export default function SignUp() {
 
 function SignUpForm({className, ...props}) {
   const router = useRouter()
-  
+
   const [userData, setUserData] = useState({
     name: '',
     email: '',

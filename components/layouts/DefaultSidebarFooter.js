@@ -5,6 +5,7 @@ import {
   Bell,
   ChevronsUpDown,
   CreditCard,
+  LayoutDashboard,
   LogInIcon,
   LogOut,
   Settings,
@@ -124,33 +125,12 @@ export function DefaultSidebarFooter() {
                     </div>
                   </div>
                 </DropdownMenuLabel>
-                {/* <DropdownMenuSeparator />
+                <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <Sparkles />
-                    Upgrade to Pro
-                  </DropdownMenuItem>
+                  {["admin", "superadmin"].includes(userData.user_role) && <Link href="/admin"><DropdownMenuItem><LayoutDashboard />Admin</DropdownMenuItem></Link>}
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <BadgeCheck />
-                    Account
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <CreditCard />
-                    Billing
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Bell />
-                    Notifications
-                  </DropdownMenuItem>
-                </DropdownMenuGroup> */}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={()=>Logout()}>
-                  <LogOut />
-                  Log out
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={()=>Logout()}><LogOut />Log out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

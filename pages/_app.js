@@ -38,7 +38,7 @@ export default function App({ Component, pageProps }) {
         enableSystem
       >
         <SidebarProvider className={roboto.className}>
-          {pathName && !pathName.startsWith("/student") && !pathName.startsWith("/admin") && <DefaultSidebar />}
+          <DefaultSidebar />
 
           <Main>
             <Component {...pageProps} />

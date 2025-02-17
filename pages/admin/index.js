@@ -1,4 +1,5 @@
 import ytkiddAPI from "@/apis/ytkidApi"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -35,11 +36,12 @@ export default function Admin() {
   }
 
   return(
-    <main className="pb-[100px] p-4">
-      <div className="flex flex-col gap-1">
-        <Link href="/admin/books" className="btn">Manage Book</Link>
-        <Link href="/admin/comfy_ui/gallery" className="btn">Comfy UI Gallery</Link>
-      </div>
-    </main>
+    <div className="flex flex-col gap-1">
+      <Card>
+        <CardHeader>
+          <CardTitle>Admin Dashboard</CardTitle>
+        </CardHeader>
+      </Card>
+    </div>
   )
 }

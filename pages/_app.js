@@ -11,6 +11,7 @@ import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sid
 import Sidebar from "@/components/Sidebar"
 import { useEffect } from "react"
 import { ChangeThemeButton } from "@/components/utils/ChangeThemeButton"
+import { Button } from "@/components/ui/button"
 
 const roboto = Geist({
   weight: '400',
@@ -75,7 +76,10 @@ function Main({ children }) {
         <div className="px-2">
           <SidebarTrigger />
         </div>
-        <div className="px-2">
+        <div className="px-2 flex gap-1">
+          <a href="https://trakteer.id/marumaru">
+            <Button size="sm" variant="outline">bantu cookie kid</Button>
+          </a>
           <ChangeThemeButton />
         </div>
       </header>

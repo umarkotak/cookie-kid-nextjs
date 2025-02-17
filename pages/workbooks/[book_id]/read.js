@@ -1,5 +1,5 @@
 import ytkiddAPI from "@/apis/ytkidApi"
-import { ArrowLeft, ArrowRight, Eraser, FileIcon, FullscreenIcon, MenuIcon, PencilIcon } from "lucide-react"
+import { ArrowLeft, ArrowRight, Eraser, FileIcon, FullscreenIcon, MenuIcon, PencilIcon, Printer } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/router"
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
@@ -222,6 +222,11 @@ export default function Read() {
           >
             <span className="text-black"><FullscreenIcon size={18} /></span>
           </button>
+          {bookDetail.pdf_url && bookDetail.pdf_url !== "" && <a href={bookDetail.pdf_url} target="_blank"><button
+            className="rounded-lg flex justify-start items-center hover:scale-110 duration-500 p-1"
+          >
+            <span className="text-black"><Printer size={18} /></span>
+          </button></a>}
         </div>
       </div>
     </main>

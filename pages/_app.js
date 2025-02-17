@@ -61,6 +61,8 @@ function Main({ children }) {
   } = useSidebar()
 
   useEffect(() => {
+    if (!pathName) { return }
+
     if (pathName.startsWith("/watch")) {
       setOpen(false)
       return

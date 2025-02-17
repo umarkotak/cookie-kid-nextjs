@@ -1,5 +1,5 @@
 import ytkiddAPI from "@/apis/ytkidApi"
-import { ArrowLeft, ArrowRight, FullscreenIcon } from "lucide-react"
+import { ArrowLeft, ArrowRight, FullscreenIcon, PrinterIcon } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/router"
@@ -130,17 +130,24 @@ export default function Read() {
             </div>
           </div>
         </div>
-        <button
-          className="absolute z-10 top-2 right-14 rounded-lg flex justify-start items-center hover:scale-110 bg-white bg-opacity-50 duration-500 p-2"
-        >
-          <span className="text-black">{activePageNumber} / {tmpMaxPageNumber}</span>
-        </button>
-        <button
-          className="absolute z-10 top-2 right-2 rounded-lg flex justify-start items-center hover:scale-110 bg-white bg-opacity-50 duration-500 p-2"
-          onClick={()=>ToggleFullScreen()}
-        >
-          <span className="text-black"><FullscreenIcon size={26} /></span>
-        </button>
+        <div className="absolute z-10 top-2 right-2 flex justify-start items-center gap-2">
+          {bookDetail.pdf_url && bookDetail.pdf_url !== "" && <a href={bookDetail.pdf_url} target="_blank"><button
+            className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-2"
+          >
+            <span className="text-black"><PrinterIcon size={22} /></span>
+          </button></a>}
+          <button
+            className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-2"
+          >
+            <span className="text-black">{activePageNumber} / {tmpMaxPageNumber}</span>
+          </button>
+          <button
+            className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-2"
+            onClick={()=>ToggleFullScreen()}
+          >
+            <span className="text-black"><FullscreenIcon size={22} /></span>
+          </button>
+        </div>
         <button
           className="absolute z-0 top-0 left-0 w-1/2 h-full bg-transparent hover:bg-black hover:bg-opacity-5 rounded-l-lg flex justify-start items-center"
           onClick={()=>PrevPage()}

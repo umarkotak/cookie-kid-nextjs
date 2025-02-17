@@ -4,10 +4,10 @@ import ytkiddAPI from '@/apis/ytkidApi'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import Utils from '@/models/Utils'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Switch } from '@/components/ui/switch'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export default function Channels() {
   const [channelList, setChannelList] = useState([])

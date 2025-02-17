@@ -44,7 +44,7 @@ export function DefaultSidebar() {
 
   useEffect(() => {
     setIsAdminPath(pathName.startsWith("/admin"))
-  }, [])
+  }, [pathName])
 
   return (
     <>

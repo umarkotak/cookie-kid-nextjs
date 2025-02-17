@@ -1,4 +1,3 @@
-import * as React from "react"
 import { Book, Bot, Calendar, ChevronDown, GraduationCap, Home, ImageIcon, Inbox, Joystick, Pencil, Search, Settings, Slack, SlackIcon, UserCheck } from "lucide-react"
 import {
   SidebarProvider,
@@ -23,6 +22,7 @@ import { DefaultSidebarFooter, SidebarUser } from "./DefaultSidebarFooter"
 import { ChangeThemeButton } from "../utils/ChangeThemeButton"
 import { usePathname } from "next/navigation"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible"
+import { useState, useEffect } from "react"
 
 const items = [
   { key: "item-1", title: "Home", url: "/home", icon: Home },
@@ -40,6 +40,11 @@ const adminItems = [
 
 export function DefaultSidebar() {
   const pathName = usePathname()
+  const [isAdminPath, setIsAdminPath] = useState(false)
+
+  useEffect(() => {
+    setIsAdminPath(pathName.startsWith("/admin"))
+  }, [])
 
   return (
     <>
@@ -84,7 +89,7 @@ export function DefaultSidebar() {
                   <SidebarMenu>
                     {items.map((item) => (
                       <SidebarMenuItem key={item.key}>
-                        <SidebarMenuButton asChild isActive={pathName.startsWith(item.url)}>
+                        <SidebarMenuButton asChild isActive={`${pathName}`.startsWith(item.url)}>
                           <a href={item.url}>
                             <item.icon />
                             <span>{item.title}</span>
@@ -97,7 +102,7 @@ export function DefaultSidebar() {
               </CollapsibleContent>
             </SidebarGroup>
           </Collapsible>
-          {pathName.startsWith("/admin") && <Collapsible defaultOpen className="group/collapsible">
+          {isAdminPath && <Collapsible defaultOpen className="group/collapsible">
             <SidebarGroup>
               <SidebarGroupLabel asChild>
                 <CollapsibleTrigger>
@@ -110,7 +115,7 @@ export function DefaultSidebar() {
                   <SidebarMenu>
                     {adminItems.map((item) => (
                       <SidebarMenuItem key={item.key}>
-                        <SidebarMenuButton asChild isActive={pathName.startsWith(item.url)}>
+                        <SidebarMenuButton asChild isActive={`${pathName}`.startsWith(item.url)}>
                           <a href={item.url}>
                             <item.icon />
                             <span>{item.title}</span>

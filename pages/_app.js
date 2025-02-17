@@ -8,7 +8,6 @@ import { DefaultSidebar } from "@/components/layouts/DefaultSidebar"
 import { Geist, Roboto } from 'next/font/google'
 import { ToastContainer } from "react-toastify"
 import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
-import Sidebar from "@/components/Sidebar"
 import { useEffect } from "react"
 import { ChangeThemeButton } from "@/components/utils/ChangeThemeButton"
 import { Button } from "@/components/ui/button"

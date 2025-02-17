@@ -66,6 +66,12 @@ export function DefaultSidebarFooter() {
 
       setUserData(body.data)
 
+      if (pathName.startsWith("/admin")) {
+        if (!["admin", "superadmin"].includes(body.data.user_role)) {
+          router.replace("/home")
+        }
+      }
+
     } catch (e) {
       toast.error(`error ${e}`)
     }
@@ -121,7 +127,8 @@ export function DefaultSidebarFooter() {
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-semibold">{userData.name}</span>
-                      <span className="truncate text-xs">{userData.email}</span>
+                      {/* <span className="truncate text-xs">{userData.email}</span> */}
+                      <span className="truncate text-xs">{userData.user_role}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>

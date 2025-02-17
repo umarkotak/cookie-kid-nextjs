@@ -1,4 +1,7 @@
 import ytkiddAPI from "@/apis/ytkidApi"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import Utils from "@/models/Utils"
 import { classNames } from "@react-pdf-viewer/core"
 import { BookIcon, PlusIcon } from "lucide-react"
@@ -86,103 +89,110 @@ export default function DevBooks() {
   }
 
   return(
-    <main className="pb-[100px] p-4">
-      <div className="container max-w-[720px] mx-auto shadow-sm">
-        <div className="flex justify-between items-center">
-          <div>
-            <span className="text-2xl flex gap-1 items-center"><BookIcon size={24} /> Add Book</span>
-          </div>
-          <div className="flex gap-1">
-            <button
-              className={`btn btn-sm ${uploadMode === "pdf" ? "btn-primary" : ""}`}
-              onClick={()=>setUploadMode("pdf")}
-            >PDF</button>
-            <button
-              className={`btn btn-sm ${uploadMode === "url" ? "btn-primary" : ""}`}
-              onClick={()=>setUploadMode("url")}
-            >URL</button>
-          </div>
-        </div>
+    <div className="flex flex-col gap-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <div className="flex justify-between items-center">
+              <span className="flex gap-1 items-center"><BookIcon size={18} /> Add Book</span>
+              <div className="flex gap-1">
+                <Button
+                  variant={uploadMode === "pdf" ? "default" : "outline"}
+                  onClick={()=>setUploadMode("pdf")}
+                >Upload By PDF</Button>
+                <Button
+                  variant={uploadMode === "url" ? "default" : "outline"}
+                  onClick={()=>setUploadMode("url")}
+                >Upload By URL</Button>
+              </div>
+            </div>
+          </CardTitle>
+        </CardHeader>
+      </Card>
 
-        <form className="flex flex-col gap-3 mt-4" onSubmit={handleSubmit}>
-          { uploadMode === "pdf" ? <div>
-            <label className="text-lg">Upload Pdf Book</label>
-            <input
-              type="file" className="file-input file-input-bordered w-full"
-              accept="application/pdf"
-              onChange={(e)=>handleFileChange(e)}
-            />
-          </div> : <div>
-            <label className="text-lg">Url Pdf Book</label>
-            <input
-              type="text" placeholder="pdf file url" className="input input-bordered w-full"
-              onChange={(e)=>handleParamsChange(e, "pdf_url")}
-              value={bookParams.pdf_url}
-            />
-          </div> }
-          <div>
-            <label className="text-lg">Title</label>
-            <input
-              type="text" placeholder="" className="input input-bordered w-full"
-              onChange={(e)=>handleParamsChange(e, "title")}
-              value={bookParams.title}
-            />
-          </div>
-          <div className="flex gap-2">
-            <div className="w-full">
-              <label className="text-lg">Slug</label>
-              <input
+
+      <Card>
+        <CardContent className="p-6">
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            { uploadMode === "pdf" ? <div>
+              <label>Upload Pdf Book</label>
+              <Input
+                type="file"
+                accept="application/pdf"
+                onChange={(e)=>handleFileChange(e)}
+              />
+            </div> : <div>
+              <label>Url Pdf Book</label>
+              <Input
+                type="text" placeholder="pdf file url"
+                onChange={(e)=>handleParamsChange(e, "pdf_url")}
+                value={bookParams.pdf_url}
+              />
+            </div> }
+            <div>
+              <label>Title</label>
+              <Input
                 type="text" placeholder="" className="input input-bordered w-full"
-                onChange={(e)=>handleParamsChange(e, "slug")}
-                value={bookParams.slug}
+                onChange={(e)=>handleParamsChange(e, "title")}
+                value={bookParams.title}
               />
             </div>
+            <div className="flex gap-2">
+              <div className="w-full">
+                <label>Slug</label>
+                <Input
+                  type="text" placeholder="" className="input input-bordered w-full"
+                  onChange={(e)=>handleParamsChange(e, "slug")}
+                  value={bookParams.slug}
+                />
+              </div>
+              <div className="w-full">
+                <label>Custom Image Slug</label>
+                <Input
+                  type="text" placeholder="" className="input input-bordered w-full"
+                  onChange={(e)=>handleParamsChange(e, "custom_image_slug")}
+                  value={bookParams.custom_image_slug}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <div className="w-full">
+                <label>Book Type</label>
+                <select
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                  onChange={(e)=>handleParamsChange(e, "book_type")}
+                  value={bookParams.book_type}
+                >
+                  <option value="default">Default</option>
+                  <option value="workbook">Workbook</option>
+                </select>
+              </div>
+              <div className="w-full">
+                <label>Image Format</label>
+                <select
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                  onChange={(e)=>handleParamsChange(e, "img_format")}
+                  value={bookParams.img_format}
+                >
+                  <option value="jpeg">Jpeg</option>
+                  <option value="png">Png</option>
+                </select>
+              </div>
+            </div>
             <div className="w-full">
-              <label className="text-lg">Custom Image Slug</label>
-              <input
-                type="text" placeholder="" className="input input-bordered w-full"
-                onChange={(e)=>handleParamsChange(e, "custom_image_slug")}
-                value={bookParams.custom_image_slug}
+              <label>Description</label>
+              <Input
+                type="text" placeholder=""
+                onChange={(e)=>handleParamsChange(e, "description")}
+                value={bookParams.description}
               />
             </div>
-          </div>
-          <div className="flex gap-2">
-            <div className="w-full">
-              <label className="text-lg">Book Type</label>
-              <select
-                className="select select-bordered w-full"
-                onChange={(e)=>handleParamsChange(e, "book_type")}
-                value={bookParams.book_type}
-              >
-                <option value="default">Default</option>
-                <option value="workbook">Workbook</option>
-              </select>
+            <div className="w-full flex justify-end">
+              <Button type="submit" variant="default" disabled={isSubmitting}>Submit</Button>
             </div>
-            <div className="w-full">
-              <label className="text-lg">Image Format</label>
-              <select
-                className="select select-bordered w-full"
-                onChange={(e)=>handleParamsChange(e, "img_format")}
-                value={bookParams.img_format}
-              >
-                <option value="jpeg">Jpeg</option>
-                <option value="png">Png</option>
-              </select>
-            </div>
-          </div>
-          <div className="w-full">
-            <label className="text-lg">Description</label>
-            <input
-              type="text" placeholder="" className="input input-bordered w-full"
-              onChange={(e)=>handleParamsChange(e, "description")}
-              value={bookParams.description}
-            />
-          </div>
-          <div className="w-full flex justify-end">
-            <button type="submit" className="btn" disabled={isSubmitting}>Submit</button>
-          </div>
-        </form>
-      </div>
-    </main>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

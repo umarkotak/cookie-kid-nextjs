@@ -1,4 +1,4 @@
-import { Book, Bot, Calendar, ChevronDown, GraduationCap, Home, ImageIcon, Inbox, Joystick, Pencil, Search, Settings, Slack, SlackIcon, UserCheck } from "lucide-react"
+import { Book, Bot, Calendar, ChevronDown, GraduationCap, Home, ImageIcon, Inbox, Joystick, LayoutDashboard, Pencil, Search, Settings, Slack, SlackIcon, UserCheck } from "lucide-react"
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -34,8 +34,9 @@ const items = [
 ]
 
 const adminItems = [
-  { key: "admin-item-1", title: "Books", url: "/admin/books", icon: Book },
-  { key: "admin-item-2", title: "ComfyUI Gallery", url: "/admin/comfy_ui/gallery", icon: ImageIcon },
+  { key: "admin-item-1", title: "Dashboard", url: "/admin", icon: LayoutDashboard },
+  { key: "admin-item-2", title: "Books", url: "/admin/books", icon: Book },
+  { key: "admin-item-3", title: "ComfyUI Gallery", url: "/admin/comfy_ui/gallery", icon: ImageIcon },
 ]
 
 export function DefaultSidebar() {
@@ -115,7 +116,7 @@ export function DefaultSidebar() {
                   <SidebarMenu>
                     {adminItems.map((item) => (
                       <SidebarMenuItem key={item.key}>
-                        <SidebarMenuButton asChild isActive={`${pathName}`.startsWith(item.url)}>
+                        <SidebarMenuButton asChild isActive={`${pathName}` === item.url}>
                           <a href={item.url}>
                             <item.icon />
                             <span>{item.title}</span>

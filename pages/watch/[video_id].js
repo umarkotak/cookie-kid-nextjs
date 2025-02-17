@@ -162,7 +162,7 @@ export default function Watch() {
 
   return (
     <main className='flex flex-col lg:flex-row'>
-      <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} />
+      {/* <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} /> */}
 
       <div className='w-full mr-4 mb-4'>
         <div ref={videoPlayerDivRef} id="video-content">
@@ -190,7 +190,7 @@ export default function Watch() {
         </div>
         <div className={`flex justify-between items-center p-1 mt-1`}>
           <div className='flex items-center mr-2'>
-            <Link href={`/channels/${videoDetail.channel.id}`} className='flex-none flex items-center gap-4'>
+            <Link href={`/channels/${videoDetail.channel.id}`} className='flex-none flex items-center gap-4 hover:bg-accent'>
               <Avatar>
                 <AvatarImage src={videoDetail.channel.image_url} />
                 <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
@@ -201,34 +201,30 @@ export default function Watch() {
         </div>
       </div>
 
-      <div id="suggestion-content" className={`flex-none w-full sm:w-[402px]`}>
+      <div id="suggestion-content" className={`flex-none w-full sm:w-[402px] flex flex-col gap-5`}>
         {suggestionVideos.map((oneVideo)=>(
-          <div className='mb-5 flex rounded-xl hover:bg-accent' key={oneVideo.id}>
+          <div className='flex flex-row gap-2 hover:bg-accent' key={oneVideo.id}>
             <div className='flex-none w-[168px] h-[94px]'>
               <Link href={`/watch/${oneVideo.id}`}>
                 <img
-                  className={`${mobileMode ? "" : "rounded-xl"} shadow-md w-full h-full`}
+                  className={`${mobileMode ? "" : ""} shadow-md w-full h-full`}
                   src={oneVideo.image_url}
                   alt="thumb"
                 />
               </Link>
             </div>
-            <div className='pr-2'>
-              <div className='w-full ml-2 flex flex-col'>
-                <Link
-                  href={`/watch/${oneVideo.id}`}
-                  className="font-medium text-[14px] leading-5 line-clamp-2 tracking-tight"
-                >{oneVideo.title}</Link>
-                <span className="flex text-sm mt-1 items-center">
-                  <Link href={`/channels/${oneVideo.channel.id}`} className="flex-none mr-2 w-7 h-7 rounded-full">
-                    <Avatar className="h-7 w-7">
-                      <AvatarImage src={oneVideo.channel.image_url} />
-                      <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
-                    </Avatar>
-                  </Link>
-                  <span className='flex-auto text-[12px] line-clamp-2'>{oneVideo.channel.name}</span>
-                </span>
-              </div>
+            <div className='w-full flex flex-col gap-2'>
+              <Link
+                href={`/watch/${oneVideo.id}`}
+                className="font-medium text-[14px] leading-5 line-clamp-2 tracking-tight"
+              >{oneVideo.title}</Link>
+              <Link href={`/channels/${oneVideo.channel.id}`} className="flex flex-row gap-2 text-sm items-center">
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={oneVideo.channel.image_url} />
+                  <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
+                </Avatar>
+                <span className='flex-auto text-[12px] line-clamp-2'>{oneVideo.channel.name}</span>
+              </Link>
             </div>
           </div>
         ))}

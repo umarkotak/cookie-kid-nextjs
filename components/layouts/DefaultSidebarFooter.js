@@ -5,7 +5,9 @@ import {
   Bell,
   ChevronsUpDown,
   CreditCard,
+  LogInIcon,
   LogOut,
+  Settings,
   Sparkles,
 } from "lucide-react"
 
@@ -30,85 +32,135 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useEffect, useState } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import ytkiddAPI from "@/apis/ytkidApi"
+import { useRouter } from "next/router"
+import { toast } from "react-toastify"
 
 export function DefaultSidebarFooter() {
+  const router = useRouter()
+  const pathName = usePathname()
   const { isMobile } = useSidebar()
+  const [userData, setUserData] = useState({})
 
-  var user={
-    avatar: "https://placehold.co/300",
-    name: "m umar r",
-    email: "codingmase@gmail.com",
+  useEffect(() => {
+    GetCheckAuth()
+  }, [pathName])
+
+  async function GetCheckAuth() {
+    if (ytkiddAPI.GenAuthToken() === "") { return }
+
+    try {
+      const response = await ytkiddAPI.GetCheckAuth("", {}, {})
+      const body = await response.json()
+
+      if (response.status !== 200) {
+        toast.error(`error ${JSON.stringify(body)}`)
+        return
+      }
+
+      // console.warn("USER DATA", body.data)
+
+      setUserData(body.data)
+
+    } catch (e) {
+      toast.error(`error ${e}`)
+    }
+  }
+
+  function Logout() {
+    localStorage.removeItem("CK:AT")
+
+    toast.success("Logout Successfull")
+
+    router.reload()
   }
 
   return (
     <SidebarFooter>
       <SidebarMenu>
-        <SidebarMenuItem>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              >
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
-                </div>
-                <ChevronsUpDown className="ml-auto size-4" />
-              </SidebarMenuButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-              side={isMobile ? "bottom" : "right"}
-              align="end"
-              sideOffset={4}
-            >
-              <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+        <Link href="/setting"><SidebarMenuItem>
+          <SidebarMenuButton>
+            <Settings />
+            Setting
+          </SidebarMenuButton>
+        </SidebarMenuItem></Link>
+        { userData.guid
+          ? <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    <AvatarImage src={userData.photo_url} alt={userData.name} />
+                    <AvatarFallback className="rounded-lg"><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+                    <span className="truncate font-semibold">{userData.name}</span>
+                    <span className="truncate text-xs">{userData.email}</span>
                   </div>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <Sparkles />
-                  Upgrade to Pro
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                side={isMobile ? "bottom" : "right"}
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage src={userData.photo_url} alt={userData.name} />
+                      <AvatarFallback className="rounded-lg"><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-semibold">{userData.name}</span>
+                      <span className="truncate text-xs">{userData.email}</span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                {/* <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <Sparkles />
+                    Upgrade to Pro
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <BadgeCheck />
+                    Account
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <CreditCard />
+                    Billing
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Bell />
+                    Notifications
+                  </DropdownMenuItem>
+                </DropdownMenuGroup> */}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={()=>Logout()}>
+                  <LogOut />
+                  Log out
                 </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <BadgeCheck />
-                  Account
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <CreditCard />
-                  Billing
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Bell />
-                  Notifications
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LogOut />
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+          : <Link href="/sign_in"><SidebarMenuItem>
+            <SidebarMenuButton>
+              <LogInIcon />
+              Sign In
+            </SidebarMenuButton>
+          </SidebarMenuItem></Link>
+        }
       </SidebarMenu>
     </SidebarFooter>
   )

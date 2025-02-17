@@ -30,12 +30,11 @@ const items = [
   { title: "Workbook", url: "/workbooks", icon: Pencil },
   { title: "Sahabat AI", url: "/sahabat_ai", icon: Bot },
   { title: "Game", url: "/games", icon: Joystick },
-  { title: "Setting", url: "/setting", icon: Settings },
 ]
 
 export function DefaultSidebar() {
   const pathName = usePathname()
-  
+
   return (
     <>
       <Sidebar

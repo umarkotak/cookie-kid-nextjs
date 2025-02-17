@@ -73,6 +73,10 @@ class YtkiddAPI {
     return this.Post(`/ytkidd/api/user/sign_in`, authToken, h, params)
   }
 
+  async GetCheckAuth(authToken, h, params) {
+    return this.Get(`/ytkidd/api/user/check_auth`, authToken, h, params)
+  }
+
   async GetComfyUIOutput(authToken, h, params) {
     return this.Get(`/ytkidd/api/comfy_ui/output`, authToken, h, params)
   }
@@ -85,7 +89,7 @@ class YtkiddAPI {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
+        'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
         ...h,
       }
     })
@@ -98,7 +102,7 @@ class YtkiddAPI {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
+        'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
         ...h,
       },
     })
@@ -111,7 +115,7 @@ class YtkiddAPI {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
+        'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
         ...h,
       },
       body: JSON.stringify(params),
@@ -125,7 +129,7 @@ class YtkiddAPI {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
+        'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
         ...h,
       },
       body: JSON.stringify(params),
@@ -142,6 +146,13 @@ class YtkiddAPI {
     } catch(e) {
       return this.Host
     }
+  }
+
+  GenAuthToken(authToken) {
+    if (authToken && authToken !== "") { return authToken }
+    if (!localStorage) { return "" }
+    if (!localStorage.getItem("CK:AT")) { return "" }
+    return localStorage.getItem("CK:AT")
   }
 }
 

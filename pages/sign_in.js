@@ -9,51 +9,36 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { GraduationCap } from "lucide-react"
+import { GraduationCap, HandshakeIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useState } from "react"
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'
+import { toast } from "react-toastify"
+import ytkiddAPI from "@/apis/ytkidApi"
+
+const GCID = "915149914245-vd6k2rs1qgaeqddb1mticba2aumtaq4h.apps.googleusercontent.com"
 
 export default function SignIn() {
-  return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <Link href="/" className="flex items-center self-center font-medium">
-          <img src="/images/cookie_kid_logo_circle.png" className="h-16 w-16" />
-          Cookie Kid
-        </Link>
-        <SignInForm />
-      </div>
-    </div>
-  )
-}
-
-function SignInForm({className, ...props}) {
   const router = useRouter()
 
-  const [userData, setUserData] = useState({
-    email: '',
-    password: '',
-  })
-
-  const handleChange = (e) => {
-    setUserData({
-      ...userData,
-      [e.target.name]: e.target.value,
-    })
-  }
-
-  async function PostSignUp() {
+  async function PostSignUp(credentialResponse) {
     try {
-      const response = await ytkiddAPI.PostSignUp("", {}, userData)
+      const response = await ytkiddAPI.PostSignIn("", {}, {
+        google_credential: credentialResponse.credential
+      })
       const body = await response.json()
+
       if (response.status !== 200) {
         toast.error(`error ${JSON.stringify(body)}`)
         return
       }
 
-      toast.success("your account succesfully registered")
-      router.push("/sign_in")
+      toast.success("Login Successfull")
+
+      localStorage.setItem("CK:AT", body.data.access_token)
+
+      router.push("/home")
 
     } catch (e) {
       toast.error(`error ${e}`)
@@ -61,52 +46,36 @@ function SignInForm({className, ...props}) {
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6">
-            <div className="grid gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  onChange={handleChange}
+    <div className="flex flex-col items-center gap-6 p-6 md:p-10">
+      <div className="flex w-full max-w-sm flex-col gap-6">
+        <Link href="/" className="flex items-center self-center font-medium">
+          <img src="/images/cookie_kid_logo_circle.png" className="h-16 w-16" />
+          Cookie Kid
+        </Link>
+
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl">Welcome!</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col">
+              <GoogleOAuthProvider clientId={GCID}>
+                <GoogleLogin
+                  onSuccess={credentialResponse => {
+                    PostSignUp(credentialResponse)
+                  }}
+                  onError={() => {
+                    toast.error('Sorry, Login Failed')
+                  }}
                 />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input id="password" type="password" required />
-              </div>
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
+              </GoogleOAuthProvider>
             </div>
-            <div className="text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link href="sign_up" className="underline underline-offset-4">
-                Sign up
-              </Link>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+          </CardContent>
+        </Card>
+        <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
+          By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+          and <a href="#">Privacy Policy</a>.
+        </div>
       </div>
     </div>
   )

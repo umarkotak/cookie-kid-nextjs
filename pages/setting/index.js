@@ -10,6 +10,9 @@ export default function Setting() {
   const [ykiddConf, setYtkiddConf] = useState({})
 
   useEffect(()=>{
+    setLockSetting(false)
+    return
+
     setVal1(Utils.GetRandomNumber(1, 10))
     setVal2(Utils.GetRandomNumber(1, 10))
 

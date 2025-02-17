@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Separator } from "@radix-ui/react-dropdown-menu"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../ui/breadcrumb"
-import { SidebarUser } from "./SidebarUser"
+import { DefaultSidebarFooter, SidebarUser } from "./DefaultSidebarFooter"
 import { ChangeThemeButton } from "../utils/ChangeThemeButton"
 import { usePathname } from "next/navigation"
 
@@ -33,7 +33,9 @@ const items = [
   { title: "Setting", url: "/setting", icon: Settings },
 ]
 
-export function DefaultLayout({ children }) {
+export function DefaultSidebar() {
+  const pathName = usePathname()
+  
   return (
     <>
       <Sidebar
@@ -42,22 +44,24 @@ export function DefaultLayout({ children }) {
       >
         <SidebarHeader>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <img src="/images/cookie_kid_logo_circle.png" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    Cookie Kid
-                  </span>
-                  <span className="truncate text-xs">help you learn</span>
-                </div>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            <a href="/">
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                    <img src="/images/cookie_kid_logo_circle.png" />
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">
+                      Cookie Kid
+                    </span>
+                    <span className="truncate text-xs">curated content for kid</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </a>
           </SidebarMenu>
         </SidebarHeader>
 
@@ -68,7 +72,7 @@ export function DefaultLayout({ children }) {
               <SidebarMenu>
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton asChild isActive={pathName.startsWith(item.url)}>
                       <a href={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
@@ -81,15 +85,8 @@ export function DefaultLayout({ children }) {
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter>
-          <SidebarUser user={{
-            avatar: "https://placehold.co/300",
-            name: "m umar r",
-            email: "codingmase@gmail.com",
-          }} />
-        </SidebarFooter>
+        <DefaultSidebarFooter />
       </Sidebar>
     </>
   )
 }
-

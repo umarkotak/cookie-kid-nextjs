@@ -132,7 +132,7 @@ export default function Watch() {
   }
 
   function videoContainerClass(tmpMobileMode, tmpSmallWebMode) {
-    if (tmpMobileMode) { return "w-full fixed z-0 top-12" }
+    if (tmpMobileMode) { return "w-full" }
     if (tmpSmallWebMode) { return "w-full" }
     return "w-full"
   }
@@ -165,8 +165,8 @@ export default function Watch() {
       <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} />
 
       <div className='w-full mr-4 mb-4'>
-        <div ref={videoPlayerDivRef} id="video-content" className={`z-10 ${videoContainerClass(mobileMode, smallWebMode)}`}>
-          <div className={`relative overflow-hidden shadow-md ${mobileMode ? "" : "rounded-xl"}`}>
+        <div ref={videoPlayerDivRef} id="video-content">
+          <div className={`relative overflow-hidden shadow-md`}>
             <div style={{height: `${videoPlayerHeight}px`}}>
               <ReactPlayerCsr
                 ref={rPlayerRef}
@@ -185,10 +185,10 @@ export default function Watch() {
             ></div>
           </div>
         </div>
-        <div>
-          <span className="font-semibold text-2xl leading-relaxed">{videoDetail.title}</span>
+        <div className='p-1 mt-1'>
+          <span className="font-semibold text-lg md:text-2xl leading-relaxed">{videoDetail.title}</span>
         </div>
-        <div className={`flex justify-between items-center mt-2 ${mobileMode ? "mx-2" : ""}`}>
+        <div className={`flex justify-between items-center p-1 mt-1`}>
           <div className='flex items-center mr-2'>
             <Link href={`/channels/${videoDetail.channel.id}`} className='flex-none flex items-center gap-4'>
               <Avatar>
@@ -201,7 +201,7 @@ export default function Watch() {
         </div>
       </div>
 
-      <div id="suggestion-content" className={`flex-none ${mobileMode || smallWebMode ? "" : "w-[402px]"}`}>
+      <div id="suggestion-content" className={`flex-none w-full sm:w-[402px]`}>
         {suggestionVideos.map((oneVideo)=>(
           <div className='mb-5 flex rounded-xl hover:bg-accent' key={oneVideo.id}>
             <div className='flex-none w-[168px] h-[94px]'>

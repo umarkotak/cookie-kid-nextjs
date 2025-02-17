@@ -91,8 +91,8 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="w-full">
-      <div className='w-full mb-4 pb-4'>
+    <div className="flex flex-col gap-2 w-full">
+      <div className='w-full pb-4'>
         <div className="flex gap-2 flex-row overflow-auto">
           {channelList.map((oneChannel) => (
             <ChannelList
@@ -105,7 +105,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-x-5 gap-y-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-x-4 gap-y-6">
         {videoList.map((oneVideo) => (
           <VideoCard
             key={oneVideo.id}

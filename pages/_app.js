@@ -4,10 +4,8 @@ import { ThemeProvider } from "@/components/layouts/ThemeProvider"
 import { CookiesProvider } from "react-cookie"
 import Head from "next/head"
 import { usePathname } from "next/navigation"
-import { DefaultLayout } from "@/components/layouts/DefaultLayout"
-import { AdminLayout } from "@/components/layouts/AdminLayout"
+import { DefaultSidebar } from "@/components/layouts/DefaultSidebar"
 import { Geist, Roboto } from 'next/font/google'
-import { StudentLayout } from "@/components/layouts/StudentLayout"
 import { ToastContainer } from "react-toastify"
 import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
 import Sidebar from "@/components/Sidebar"
@@ -26,34 +24,25 @@ export default function App({ Component, pageProps }) {
     <>
       <Head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        <title>Cookie Kid</title>
       </Head>
+
       <CookiesProvider defaultSetOptions={{ path: '/' }} />
+
       <ToastContainer />
+
       <ThemeProvider
         attribute="class"
         defaultTheme="system"
         enableSystem
       >
-        <Head>
-          <title>Cookie Kid</title>
-        </Head>
-
         <SidebarProvider className={roboto.className}>
-          {pathName && !pathName.startsWith("/student") && !pathName.startsWith("/admin") && <DefaultLayout />}
-
-          {/* {pathName && pathName.startsWith("/student") && <StudentLayout>
-            <Component {...pageProps} />
-          </StudentLayout>}
-
-          {pathName && pathName.startsWith("/admin") && <AdminLayout>
-            <Component {...pageProps} />
-          </AdminLayout>} */}
+          {pathName && !pathName.startsWith("/student") && !pathName.startsWith("/admin") && <DefaultSidebar />}
 
           <Main>
             <Component {...pageProps} />
           </Main>
         </SidebarProvider>
-
       </ThemeProvider>
     </>
   )
@@ -82,16 +71,16 @@ function Main({ children }) {
 
   return(
     <main className={`${!isMobile ? open ? "w-[calc(100%-13rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
-      <header className="flex justify-between h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 backdrop-blur-md z-50 bg-inherit">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
+      <header className="sticky top-0 flex justify-between h-10 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 backdrop-blur-md z-50 bg-inherit border-b border-primary">
+        <div className="px-2">
+          <SidebarTrigger />
         </div>
-        <div className="flex justify-end items-center gap-2 px-4">
+        <div className="px-2">
           <ChangeThemeButton />
         </div>
       </header>
 
-      <div className="p-4 pt-0 w-full">
+      <div className="py-2 px-0 sm:px-2 w-full">
         {children}
       </div>
     </main>

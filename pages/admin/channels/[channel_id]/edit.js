@@ -84,6 +84,7 @@ export default function AdminChannelEdit() {
         return
       }
 
+      toast.success(`Update successfull!`)
       GetChannelDetail(router.query.channel_id)
     } catch (e) {
       console.error(e)

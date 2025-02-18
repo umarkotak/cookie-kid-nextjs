@@ -2,22 +2,22 @@ import { Adsense } from '@ctrl/react-adsense';
 import React, { useEffect } from 'react';
 
 const AdsenseAd = () => {
-  useEffect(() => {
-    // Load the AdSense script
-    const script = document.createElement('script');
-    script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6813236705463574';
-    script.async = true;
-    script.crossOrigin = 'anonymous';
-    document.head.appendChild(script);
+  // useEffect(() => {
+  //   // Load the AdSense script
+  //   const script = document.createElement('script');
+  //   script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6813236705463574';
+  //   script.async = true;
+  //   script.crossOrigin = 'anonymous';
+  //   document.head.appendChild(script);
 
-    // Initialize the ad
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  //   // Initialize the ad
+  //   (window.adsbygoogle = window.adsbygoogle || []).push({});
 
-    // Cleanup function to remove the script when the component unmounts
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
+  //   // Cleanup function to remove the script when the component unmounts
+  //   return () => {
+  //     document.head.removeChild(script);
+  //   };
+  // }, []);
 
   return (
     <div>

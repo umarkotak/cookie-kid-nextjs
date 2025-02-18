@@ -1,5 +1,7 @@
 import ytkiddAPI from "@/apis/ytkidApi"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { BookIcon, ImageIcon, PlayIcon, TvIcon } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -36,11 +38,37 @@ export default function Admin() {
   }
 
   return(
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-4">
       <Card>
         <CardHeader>
           <CardTitle>Admin Dashboard</CardTitle>
         </CardHeader>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Menu</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-row flex-wrap items-center justify-start gap-2">
+            <Link href="/admin/books"><Button variant="outline">
+              <BookIcon />
+              Manage Books
+            </Button></Link>
+            <Link href="/admin/comfy_ui/gallery"><Button variant="outline">
+              <ImageIcon />
+              ComfyUI Gallery
+            </Button></Link>
+            <Link href="/admin/channels"><Button variant="outline">
+              <TvIcon />
+              Manage Channels
+            </Button></Link>
+            <Link href="/admin/videos"><Button variant="outline">
+              <PlayIcon />
+              Manage Videos
+            </Button></Link>
+          </div>
+        </CardContent>
       </Card>
     </div>
   )

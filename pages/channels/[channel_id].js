@@ -5,6 +5,8 @@ import { useRouter } from 'next/router'
 
 import ytkiddAPI from '@/apis/ytkidApi'
 import VideoCard from '@/components/VideoCard'
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export default function Channel() {
   const router = useRouter()
@@ -36,15 +38,18 @@ export default function Channel() {
   }
 
   return (
-    <main className='pb-[100px] p-4'>
-      <div className='mb-8 flex items-center px-2 pt-2 pb-4 rounded-xl shadow-md'>
-        <div className='mr-6'>
-          <img className="w-24 h-24 rounded-full shadow-md" src={channelDetail.image_url} alt="thumb" />
-        </div>
-        <div className=''>
-          <span className='text-xl'>{channelDetail.name}</span>
-        </div>
-      </div>
+    <div className='flex flex-col gap-4'>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-start gap-4">
+            <Avatar className="h-20 w-20">
+              <AvatarImage src={channelDetail.image_url} />
+              <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
+            </Avatar>
+            <span className='text-xl'>{channelDetail.name}</span>
+          </CardTitle>
+        </CardHeader>
+      </Card>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-5 gap-y-8">
         {videoList.map((oneVideo) => (
           <VideoCard
@@ -59,6 +64,6 @@ export default function Channel() {
           />
         ))}
       </div>
-    </main>
+    </div>
   )
 }

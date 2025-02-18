@@ -57,6 +57,10 @@ class YtkiddAPI {
     return this.Get(`/ytkidd/api/youtube_channel/${params.channel_id}`, authToken, h, params)
   }
 
+  async GetChannelDetailed(authToken, h, params) {
+    return this.Get(`/ytkidd/api/youtube_channel/${params.channel_id}/detailed`, authToken, h, params)
+  }
+
   async DeleteBook(authToken, h, params) {
     return this.Delete(`/ytkidd/api/book/${params.book_id}`, authToken, h, params)
   }
@@ -71,6 +75,14 @@ class YtkiddAPI {
 
   async PostSignIn(authToken, h, params) {
     return this.Post(`/ytkidd/api/user/sign_in`, authToken, h, params)
+  }
+
+  async PostScrapYoutubeVideos(authToken, h, params) {
+    return this.Post(`/ytkidd/api/youtube/scrap_videos`, authToken, h, params)
+  }
+
+  async PatchUpdateYoutubeChannel(authToken, h, params) {
+    return this.Patch(`/ytkidd/api/youtube_channel/${params.id}`, authToken, h, params)
   }
 
   async GetCheckAuth(authToken, h, params) {

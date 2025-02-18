@@ -1,96 +1,126 @@
-import ytkiddAPI from "@/apis/ytkidApi"
-import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { classNames } from "@react-pdf-viewer/core"
-import { MoreHorizontal, Plus, PlusIcon, Trash } from "lucide-react"
-import Link from "next/link"
-import { useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
 
-export default function AdminChannels() {
-  const [bookList, setBookList] = useState([])
-  const searchParams = useSearchParams()
-  const [bookParams, setBookParams] = useState({})
+
+import ytkiddAPI from '@/apis/ytkidApi'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Utils from '@/models/Utils'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { Switch } from '@/components/ui/switch'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { PlusIcon, RefreshCcw } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { toast } from 'react-toastify'
+
+export default function Channels() {
+  const [channelList, setChannelList] = useState([])
+  const [blacklistChannelMap, setBlacklistChannelMap] = useState({})
 
   useEffect(() => {
-    GetBookList(bookParams)
-  }, [searchParams])
+    GetChannelList({})
+  }, [])
 
-  async function GetBookList(params) {
+  async function GetChannelList(params) {
     try {
-      const response = await ytkiddAPI.GetBooks("", {}, params)
+      const response = await ytkiddAPI.GetChannels("", {}, params)
       const body = await response.json()
       if (response.status !== 200) {
+        toast.error(`Error getting youtube channels: ${body.data}`)
         return
       }
 
-      setBookList(body.data.books)
+      setChannelList(body.data)
     } catch (e) {
       console.error(e)
     }
   }
 
-  async function DeleteBook(bookID) {
-    if (!confirm("are you sure want to delete this book?")) { return }
-
+  async function SyncChannel(oneChannel, breakOnExists) {
     try {
-      const response = await ytkiddAPI.DeleteBook("", {}, {
-        book_id: bookID
-      })
+      console.log(oneChannel)
+      var scrapParams = {
+        "channel_id": oneChannel.external_id,
+        "page_token": "",
+        "query": "",
+        "max_page": 20,
+        "break_on_exists": breakOnExists
+      }
+
+      const response = await ytkiddAPI.PostScrapYoutubeVideos("", {}, scrapParams)
+
+      const body = await response.json()
+
       if (response.status !== 200) {
+        toast.error(`Error scrapping youtube videos: ${body.data}`)
         return
       }
 
-      GetBookList(bookParams)
+      toast.success(`Success sycn ${oneChannel.name}`)
+
     } catch (e) {
       console.error(e)
     }
   }
 
-  return(
-    <div className="flex flex-col gap-4">
+  return (
+    <div className='flex flex-col gap-4'>
       <Card>
         <CardHeader>
-          <CardTitle>
-            <div className="flex justify-between items-center">
-              <div>Manage Books</div>
-              <Link href="/admin/books/add"><Button size="sm"><PlusIcon />Add Book</Button></Link>
-            </div>
+          <CardTitle className="flex items-center justify-between">
+            <span>Manage Channels</span>
+            <Link href="/admin/channels/add">
+              <Button size="sm" variant="default"><PlusIcon />Add Channel</Button>
+            </Link>
           </CardTitle>
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-x-5 gap-y-8">
-        {bookList.map((oneBook) => (
-          <div key={oneBook.id} className="relative border p-1 shadow-sm rounded-lg hover:bg-accent">
-            <div className="absolute top-2 right-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button variant="outline" size="icon_sm"><MoreHorizontal /></Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={()=>DeleteBook(oneBook.id)}>
-                      delete
-                      <DropdownMenuShortcut><Trash size={14} /></DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <Link href={`/books/${oneBook.id}/read?page=1`}>
-              <div>
-                <img
-                  className="flex-none w-full h-64 object-cover z-0 rounded-lg"
-                  src={oneBook.cover_file_url}
-                />
-                <div className="m-1 flex flex-col gap-2">
-                  <p className="text-center text-sm line-clamp-1">{oneBook.title}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6 gap-x-5 gap-y-8">
+        {channelList.map((oneChannel) => (
+          <Card key={oneChannel.id} className="hover:bg-accent">
+            <Link href={`/admin/channels/${oneChannel.id}/edit`}>
+              <CardHeader className="p-4">
+                <div className='flex items-center gap-3'>
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage src={oneChannel.image_url}/>
+                      <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
+                    </Avatar>
+                  <div>
+                    <span>{oneChannel.name}</span>
+                    <small className="">{oneChannel.string_tags}</small>
+                  </div>
                 </div>
-              </div>
+              </CardHeader>
             </Link>
-          </div>
+            <CardContent className="p-4">
+              <div className='flex items-center justify-end'>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">action</Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuItem onClick={() => SyncChannel(oneChannel, false)}>
+                      Sync All
+                      <DropdownMenuShortcut><RefreshCcw size={16} /></DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => SyncChannel(oneChannel, true)}>
+                      Sync With Break
+                      <DropdownMenuShortcut><RefreshCcw size={16} /></DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>

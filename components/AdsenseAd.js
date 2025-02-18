@@ -11,7 +11,8 @@ const AdsenseAd = () => {
         data-ad-slot="7790215901"
         data-ad-format="auto"
         data-full-width-responsive="true"
-      ></ins>
+      />
+      <div>google ads here</div>
     </div>
   );
 };

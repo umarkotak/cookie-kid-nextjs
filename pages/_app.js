@@ -11,6 +11,7 @@ import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sid
 import { useEffect } from "react"
 import { ChangeThemeButton } from "@/components/utils/ChangeThemeButton"
 import { Button } from "@/components/ui/button"
+import { useCronitor } from '@cronitorio/cronitor-rum-nextjs'
 
 const roboto = Geist({
   weight: '400',
@@ -19,6 +20,7 @@ const roboto = Geist({
 
 export default function App({ Component, pageProps }) {
   const pathName = usePathname()
+  useCronitor('3f97b0a02f683b7af499e046f0495786')
 
   return (
     <>

@@ -4,12 +4,10 @@ const PuzzleGame = () => {
   const [imageUrl, setImageUrl] = useState('https://pbs.twimg.com/media/BeNPfJNCAAAp1DW.png');
   const [inputUrl, setInputUrl] = useState('');
   const [pieces, setPieces] = useState([]);
-  const [draggedPiece, setDraggedPiece] = useState(null);
+  const [selectedPiece, setSelectedPiece] = useState(null);
   const [isComplete, setIsComplete] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [gridSize, setGridSize] = useState(4);
-  const [touchOffset, setTouchOffset] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
 
   const TOTAL_PIECES = gridSize * gridSize;
   const PIECE_SIZE = 100;
@@ -59,103 +57,23 @@ const PuzzleGame = () => {
     setIsComplete(false);
   };
 
-  // Mouse events
-  const handleDragStart = (e, piece) => {
-    setDraggedPiece(piece);
-    e.dataTransfer.effectAllowed = 'move';
-    e.target.style.opacity = '0.5';
-  };
-
-  const handleDragEnd = (e) => {
-    e.target.style.opacity = '1';
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  // Touch events
-  const handleTouchStart = (e, piece) => {
-    e.preventDefault();
-    setDraggedPiece(piece);
-    setIsDragging(true);
-    
-    const touch = e.touches[0];
-    const rect = e.target.getBoundingClientRect();
-    setTouchOffset({
-      x: touch.clientX - rect.left,
-      y: touch.clientY - rect.top
-    });
-    
-    // Add visual feedback
-    e.target.style.opacity = '0.7';
-    e.target.style.transform = 'scale(1.1)';
-    e.target.style.zIndex = '1000';
-    e.target.style.position = 'fixed';
-    e.target.style.pointerEvents = 'none';
-  };
-
-  const handleTouchMove = (e) => {
-    if (!isDragging || !draggedPiece) return;
-    e.preventDefault();
-    
-    const touch = e.touches[0];
-    const draggedElement = document.querySelector(`[data-piece-id="${draggedPiece.id}"]`);
-    
-    if (draggedElement) {
-      draggedElement.style.left = `${touch.clientX - touchOffset.x}px`;
-      draggedElement.style.top = `${touch.clientY - touchOffset.y}px`;
+  // Click-to-select system
+  const handlePieceClick = (piece) => {
+    if (selectedPiece && selectedPiece.id === piece.id) {
+      // Clicking the same piece deselects it
+      setSelectedPiece(null);
+    } else {
+      // Select the piece
+      setSelectedPiece(piece);
     }
   };
 
-  const handleTouchEnd = (e) => {
-    if (!isDragging || !draggedPiece) return;
-    e.preventDefault();
-    
-    const touch = e.changedTouches[0];
-    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-    
-    // Reset dragged element styles
-    const draggedElement = document.querySelector(`[data-piece-id="${draggedPiece.id}"]`);
-    if (draggedElement) {
-      draggedElement.style.opacity = '1';
-      draggedElement.style.transform = 'scale(1)';
-      draggedElement.style.zIndex = 'auto';
-      draggedElement.style.position = 'static';
-      draggedElement.style.pointerEvents = 'auto';
-      draggedElement.style.left = 'auto';
-      draggedElement.style.top = 'auto';
-    }
-    
-    // Check if dropped on target area
-    if (elementBelow && elementBelow.classList.contains('drop-target')) {
-      const targetPosition = parseInt(elementBelow.dataset.position);
-      handlePieceDrop(targetPosition);
-    } else if (elementBelow && elementBelow.classList.contains('spare-area')) {
-      handlePieceDropOnSpare();
-    }
-    
-    setIsDragging(false);
-    setDraggedPiece(null);
-  };
+  const handleTargetClick = (targetPosition) => {
+    if (!selectedPiece) return;
 
-  const handleDropOnTarget = (e, targetPosition) => {
-    e.preventDefault();
-    if (!draggedPiece) return;
-    handlePieceDrop(targetPosition);
-  };
-
-  const handleDropOnSpare = (e) => {
-    e.preventDefault();
-    if (!draggedPiece || draggedPiece.inSpareArea) return;
-    handlePieceDropOnSpare();
-  };
-
-  const handlePieceDrop = (targetPosition) => {
     setPieces(prevPieces => {
       const newPieces = prevPieces.map(piece => {
-        if (piece.id === draggedPiece.id) {
+        if (piece.id === selectedPiece.id) {
           return {
             ...piece,
             currentPosition: targetPosition,
@@ -163,7 +81,7 @@ const PuzzleGame = () => {
           };
         }
         // If there's already a piece in the target position, move it back to spare
-        if (piece.currentPosition === targetPosition && piece.id !== draggedPiece.id) {
+        if (piece.currentPosition === targetPosition && piece.id !== selectedPiece.id) {
           return {
             ...piece,
             currentPosition: null,
@@ -177,13 +95,16 @@ const PuzzleGame = () => {
       checkCompletion(newPieces);
       return newPieces;
     });
-    setDraggedPiece(null);
+
+    setSelectedPiece(null);
   };
 
-  const handlePieceDropOnSpare = () => {
+  const handleSpareAreaClick = () => {
+    if (!selectedPiece || selectedPiece.inSpareArea) return;
+
     setPieces(prevPieces => {
       return prevPieces.map(piece => {
-        if (piece.id === draggedPiece.id) {
+        if (piece.id === selectedPiece.id) {
           return {
             ...piece,
             currentPosition: null,
@@ -193,7 +114,8 @@ const PuzzleGame = () => {
         return piece;
       });
     });
-    setDraggedPiece(null);
+
+    setSelectedPiece(null);
     setIsComplete(false);
   };
 
@@ -204,8 +126,7 @@ const PuzzleGame = () => {
     setIsComplete(isCompleted);
   };
 
-  const handleImageSubmit = (e) => {
-    e.preventDefault();
+  const handleImageSubmit = () => {
     if (inputUrl.trim()) {
       setImageUrl(inputUrl);
       setImageLoaded(false);
@@ -214,17 +135,16 @@ const PuzzleGame = () => {
 
   const PuzzlePiece = ({ piece }) => {
     const imageSize = PIECE_SIZE * gridSize;
+    const isSelected = selectedPiece && selectedPiece.id === piece.id;
 
     return (
       <div
-        data-piece-id={piece.id}
-        draggable
-        onDragStart={(e) => handleDragStart(e, piece)}
-        onDragEnd={handleDragEnd}
-        onTouchStart={(e) => handleTouchStart(e, piece)}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className="cursor-move transition-all duration-200 hover:scale-105 hover:shadow-lg select-none touch-none"
+        onClick={() => handlePieceClick(piece)}
+        className={`cursor-pointer transition-all duration-200 select-none ${
+          isSelected
+            ? 'scale-110 shadow-xl ring-4 ring-blue-500 ring-opacity-75 z-10'
+            : 'hover:scale-105 hover:shadow-lg'
+        }`}
         style={{
           width: `${PIECE_SIZE}px`,
           height: `${PIECE_SIZE}px`,
@@ -232,10 +152,23 @@ const PuzzleGame = () => {
           backgroundSize: `${imageSize}px ${imageSize}px`,
           backgroundPosition: `-${piece.col * PIECE_SIZE}px -${piece.row * PIECE_SIZE}px`,
           borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          border: '1px solid rgba(0,0,0,0.1)'
+          boxShadow: isSelected
+            ? '0 8px 25px rgba(59, 130, 246, 0.4)'
+            : '0 2px 8px rgba(0,0,0,0.15)',
+          border: isSelected
+            ? '2px solid #3B82F6'
+            : '1px solid rgba(0,0,0,0.1)',
+          position: 'relative'
         }}
-      />
+      >
+        {isSelected && (
+          <div className="absolute -top-2 -right-2 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+            <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -244,10 +177,19 @@ const PuzzleGame = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Touch-Friendly Puzzle Game</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">Click-to-Move Puzzle Game</h1>
+
+          {/* Selection Status */}
+          {/* {selectedPiece && (
+            <div className="mb-4 p-3 bg-blue-100 rounded-lg inline-block">
+              <p className="text-blue-800 font-medium">
+                ✨ Piece selected! Click on a target position or spare area to place it.
+              </p>
+            </div>
+          )} */}
 
           {/* Image URL Input */}
-          <form onSubmit={handleImageSubmit} className="max-w-2xl mx-auto mb-6">
+          <div className="max-w-2xl mx-auto mb-6">
             <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
@@ -255,15 +197,21 @@ const PuzzleGame = () => {
                 onChange={(e) => setInputUrl(e.target.value)}
                 placeholder="Enter image URL (or use default)"
                 className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleImageSubmit();
+                  }
+                }}
               />
               <button
-                type="submit"
+                type="button"
+                onClick={handleImageSubmit}
                 className="px-6 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
               >
                 Load Image
               </button>
             </div>
-          </form>
+          </div>
 
           {/* Grid Size Controls */}
           <div className="mb-6">
@@ -284,16 +232,14 @@ const PuzzleGame = () => {
                   {size}x{size}
                 </button>
               ))}
+              <button
+                onClick={handleShuffle}
+                className="px-6 py-2 bg-purple-500 text-white rounded-lg font-medium hover:bg-purple-600 transition-colors"
+              >
+                Shuffle Pieces
+              </button>
             </div>
           </div>
-
-          {/* Controls */}
-          <button
-            onClick={handleShuffle}
-            className="px-6 py-2 bg-purple-500 text-white rounded-lg font-medium hover:bg-purple-600 transition-colors"
-          >
-            Shuffle Pieces
-          </button>
         </div>
 
         {/* Completion Message */}
@@ -311,9 +257,12 @@ const PuzzleGame = () => {
           <div className="bg-white rounded-xl shadow-xl p-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-4">Puzzle Pieces</h2>
             <div
-              onDragOver={handleDragOver}
-              onDrop={handleDropOnSpare}
-              className="spare-area min-h-[450px] bg-gray-50 rounded-lg p-4 border-2 border-dashed border-gray-300"
+              onClick={handleSpareAreaClick}
+              className={`spare-area min-h-[450px] bg-gray-50 rounded-lg p-4 border-2 border-dashed transition-colors ${
+                selectedPiece && !selectedPiece.inSpareArea
+                  ? 'border-green-400 bg-green-50 cursor-pointer'
+                  : 'border-gray-300'
+              }`}
             >
               <div className="flex flex-wrap gap-3">
                 {pieces.filter(p => p.inSpareArea).map(piece => (
@@ -329,7 +278,7 @@ const PuzzleGame = () => {
             <div className="inline-block bg-gray-50 rounded-lg p-4 border-2 border-gray-300">
               <div
                 className="grid gap-1"
-                style={{ 
+                style={{
                   gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
                   width: `${(PIECE_SIZE + 4) * gridSize}px`,
                   height: `${(PIECE_SIZE + 4) * gridSize}px`
@@ -337,13 +286,17 @@ const PuzzleGame = () => {
               >
                 {Array.from({ length: TOTAL_PIECES }).map((_, index) => {
                   const piece = pieces.find(p => p.currentPosition === index);
+                  const isTargetHighlighted = selectedPiece && !piece;
+
                   return (
                     <div
                       key={index}
-                      data-position={index}
-                      onDragOver={handleDragOver}
-                      onDrop={(e) => handleDropOnTarget(e, index)}
-                      className="drop-target relative bg-gray-200 rounded border-2 border-dashed border-gray-400 flex items-center justify-center"
+                      onClick={() => handleTargetClick(index)}
+                      className={`drop-target relative rounded border-2 border-dashed flex items-center justify-center transition-all cursor-pointer ${
+                        isTargetHighlighted
+                          ? 'border-blue-400 bg-blue-50 scale-105'
+                          : 'border-gray-400 bg-gray-200 hover:bg-gray-300'
+                      }`}
                       style={{ width: `${PIECE_SIZE}px`, height: `${PIECE_SIZE}px` }}
                     >
                       {piece && <PuzzlePiece piece={piece} />}
@@ -358,13 +311,6 @@ const PuzzleGame = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Instructions */}
-        <div className="mt-8 text-center text-gray-600">
-          <p className="mb-2">Drag or touch and drag pieces from the left to complete the puzzle on the right.</p>
-          <p className="mb-2">Change the grid size to adjust difficulty level.</p>
-          <p>You can drag pieces back to the spare area if needed.</p>
         </div>
       </div>
     </div>

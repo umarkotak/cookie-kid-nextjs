@@ -74,20 +74,20 @@ function Main({ children }) {
   }, [pathName])
 
   return(
-    <main className={`${!isMobile ? open ? "w-[calc(100%-13rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
-      <header className="sticky top-0 flex justify-between h-10 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 backdrop-blur-md z-50 bg-inherit border-b border-primary">
-        <div className="px-2">
+    <main className={`${!isMobile ? open ? "w-[calc(100%-15rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
+      <header className="sticky top-0 flex justify-between h-10 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-50 bg-background">
+        <div className="px-4">
           <SidebarTrigger />
         </div>
-        <div className="px-2 flex gap-1">
+        <div className="px-4 flex gap-1">
           <a href="https://trakteer.id/marumaru">
-            <Button size="sm" variant="outline">bantu cookie kid</Button>
+            <Button size="smv2" variant="outline">bantu cookie kid</Button>
           </a>
           <ChangeThemeButton />
         </div>
       </header>
 
-      <div className="py-2 px-0 sm:px-2 w-full">
+      <div className="py-4 px-2 sm:px-4 w-full">
         {children}
       </div>
     </main>

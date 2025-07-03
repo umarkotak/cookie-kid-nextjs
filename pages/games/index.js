@@ -33,7 +33,7 @@ export default function Home() {
         <Link href="/games/puzzle" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
-              src="https://ytkidd-api-m4.cloudflare-avatar-id-1.site/comfy_ui_gallery/ComfyUI_00028_.png"
+              src="/images/puzzle_game.jpg"
               className='w-full rounded-lg shadow-sm'
             />
             <h1 className='text-2xl flex gap-1 items-center justify-center'><Puzzle size={24} /> Puzzle</h1>

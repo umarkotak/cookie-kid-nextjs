@@ -1,4 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Shuffle, Check, Sparkles, Image, Eye, EyeOff, Images } from 'lucide-react';
 
 const PuzzleGame = () => {
   const [imageUrl, setImageUrl] = useState('https://pbs.twimg.com/media/BeNPfJNCAAAp1DW.png');
@@ -8,9 +15,75 @@ const PuzzleGame = () => {
   const [isComplete, setIsComplete] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [gridSize, setGridSize] = useState(4);
+  const [showPreview, setShowPreview] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   const TOTAL_PIECES = gridSize * gridSize;
-  const PIECE_SIZE = 100;
+  const PIECE_SIZE = 80;
+
+  // Predefined image gallery
+  const imageGallery = [
+    {
+      id: 1,
+      url: 'https://pbs.twimg.com/media/BeNPfJNCAAAp1DW.png',
+      title: 'Colorful Pattern',
+      category: 'Abstract'
+    },
+    {
+      id: 2,
+      url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop',
+      title: 'Mountain Lake',
+      category: 'Nature'
+    },
+    {
+      id: 3,
+      url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop',
+      title: 'Forest Path',
+      category: 'Nature'
+    },
+    {
+      id: 4,
+      url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=400&fit=crop',
+      title: 'Ocean Waves',
+      category: 'Nature'
+    },
+    {
+      id: 5,
+      url: 'https://images.unsplash.com/photo-1574169208507-84376144848b?w=400&h=400&fit=crop',
+      title: 'Autumn Leaves',
+      category: 'Nature'
+    },
+    {
+      id: 6,
+      url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=400&fit=crop',
+      title: 'Colorful Flowers',
+      category: 'Nature'
+    },
+    {
+      id: 8,
+      url: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=400&fit=crop',
+      title: 'Golden Gate Bridge',
+      category: 'Architecture'
+    },
+    {
+      id: 9,
+      url: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=400&h=400&fit=crop',
+      title: 'Cute Cat',
+      category: 'Animals'
+    },
+    {
+      id: 10,
+      url: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&h=400&fit=crop',
+      title: 'Golden Retriever',
+      category: 'Animals'
+    },
+    {
+      id: 11,
+      url: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=400&fit=crop',
+      title: 'Butterfly',
+      category: 'Animals'
+    },
+  ];
 
   // Initialize puzzle pieces
   useEffect(() => {
@@ -57,13 +130,18 @@ const PuzzleGame = () => {
     setIsComplete(false);
   };
 
+  const handleImageSelect = (selectedImageUrl) => {
+    setImageUrl(selectedImageUrl);
+    setImageLoaded(false);
+    setIsImageModalOpen(false);
+    setShowPreview(false);
+  };
+
   // Click-to-select system
   const handlePieceClick = (piece) => {
     if (selectedPiece && selectedPiece.id === piece.id) {
-      // Clicking the same piece deselects it
       setSelectedPiece(null);
     } else {
-      // Select the piece
       setSelectedPiece(piece);
     }
   };
@@ -80,7 +158,6 @@ const PuzzleGame = () => {
             inSpareArea: false
           };
         }
-        // If there's already a piece in the target position, move it back to spare
         if (piece.currentPosition === targetPosition && piece.id !== selectedPiece.id) {
           return {
             ...piece,
@@ -91,7 +168,6 @@ const PuzzleGame = () => {
         return piece;
       });
 
-      // Check if puzzle is complete
       checkCompletion(newPieces);
       return newPieces;
     });
@@ -140,10 +216,10 @@ const PuzzleGame = () => {
     return (
       <div
         onClick={() => handlePieceClick(piece)}
-        className={`cursor-pointer transition-all duration-200 select-none ${
+        className={`relative cursor-pointer transition-all duration-200 select-none rounded-md overflow-hidden ${
           isSelected
-            ? 'scale-110 shadow-xl ring-4 ring-blue-500 ring-opacity-75 z-10'
-            : 'hover:scale-105 hover:shadow-lg'
+            ? 'scale-105 shadow-lg ring-2 ring-primary z-10'
+            : 'hover:scale-[1.02] hover:shadow-md'
         }`}
         style={{
           width: `${PIECE_SIZE}px`,
@@ -151,165 +227,264 @@ const PuzzleGame = () => {
           backgroundImage: `url(${imageUrl})`,
           backgroundSize: `${imageSize}px ${imageSize}px`,
           backgroundPosition: `-${piece.col * PIECE_SIZE}px -${piece.row * PIECE_SIZE}px`,
-          borderRadius: '8px',
-          boxShadow: isSelected
-            ? '0 8px 25px rgba(59, 130, 246, 0.4)'
-            : '0 2px 8px rgba(0,0,0,0.15)',
-          border: isSelected
-            ? '2px solid #3B82F6'
-            : '1px solid rgba(0,0,0,0.1)',
-          position: 'relative'
+          border: isSelected ? '2px solid hsl(var(--primary))' : '1px solid hsl(var(--border))'
         }}
       >
         {isSelected && (
-          <div className="absolute -top-2 -right-2 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-            <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
+          <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+            <Check className="w-3 h-3 text-primary-foreground" />
           </div>
         )}
       </div>
     );
   };
 
+  const PreviewOverlay = () => {
+    if (!showPreview) return null;
+
+    return (
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center justify-between">
+              Completed Puzzle Preview
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowPreview(false)}
+              >
+                <EyeOff className="w-4 h-4" />
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div
+              className="mx-auto rounded-lg overflow-hidden shadow-lg"
+              style={{
+                width: `${PIECE_SIZE * 3}px`,
+                height: `${PIECE_SIZE * 3}px`,
+                backgroundImage: `url(${imageUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            />
+            <p className="text-sm text-muted-foreground mt-3 text-center">
+              This is how the completed puzzle should look
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Click-to-Move Puzzle Game</h1>
-
-          {/* Selection Status */}
-          {/* {selectedPiece && (
-            <div className="mb-4 p-3 bg-blue-100 rounded-lg inline-block">
-              <p className="text-blue-800 font-medium">
-                ✨ Piece selected! Click on a target position or spare area to place it.
-              </p>
+    <div className="bg-gradient-to-br from-background to-muted/50">
+      <div className="relative">
+        <PreviewOverlay />
+        
+        {/* Compact Header */}
+        <div className="mb-6">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div className="text-center lg:text-left">
+              <h1 className="text-3xl font-bold text-foreground mb-2">Puzzle Game</h1>
+              {selectedPiece && (
+                <Badge variant="secondary" className="animate-pulse">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Piece selected - click to place
+                </Badge>
+              )}
             </div>
-          )} */}
 
-          {/* Image URL Input */}
-          <div className="max-w-2xl mx-auto mb-6">
-            <div className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="text"
-                value={inputUrl}
-                onChange={(e) => setInputUrl(e.target.value)}
-                placeholder="Enter image URL (or use default)"
-                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleImageSubmit();
-                  }
-                }}
-              />
-              <button
-                type="button"
-                onClick={handleImageSubmit}
-                className="px-6 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
-              >
-                Load Image
-              </button>
-            </div>
-          </div>
+            {/* Controls in header */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="grid-size" className="text-sm">Size:</Label>
+                {[3, 4, 5, 6].map(size => (
+                  <Button
+                    key={size}
+                    variant={gridSize === size ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleGridSizeChange(size)}
+                    className="w-12"
+                  >
+                    {size}×{size}
+                  </Button>
+                ))}
+              </div>
+              
+              <Button onClick={handleShuffle} size="sm" variant="secondary">
+                <Shuffle className="w-4 h-4 mr-1" />
+                Shuffle
+              </Button>
 
-          {/* Grid Size Controls */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Puzzle Difficulty: {gridSize}x{gridSize} ({TOTAL_PIECES} pieces)
-            </label>
-            <div className="flex justify-center gap-2 flex-wrap">
-              {[3, 4, 5, 6].map(size => (
-                <button
-                  key={size}
-                  onClick={() => handleGridSizeChange(size)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    gridSize === size
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  {size}x{size}
-                </button>
-              ))}
-              <button
-                onClick={handleShuffle}
-                className="px-6 py-2 bg-purple-500 text-white rounded-lg font-medium hover:bg-purple-600 transition-colors"
+              <Button 
+                onClick={() => setShowPreview(true)} 
+                size="sm" 
+                variant="outline"
               >
-                Shuffle Pieces
-              </button>
+                <Eye className="w-4 h-4 mr-1" />
+                Preview
+              </Button>
+
+              <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline">
+                    <Images className="w-4 h-4 mr-1" />
+                    Change Image
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Choose an Image</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+                    {imageGallery.map((image) => (
+                      <div key={image.id} className="space-y-2">
+                        <div
+                          onClick={() => handleImageSelect(image.url)}
+                          className="relative cursor-pointer group rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-all"
+                        >
+                          <img
+                            src={image.url}
+                            alt={image.title}
+                            className="w-full h-32 object-cover group-hover:scale-105 transition-transform"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Badge variant="secondary" className="text-xs">
+                                Select
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm font-medium">{image.title}</p>
+                          <Badge variant="outline" className="text-xs">
+                            {image.category}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Custom URL input in modal */}
+                  <div className="mt-6 pt-4 border-t">
+                    <Label className="text-sm font-medium">Or use custom image URL:</Label>
+                    <div className="flex gap-2 mt-2">
+                      <Input
+                        value={inputUrl}
+                        onChange={(e) => setInputUrl(e.target.value)}
+                        placeholder="Enter image URL"
+                        className="text-sm"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleImageSubmit();
+                            setIsImageModalOpen(false);
+                          }
+                        }}
+                      />
+                      <Button 
+                        onClick={() => {
+                          handleImageSubmit();
+                          setIsImageModalOpen(false);
+                        }} 
+                        size="sm"
+                      >
+                        Use URL
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>
 
         {/* Completion Message */}
         {isComplete && (
-          <div className="text-center mb-6 animate-bounce">
-            <div className="inline-block px-8 py-4 bg-green-500 text-white rounded-lg shadow-lg">
-              <p className="text-xl font-bold">🎉 Congratulations! Puzzle Completed! 🎉</p>
-            </div>
+          <div className="mb-4 text-center">
+            <Badge className="text-base px-4 py-2 bg-green-500 hover:bg-green-500 animate-bounce">
+              🎉 Puzzle Completed! 🎉
+            </Badge>
           </div>
         )}
 
-        {/* Game Area */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Spare Area */}
-          <div className="bg-white rounded-xl shadow-xl p-6">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Puzzle Pieces</h2>
-            <div
-              onClick={handleSpareAreaClick}
-              className={`spare-area min-h-[450px] bg-gray-50 rounded-lg p-4 border-2 border-dashed transition-colors ${
-                selectedPiece && !selectedPiece.inSpareArea
-                  ? 'border-green-400 bg-green-50 cursor-pointer'
-                  : 'border-gray-300'
-              }`}
-            >
-              <div className="flex flex-wrap gap-3">
-                {pieces.filter(p => p.inSpareArea).map(piece => (
-                  <PuzzlePiece key={piece.id} piece={piece} />
-                ))}
-              </div>
-            </div>
+        {/* Main Game Area - Horizontal Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
+          {/* Puzzle Pieces - Left Side */}
+          <div className="xl:col-span-2">
+            <Card className="h-fit">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Pieces ({pieces.filter(p => p.inSpareArea).length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div
+                  onClick={handleSpareAreaClick}
+                  className={`min-h-[300px] bg-muted/30 rounded-lg p-3 border-2 border-dashed transition-colors ${
+                    selectedPiece && !selectedPiece.inSpareArea
+                      ? 'border-green-400 bg-green-50 dark:bg-green-950/20 cursor-pointer'
+                      : 'border-muted-foreground/30'
+                  }`}
+                >
+                  <div className="flex flex-wrap gap-2">
+                    {pieces.filter(p => p.inSpareArea).map(piece => (
+                      <PuzzlePiece key={piece.id} piece={piece} />
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Target Area */}
-          <div className="bg-white rounded-xl shadow-xl p-6">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Target Area</h2>
-            <div className="inline-block bg-gray-50 rounded-lg p-4 border-2 border-gray-300">
-              <div
-                className="grid gap-1"
-                style={{
-                  gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-                  width: `${(PIECE_SIZE + 4) * gridSize}px`,
-                  height: `${(PIECE_SIZE + 4) * gridSize}px`
-                }}
-              >
-                {Array.from({ length: TOTAL_PIECES }).map((_, index) => {
-                  const piece = pieces.find(p => p.currentPosition === index);
-                  const isTargetHighlighted = selectedPiece && !piece;
+          {/* Target Area - Right Side */}
+          <div className="xl:col-span-3">
+            <Card className="h-fit">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center justify-between">
+                  Target Area
+                  <Badge variant="outline">
+                    {pieces.filter(p => !p.inSpareArea).length}/{TOTAL_PIECES}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex justify-center">
+                <div className="inline-block bg-muted/30 rounded-lg p-3 border-2 border-muted-foreground/30">
+                  <div
+                    className="grid gap-1"
+                    style={{
+                      gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+                      width: `${(PIECE_SIZE + 4) * gridSize}px`,
+                      height: `${(PIECE_SIZE + 4) * gridSize}px`
+                    }}
+                  >
+                    {Array.from({ length: TOTAL_PIECES }).map((_, index) => {
+                      const piece = pieces.find(p => p.currentPosition === index);
+                      const isTargetHighlighted = selectedPiece && !piece;
 
-                  return (
-                    <div
-                      key={index}
-                      onClick={() => handleTargetClick(index)}
-                      className={`drop-target relative rounded border-2 border-dashed flex items-center justify-center transition-all cursor-pointer ${
-                        isTargetHighlighted
-                          ? 'border-blue-400 bg-blue-50 scale-105'
-                          : 'border-gray-400 bg-gray-200 hover:bg-gray-300'
-                      }`}
-                      style={{ width: `${PIECE_SIZE}px`, height: `${PIECE_SIZE}px` }}
-                    >
-                      {piece && <PuzzlePiece piece={piece} />}
-                      {!piece && (
-                        <span className="text-gray-400 text-sm font-medium">
-                          {index + 1}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+                      return (
+                        <div
+                          key={index}
+                          onClick={() => handleTargetClick(index)}
+                          className={`relative rounded-md border-2 border-dashed flex items-center justify-center transition-all cursor-pointer ${
+                            isTargetHighlighted
+                              ? 'border-primary bg-primary/10 scale-105'
+                              : 'border-muted-foreground/30 bg-muted/50 hover:bg-muted/80'
+                          }`}
+                          style={{ width: `${PIECE_SIZE}px`, height: `${PIECE_SIZE}px` }}
+                        >
+                          {piece && <PuzzlePiece piece={piece} />}
+                          {!piece && (
+                            <span className="text-muted-foreground text-xs font-medium">
+                              {index + 1}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

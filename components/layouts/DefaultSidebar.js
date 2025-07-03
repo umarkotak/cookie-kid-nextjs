@@ -29,7 +29,7 @@ const items = [
   { key: "item-2", title: "Channel", url: "/channels", icon: UserCheck },
   { key: "item-3", title: "Book", url: "/books", icon: Book },
   { key: "item-4", title: "Workbook", url: "/workbooks", icon: Pencil },
-  { key: "item-5", title: "Sahabat AI", url: "/sahabat_ai", icon: Bot },
+  // { key: "item-5", title: "Sahabat AI", url: "/sahabat_ai", icon: Bot },
   { key: "item-6", title: "Game", url: "/games", icon: Joystick },
 ]
 

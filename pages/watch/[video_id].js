@@ -1,5 +1,3 @@
-
-
 import { useRef, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import YouTube, { YouTubeProps } from 'react-youtube'
@@ -38,7 +36,7 @@ export default function Watch() {
   const videoPlayerDivRef = useRef()
 
   var rPlayerRef = useRef(null)
-  const [playerPlaying, setPlayerPlaying] = useState(false)
+  const [playerPlaying, setPlayerPlaying] = useState(true)
 
   const intervalRef = useRef(null)
 
@@ -170,7 +168,7 @@ export default function Watch() {
             <div style={{height: `${videoPlayerHeight}px`}}>
               <ReactPlayerCsr
                 ref={rPlayerRef}
-                url={`https://www.youtube.com/watch?v=${videoDetail.external_id}`}
+                src={`https://www.youtube.com/watch?v=${videoDetail.external_id}`}
                 width="100%"
                 height="100%"
                 playing={playerPlaying}
@@ -185,6 +183,7 @@ export default function Watch() {
             ></div>
           </div>
         </div>
+        {/* {`https://www.youtube.com/watch?v=${videoDetail.external_id}`} */}
         <div className='p-1 mt-1'>
           <span className="font-semibold text-lg md:text-2xl leading-relaxed">{videoDetail.title}</span>
         </div>

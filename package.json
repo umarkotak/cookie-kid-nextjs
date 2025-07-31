@@ -65,6 +65,7 @@
     "react-toastify": "^11.0.3",
     "react-youtube": "^10.1.0",
     "recharts": "^3.0.2",
+    "regenerator-runtime": "^0.14.1",
     "sbd": "^1.0.19",
     "sonner": "^2.0.5",
     "tailwind-merge": "^2.6.0",

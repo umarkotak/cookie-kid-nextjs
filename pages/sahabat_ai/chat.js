@@ -171,7 +171,7 @@ export default function Home() {
           <div className='w-full rounded-lg overflow-hidden border border-black relative h-[600px]'>
             <div className={`scale-[2.8]`}>
               <ReactPlayerCsr
-                url={'/videos/ai-idle.m3u8'}
+                src={'/videos/ai-idle.m3u8'}
                 width={"100%"}
                 height={vidHeight}
                 playing={playing}
@@ -180,7 +180,7 @@ export default function Home() {
             </div>
             <div className={`scale-[2.8] absolute top-0 transition-opacity ease-in duration-700 ${avatarState === 'talk' ? 'opacity-100' : 'opacity-0'}`}>
               <ReactPlayerCsr
-                url={'/videos/ai-talk.m3u8'}
+                src={'/videos/ai-talk.m3u8'}
                 width={"100%"}
                 height={vidHeight}
                 playing={playing}

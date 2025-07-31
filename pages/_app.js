@@ -87,7 +87,7 @@ function Main({ children }) {
         </div>
       </header>
 
-      <div className="py-4 px-2 sm:px-4 w-full">
+      <div className="py-2 px-2 sm:px-2 w-full">
         {children}
       </div>
     </main>

@@ -16,6 +16,7 @@ const FlowchartPuzzleGame = () => {
   const [currentCommandIndex, setCurrentCommandIndex] = useState(-1);
   const [draggedCommand, setDraggedCommand] = useState(null);
   const [message, setMessage] = useState('');
+  const [hasRun, setHasRun] = useState(false); // New state to track if game has been run
 
   // Theme colors
   const colors = {
@@ -38,6 +39,38 @@ const FlowchartPuzzleGame = () => {
     { id: 'down', label: 'Move Down', icon: '↓', color: '#EF4444' }
   ];
 
+  // Generate random obstacles
+  const generateRandomObstacles = () => {
+    const newObstacles = [];
+    const numObstacles = Math.floor(gridSize * gridSize * 0.15);
+
+    for (let i = 0; i < numObstacles; i++) {
+      let x, y;
+      do {
+        x = Math.floor(Math.random() * gridSize);
+        y = Math.floor(Math.random() * gridSize);
+      } while (
+        (x === startPos.x && y === startPos.y) ||
+        (x === (gridSize === 6 ? finishPos.x : gridSize - 1) && y === (gridSize === 6 ? finishPos.y : gridSize - 1)) ||
+        newObstacles.some(obs => obs.x === x && obs.y === y)
+      );
+      newObstacles.push({ x, y });
+    }
+
+    return newObstacles;
+  };
+
+  // Regenerate obstacles function
+  const regenerateObstacles = () => {
+    const newObstacles = generateRandomObstacles();
+    setObstacles(newObstacles);
+    setPlayerPos(startPos);
+    setCommandSequence([]);
+    setHasWon(false);
+    setMessage('');
+    setHasRun(false);
+  };
+
   // Reset game
   const resetGame = () => {
     setPlayerPos(startPos);
@@ -45,6 +78,7 @@ const FlowchartPuzzleGame = () => {
     setHasWon(false);
     setCurrentCommandIndex(-1);
     setMessage('');
+    setHasRun(false); // Reset the hasRun state
   };
 
   // Check if position is valid
@@ -91,17 +125,20 @@ const FlowchartPuzzleGame = () => {
         setPlayerPos(newPos);
 
         // Check win condition
-        if (newPos.x === finishPos.x && newPos.y === finishPos.y) {
+        if ((gridSize === 6 && newPos.x === finishPos.x && newPos.y === finishPos.y) ||
+            (gridSize !== 6 && newPos.x === gridSize - 1 && newPos.y === gridSize - 1)) {
           setHasWon(true);
           setMessage('🎉 Congratulations! You reached the goal!');
           setIsRunning(false);
           setCurrentCommandIndex(-1);
+          setHasRun(true); // Set hasRun to true when execution completes
           return;
         }
       } else {
         setMessage('💥 Oops! Hit an obstacle or boundary!');
         setIsRunning(false);
         setCurrentCommandIndex(-1);
+        setHasRun(true); // Set hasRun to true when execution completes
         return;
       }
 
@@ -112,6 +149,7 @@ const FlowchartPuzzleGame = () => {
     setIsRunning(false);
     setCurrentCommandIndex(-1);
     setMessage('Commands completed. Try to reach the goal! 🎯');
+    setHasRun(true); // Set hasRun to true when execution completes
   };
 
   // Drag and drop handlers
@@ -147,27 +185,13 @@ const FlowchartPuzzleGame = () => {
 
   // Update obstacles when grid size changes
   useEffect(() => {
-    const newObstacles = [];
-    const numObstacles = Math.floor(gridSize * gridSize * 0.15);
-
-    for (let i = 0; i < numObstacles; i++) {
-      let x, y;
-      do {
-        x = Math.floor(Math.random() * gridSize);
-        y = Math.floor(Math.random() * gridSize);
-      } while (
-        (x === startPos.x && y === startPos.y) ||
-        (x === gridSize - 1 && y === gridSize - 1) ||
-        newObstacles.some(obs => obs.x === x && obs.y === y)
-      );
-      newObstacles.push({ x, y });
-    }
-
+    const newObstacles = generateRandomObstacles();
     setObstacles(newObstacles);
     setPlayerPos(startPos);
     setCommandSequence([]);
     setHasWon(false);
     setMessage('');
+    setHasRun(false);
   }, [gridSize]);
 
   // Cell component
@@ -228,29 +252,53 @@ const FlowchartPuzzleGame = () => {
         <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           {/* Game Board */}
           <div>
-            {/* Grid Size Control */}
+            {/* Grid Size Control and Regenerate Button */}
             <div style={{
               marginBottom: '1rem',
               backgroundColor: 'white',
               padding: '1rem',
               borderRadius: '12px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1rem'
             }}>
-              <label style={{ marginRight: '1rem', color: colors.text, fontWeight: '500' }}>
-                Grid Size: {gridSize}x{gridSize}
-              </label>
-              <input
-                type="range"
-                min="4"
-                max="8"
-                value={gridSize}
-                onChange={(e) => setGridSize(Number(e.target.value))}
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <label style={{ marginRight: '1rem', color: colors.text, fontWeight: '500' }}>
+                  Grid Size: {gridSize}x{gridSize}
+                </label>
+                <input
+                  type="range"
+                  min="4"
+                  max="8"
+                  value={gridSize}
+                  onChange={(e) => setGridSize(Number(e.target.value))}
+                  disabled={isRunning}
+                  style={{
+                    width: '150px',
+                    accentColor: colors.primary
+                  }}
+                />
+              </div>
+              <button
+                onClick={regenerateObstacles}
                 disabled={isRunning}
                 style={{
-                  width: '150px',
-                  accentColor: colors.primary
+                  backgroundColor: colors.secondary,
+                  color: 'white',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '6px',
+                  border: 'none',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  cursor: isRunning ? 'not-allowed' : 'pointer',
+                  opacity: isRunning ? 0.5 : 1,
+                  transition: 'all 0.2s'
                 }}
-              />
+              >
+                🎲 Regenerate Obstacles
+              </button>
             </div>
 
             {/* Game Grid */}
@@ -430,7 +478,7 @@ const FlowchartPuzzleGame = () => {
             <div style={{ display: 'flex', gap: '1rem' }}>
               <button
                 onClick={executeCommands}
-                disabled={isRunning || commandSequence.length === 0}
+                disabled={isRunning || commandSequence.length === 0 || hasRun}
                 style={{
                   flex: 1,
                   backgroundColor: colors.primary,
@@ -440,8 +488,8 @@ const FlowchartPuzzleGame = () => {
                   border: 'none',
                   fontSize: '1.1rem',
                   fontWeight: 'bold',
-                  cursor: isRunning || commandSequence.length === 0 ? 'not-allowed' : 'pointer',
-                  opacity: isRunning || commandSequence.length === 0 ? 0.5 : 1,
+                  cursor: isRunning || commandSequence.length === 0 || hasRun ? 'not-allowed' : 'pointer',
+                  opacity: isRunning || commandSequence.length === 0 || hasRun ? 0.5 : 1,
                   transition: 'all 0.2s'
                 }}
               >
@@ -527,3 +575,4 @@ const FlowchartPuzzleGame = () => {
 };
 
 export default FlowchartPuzzleGame;
+

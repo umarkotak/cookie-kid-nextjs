@@ -85,11 +85,11 @@ export default function Channels() {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6 gap-x-5 gap-y-8">
         {channelList.map((oneChannel) => (
-          <Card key={oneChannel.id} className="hover:bg-accent">
+          <Card key={oneChannel.id} className="group hover:text-accent">
             <CardHeader className="p-4">
               <div className='flex items-center gap-3'>
                 <Link href={`/channels/${oneChannel.id}`}>
-                  <Avatar className="h-20 w-20">
+                  <Avatar className="h-20 w-20 group-hover:scale-105">
                     <AvatarImage src={oneChannel.image_url}/>
                     <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
                   </Avatar>

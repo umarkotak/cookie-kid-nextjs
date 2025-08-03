@@ -75,11 +75,11 @@ function Main({ children }) {
 
   return(
     <main className={`${!isMobile ? open ? "w-[calc(100%-15rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
-      <header className="sticky top-0 flex justify-between h-10 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-50 bg-background">
-        <div className="px-4">
+      <header className="sticky top-0 flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-50 bg-background pt-3 pb-2 px-4">
+        <div>
           <SidebarTrigger />
         </div>
-        <div className="px-4 flex gap-1">
+        <div className="flex gap-1">
           <a href="https://trakteer.id/marumaru">
             <Button size="smv2" variant="outline">bantu cookie kid</Button>
           </a>

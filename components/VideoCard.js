@@ -12,17 +12,17 @@ export default function VideoCard({
   creatorName,
 }) {
   return (
-    <div className='rounded-lg hover:bg-accent'>
+    <div className='group rounded-lg hover:text-accent'>
       <div className='overflow-hidden rounded-lg'>
         <Link href={`/watch/${ytkiddId}`}>
-          <img className="w-full rounded-lg hover:scale-105 transition" src={videoImageUrl} alt="thumb" onLoad={(e) => {
+          <img className="w-full rounded-lg group-hover:scale-105 transition" src={videoImageUrl} alt="thumb" onLoad={(e) => {
             if (e.target.width/e.target.height < 1.4) {
               e.target.src = "/images/no_video.png"
             }
           }} />
         </Link>
       </div>
-      <div className="flex mt-2">
+      <div className="flex mt-2 overflow-hidden">
         <div className="min-w-[50px] p-1">
           <Link href={`/channels/${channelId}`} className="">
             <Avatar>

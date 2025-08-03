@@ -17,6 +17,14 @@ const FlowchartPuzzleGame = () => {
   const [message, setMessage] = useState('');
   const [hasRun, setHasRun] = useState(false);
 
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+
+  // Game mode state
+  const [gameMode, setGameMode] = useState('default');
+  const [starPos, setStarPos] = useState({ x: 3, y: 3 });
+  const [hasCollectedStar, setHasCollectedStar] = useState(false);
+
   // Available commands
   const commands = [
     { id: 'right', label: 'Move Right', icon: '→', colorClass: 'bg-blue-500' },
@@ -38,12 +46,26 @@ const FlowchartPuzzleGame = () => {
       } while (
         (x === startPos.x && y === startPos.y) ||
         (x === (gridSize === 6 ? finishPos.x : gridSize - 1) && y === (gridSize === 6 ? finishPos.y : gridSize - 1)) ||
-        newObstacles.some(obs => obs.x === x && obs.y === y)
+        newObstacles.some(obs => obs.x === x && obs.y === y) ||
+        (gameMode === 'star' && x === starPos.x && y === starPos.y)
       );
       newObstacles.push({ x, y });
     }
 
     return newObstacles;
+  };
+
+  // Generate random star position
+  const generateRandomStarPosition = () => {
+    let x, y;
+    do {
+      x = Math.floor(Math.random() * gridSize);
+      y = Math.floor(Math.random() * gridSize);
+    } while (
+      (x === startPos.x && y === startPos.y) ||
+      (x === (gridSize === 6 ? finishPos.x : gridSize - 1) && y === (gridSize === 6 ? finishPos.y : gridSize - 1))
+    );
+    return { x, y };
   };
 
   // Add command to sequence
@@ -54,11 +76,16 @@ const FlowchartPuzzleGame = () => {
 
   // Regenerate obstacles function
   const regenerateObstacles = () => {
+    if (gameMode === 'star') {
+      const newStarPos = generateRandomStarPosition();
+      setStarPos(newStarPos);
+    }
     const newObstacles = generateRandomObstacles();
     setObstacles(newObstacles);
     setPlayerPos(startPos);
     setCommandSequence([]);
     setHasWon(false);
+    setHasCollectedStar(false);
     setMessage('');
     setHasRun(false);
   };
@@ -68,6 +95,7 @@ const FlowchartPuzzleGame = () => {
     setPlayerPos(startPos);
     setIsRunning(false);
     setHasWon(false);
+    setHasCollectedStar(false);
     setCurrentCommandIndex(-1);
     setMessage('');
     setHasRun(false);
@@ -122,15 +150,32 @@ const FlowchartPuzzleGame = () => {
         currentPos = newPos;
         setPlayerPos(newPos);
 
+        // Check if player collected the star in star mode
+        if (gameMode === 'star' && !hasCollectedStar && newPos.x === starPos.x && newPos.y === starPos.y) {
+          setHasCollectedStar(true);
+          setMessage('⭐ Star collected! Now head to the goal! 🎯');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
         // Check win condition
-        if ((gridSize === 6 && newPos.x === finishPos.x && newPos.y === finishPos.y) ||
-            (gridSize !== 6 && newPos.x === gridSize - 1 && newPos.y === gridSize - 1)) {
-          setHasWon(true);
-          setMessage('🎉 Congratulations! You reached the goal!');
-          setIsRunning(false);
-          setCurrentCommandIndex(-1);
-          setHasRun(true);
-          return;
+        const reachedGoal = (gridSize === 6 && newPos.x === finishPos.x && newPos.y === finishPos.y) ||
+                           (gridSize !== 6 && newPos.x === gridSize - 1 && newPos.y === gridSize - 1);
+
+        if (reachedGoal) {
+          if (gameMode === 'default' || (gameMode === 'star' && hasCollectedStar)) {
+            setHasWon(true);
+            setMessage('🎉 Congratulations! You reached the goal!');
+            setIsRunning(false);
+            setCurrentCommandIndex(-1);
+            setHasRun(true);
+            return;
+          } else if (gameMode === 'star' && !hasCollectedStar) {
+            setMessage('🌟 You need to collect the star first!');
+            setIsRunning(false);
+            setCurrentCommandIndex(-1);
+            setHasRun(true);
+            return;
+          }
         }
       } else {
         setMessage('💥 Oops! Hit an obstacle or boundary!');
@@ -157,14 +202,19 @@ const FlowchartPuzzleGame = () => {
 
   // Update obstacles when grid size changes
   useEffect(() => {
+    if (gameMode === 'star') {
+      const newStarPos = generateRandomStarPosition();
+      setStarPos(newStarPos);
+    }
     const newObstacles = generateRandomObstacles();
     setObstacles(newObstacles);
     setPlayerPos(startPos);
     setCommandSequence([]);
     setHasWon(false);
+    setHasCollectedStar(false);
     setMessage('');
     setHasRun(false);
-  }, [gridSize]);
+  }, [gridSize, gameMode]);
 
   // Calculate dynamic cell size based on grid size and screen size
   const getGridSize = () => {
@@ -192,18 +242,129 @@ const FlowchartPuzzleGame = () => {
   const cellSize = Math.floor(dynamicGridSize / gridSize);
   const fontSize = Math.max(12, Math.floor(cellSize * 0.6));
 
+  // Modal component
+  const Modal = () => {
+    if (!showModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                🎮 How to Play
+              </h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <div className="flex items-center mb-2">
+                    <span className="text-2xl mr-2">🎯</span>
+                    <strong className="text-purple-600 text-lg">Goal</strong>
+                  </div>
+                  <p className="text-gray-700">
+                    <strong>Default Mode:</strong> Guide the robot 🤖 to reach the target 🎯.<br/>
+                    <strong>Pick Up Star Mode:</strong> First collect the star ⭐, then reach the target 🎯.
+                  </p>
+                </div>
+
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <div className="flex items-center mb-2">
+                    <span className="text-2xl mr-2">⚙️</span>
+                    <strong className="text-blue-600 text-lg">Program</strong>
+                  </div>
+                  <p className="text-gray-700">
+                    Click the movement commands (↑ ↓ ← →) to add them to your sequence. Plan your path carefully!
+                  </p>
+                </div>
+
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <div className="flex items-center mb-2">
+                    <span className="text-2xl mr-2">▶️</span>
+                    <strong className="text-green-600 text-lg">Execute</strong>
+                  </div>
+                  <p className="text-gray-700">
+                    Click the "Run" button to execute your commands and watch your robot move step by step.
+                  </p>
+                </div>
+
+                <div className="bg-red-50 p-4 rounded-lg">
+                  <div className="flex items-center mb-2">
+                    <span className="text-2xl mr-2">🚫</span>
+                    <strong className="text-red-600 text-lg">Avoid</strong>
+                  </div>
+                  <p className="text-gray-700">
+                    Don't hit the walls 🧱 or go out of bounds! Plan your route to avoid obstacles.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-bold text-gray-800 mb-3 flex items-center">
+                  <span className="text-xl mr-2">💡</span>
+                  Tips for Success
+                </h3>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    You can adjust the grid size (4x4 to 8x8) to change difficulty
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    Use "Regenerate" to create new obstacle layouts
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    Click the "×" on command blocks to remove them from your sequence
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    Use "Reset" to return the robot to start and try again
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    Switch between Default and Pick Up Star modes for different challenges
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowModal(false)}
+                className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium"
+              >
+                Got it! Let's Play 🚀
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Cell component
   const Cell = ({ x, y }) => {
     const isPlayer = playerPos.x === x && playerPos.y === y;
     const isObstacle = obstacles.some(obs => obs.x === x && obs.y === y);
     const isFinish = finishPos.x === x && finishPos.y === y && gridSize === 6;
     const isCustomFinish = x === gridSize - 1 && y === gridSize - 1 && gridSize !== 6;
+    const isStar = gameMode === 'star' && starPos.x === x && starPos.y === y && !hasCollectedStar;
 
     return (
       <div
         className={`
           border border-gray-200 flex items-center justify-center transition-all duration-300 ease-in-out
-          ${isObstacle ? 'bg-gray-500' : isFinish || isCustomFinish ? 'bg-green-500' : 'bg-white'}
+          ${isObstacle ? 'bg-gray-500' :
+            isFinish || isCustomFinish ? 'bg-green-500' :
+            isStar ? 'bg-yellow-200' : 'bg-white'}
           ${isPlayer ? 'scale-110 shadow-lg shadow-purple-300' : 'scale-100'}
         `}
         style={{
@@ -212,15 +373,19 @@ const FlowchartPuzzleGame = () => {
           fontSize: `${fontSize}px`
         }}
       >
-        {isPlayer && '🤖'}
+        {isPlayer && (gameMode === 'star' && hasCollectedStar ? '🤖⭐' : '🤖')}
         {isObstacle && '🧱'}
         {(isFinish || isCustomFinish) && '🎯'}
+        {isStar && '⭐'}
       </div>
     );
   };
 
   return (
     <div className="font-sans p-2 sm:p-4">
+      {/* Modal */}
+      <Modal />
+
       {/* Header */}
       <div className='flex flex-row justify-between items-start sm:items-center mb-4'>
         <div className="mb-2 sm:mb-0">
@@ -232,13 +397,17 @@ const FlowchartPuzzleGame = () => {
           </p>
         </div>
         <div>
-          <Button size="sm">How to play</Button>
+          <Button size="sm" onClick={() => setShowModal(true)}>
+            How to play
+          </Button>
         </div>
       </div>
 
+      {/* Game Mode Selection */}
+
       {/* Controls */}
       <div className='flex flex-row items-stretch lg:items-center justify-between gap-2 mb-4'>
-        <div className="bg-white p-2 sm:p-3 rounded shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+        <div className="bg-white p-1 sm:p-2 rounded shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center w-full sm:w-auto">
             <label className="mr-2 sm:mr-4 text-gray-700 font-medium text-sm">
               Grid: {gridSize}x{gridSize}
@@ -265,7 +434,30 @@ const FlowchartPuzzleGame = () => {
           </button>
         </div>
 
-        <div className="bg-white p-2 sm:p-3 rounded shadow-sm flex items-center justify-between gap-2 sm:gap-4">
+        <div className="bg-white p-1 sm:p-2 rounded shadow-sm">
+          <div className="flex items-center gap-4">
+            <label className="text-gray-700 font-medium text-sm">Game Mode:</label>
+            <select
+              value={gameMode}
+              onChange={(e) => setGameMode(e.target.value)}
+              disabled={isRunning}
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <option value="default">Default - Reach Goal</option>
+              <option value="star">Pick Up Star - Collect Star Then Reach Goal</option>
+            </select>
+            {gameMode === 'star' && (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-gray-600">Status:</span>
+                <span className={`font-medium ${hasCollectedStar ? 'text-green-600' : 'text-orange-600'}`}>
+                  {hasCollectedStar ? '⭐ Star Collected!' : '⭐ Need to collect star'}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white p-1 sm:p-2 rounded shadow-sm flex items-center justify-between gap-2 sm:gap-4">
           <button
             onClick={executeCommands}
             disabled={isRunning || commandSequence.length === 0 || hasRun}
@@ -395,31 +587,6 @@ const FlowchartPuzzleGame = () => {
               {message}
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Instructions */}
-      <div className="mt-6 bg-white p-3 sm:p-4 rounded-2xl shadow-lg">
-        <h2 className="text-lg sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">
-          How to Play
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-gray-700 text-sm">
-          <div>
-            <strong className="text-purple-600">1. Goal:</strong>
-            <p>Guide the robot 🤖 to reach the target 🎯</p>
-          </div>
-          <div>
-            <strong className="text-purple-600">2. Program:</strong>
-            <p>Click movement commands to add them to sequence</p>
-          </div>
-          <div>
-            <strong className="text-purple-600">3. Execute:</strong>
-            <p>Click "Run" to see your robot move</p>
-          </div>
-          <div>
-            <strong className="text-purple-600">4. Avoid:</strong>
-            <p>Don't hit the walls 🧱 or go out of bounds!</p>
-          </div>
         </div>
       </div>
     </div>

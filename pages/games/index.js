@@ -42,7 +42,7 @@ export default function Home() {
         <Link href="/games/race_avoid" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
-              src="/images/puzzle_game.jpg"
+              src="/images/car_game.jpg"
               className='w-full rounded-lg shadow-sm'
             />
             <h1 className='text-2xl flex gap-1 items-center justify-center'><CarIcon size={24} /> Race Avoid</h1>
@@ -51,7 +51,7 @@ export default function Home() {
         <Link href="/games/flowchart" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
-              src="/images/puzzle_game.jpg"
+              src="/images/flowchart_game.jpg"
               className='w-full rounded-lg shadow-sm'
             />
             <h1 className='text-2xl flex gap-1 items-center justify-center'><CarIcon size={24} /> Flowchart</h1>

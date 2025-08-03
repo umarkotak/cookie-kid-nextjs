@@ -65,7 +65,7 @@ function Main({ children }) {
   useEffect(() => {
     if (!pathName) { return }
 
-    if (pathName.startsWith("/watch")) {
+    if (pathName.startsWith("/watch") || pathName.startsWith("/games/flowchart")) {
       setOpen(false)
       return
     }

@@ -69,9 +69,9 @@ export function DefaultSidebar() {
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      Cookie Kid
+                      CaBocil
                     </span>
-                    <span className="truncate text-xs">curated content for kid</span>
+                    <span className="truncate text-xs">entertainment and education for kids</span>
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>

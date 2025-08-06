@@ -71,7 +71,7 @@ export function DefaultSidebar() {
                     <span className="truncate font-semibold">
                       CaBocil
                     </span>
-                    <span className="truncate text-xs">entertainment and education for kids</span>
+                    <span className="truncate text-xs">aplikasi untuk anak</span>
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>

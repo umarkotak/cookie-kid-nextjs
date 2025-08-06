@@ -77,7 +77,7 @@ function Main({ children }) {
 
   return(
     <main className={`${!isMobile ? open ? "w-[calc(100%-15rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
-      <header className="sticky top-0 flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-50 bg-background pt-3 pb-2 px-4">
+      <header className="sticky top-0 flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-40 bg-background pt-3 pb-2 px-3">
         <div>
           <SidebarTrigger />
         </div>
@@ -89,7 +89,7 @@ function Main({ children }) {
         </div>
       </header>
 
-      <div className="py-2 px-2 sm:px-2 w-full">
+      <div className="py-2 px-2 sm:px-3 w-full">
         {children}
       </div>
     </main>

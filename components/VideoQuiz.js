@@ -26,16 +26,6 @@ export default function VideoQuiz({
   },[])
 
   useEffect(() => {
-    // var ytVideo = new YtVideo({})
-
-    // var t = Math.floor(ytVideo.GetCurrentDailyLocalVideoStat()["total_watch_duration"] / 30)
-    // if (t >= 15) {
-    //   t = 15
-    // }
-    // if (t <= 1) {
-    //   t = 3
-    // }
-
     currenstAnswerCount = 0
 
     if (ts <= 0) {
@@ -100,7 +90,7 @@ export default function VideoQuiz({
 
   return (
     <div className={`${show ? "block" : "hidden"}`}>
-      <div className={`w-full h-screen fixed top-0 left-0 backdrop-blur-md bg-black bg-opacity-80 z-20`} />
+      <div className={`w-full h-screen fixed top-0 left-0 backdrop-blur-md bg-black bg-opacity-80 z-50`} />
       <div className='fixed top-6 left-0 right-0 mx-auto rounded-lg overflow-hidden h-4/5 max-w-lg w-full z-50'>
         <Card>
           <CardHeader>

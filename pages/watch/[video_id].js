@@ -27,9 +27,6 @@ export default function Watch() {
   const [smallWebMode, setSmallWebMode] = useState(true)
   const [videoDetail, setVideoDetail] = useState({channel: {}})
   const [suggestionVideos, setSuggestionVideos] = useState([])
-  const [selectedVideo, setSelectedVideo] = useState(new YtVideo({}))
-  const [selectedVideoStat, setSelectedVideoStat] = useState({})
-  const [allVideo, setAllVideo] = useState([])
   const [blockVideoRecomm, setBlockVideoRecomm] = useState(false)
   const [quizTs, setQuizTs] = useState(0)
 
@@ -160,7 +157,7 @@ export default function Watch() {
 
   return (
     <main className='flex flex-col lg:flex-row'>
-      {/* <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} /> */}
+      <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} />
 
       <div className='w-full mr-4 mb-4'>
         <div ref={videoPlayerDivRef} id="video-content">

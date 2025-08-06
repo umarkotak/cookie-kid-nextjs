@@ -26,7 +26,7 @@ export default function App({ Component, pageProps }) {
     <>
       <Head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <title>Cookie Kid</title>
+        <title>CaBocil</title>
       </Head>
 
       <CookiesProvider defaultSetOptions={{ path: '/' }} />
@@ -65,7 +65,9 @@ function Main({ children }) {
   useEffect(() => {
     if (!pathName) { return }
 
-    if (pathName.startsWith("/watch") || pathName.startsWith("/games/flowchart")) {
+    if (pathName.startsWith("/watch") ||
+        pathName.startsWith("/games/flowchart") ||
+        pathName.includes("/read")) {
       setOpen(false)
       return
     }

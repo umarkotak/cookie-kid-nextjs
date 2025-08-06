@@ -200,13 +200,13 @@ export default function Watch() {
         </div>
       </div>
 
-      <div id="suggestion-content" className={`flex-none w-full sm:w-[402px] flex flex-col gap-5`}>
+      <div id="suggestion-content" className={`flex-none w-full sm:w-[402px] flex flex-col gap-5 sm:h-[calc(100vh-60px)] sm:overflow-auto`}>
         {suggestionVideos.map((oneVideo)=>(
-          <div className='flex flex-row gap-2 hover:bg-accent' key={oneVideo.id}>
-            <div className='flex-none w-[168px] h-[94px]'>
+          <div className='group flex flex-row gap-2 hover:text-accent' key={oneVideo.id}>
+            <div className='flex-none w-[168px] h-[94px] overflow-hidden'>
               <Link href={`/watch/${oneVideo.id}`}>
                 <img
-                  className={`${mobileMode ? "" : ""} shadow-md w-full h-full`}
+                  className={`${mobileMode ? "" : ""} shadow-md w-full h-full group-hover:scale-105 group-hover:duration-100`}
                   src={oneVideo.image_url}
                   alt="thumb"
                 />

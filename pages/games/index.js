@@ -24,10 +24,10 @@ export default function Home() {
         <Link href="/games/maze2" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
-              src="/images/game_ico_maze.png"
+              src="/images/game_ico_cave.png"
               className='w-full rounded-lg shadow-sm'
             />
-            <h1 className='text-xl flex gap-1 items-center justify-center'><BrickWall size={24} /> Maze 2</h1>
+            <h1 className='text-xl flex gap-1 items-center justify-center'><BrickWall size={24} /> Pencari Harta</h1>
           </div>
         </Link>
         <Link href="/games/snake" className='hover:scale-105 duration-300'>

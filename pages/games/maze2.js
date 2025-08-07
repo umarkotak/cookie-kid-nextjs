@@ -135,7 +135,7 @@ const MazeGame = () => {
         }
         return false;
     };
-    
+
     // --- Game Logic Loop ---
     const gameLoop = useCallback(() => {
         if (gameWon || gameLost) return;
@@ -176,7 +176,7 @@ const MazeGame = () => {
                 newY = prev.y;
                 newVy = 0;
             }
-            
+
             // --- Check for Interactions (Coins, Traps, Goal) ---
             const gridX = Math.floor(newX / CELL_SIZE);
             const gridY = Math.floor(newY / CELL_SIZE);
@@ -218,7 +218,7 @@ const MazeGame = () => {
         setGameLost(false);
         setKeys({});
     };
-    
+
     // --- Event Handlers ---
     const handleKeyDown = useCallback((e) => setKeys(prev => ({ ...prev, [e.key.toLowerCase()]: true })), []);
     const handleKeyUp = useCallback((e) => setKeys(prev => ({ ...prev, [e.key.toLowerCase()]: false })), []);
@@ -256,7 +256,7 @@ const MazeGame = () => {
 
     // --- JSX Rendering ---
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4 font-sans">
+        <div className="flex flex-col items-center justify-center text-white p-4 font-sans">
             <div className="mb-4 text-center">
                 <h1 className="text-4xl font-bold mb-2">Maze Runner</h1>
                 <div className="flex justify-center items-center gap-4 mb-2">
@@ -272,7 +272,7 @@ const MazeGame = () => {
                     ))}
                 </div>
                 {totalCoins > 0 && <p className="text-xl text-yellow-400 font-semibold my-2">💰 Coins: {coinsCollected} / {totalCoins}</p>}
-                
+
                 {gameWon && (
                     <div className="mt-4 p-4 bg-gray-800 rounded-lg">
                         <p className="text-2xl font-bold text-green-400 mb-2">🎉 You Won! 🎉</p>

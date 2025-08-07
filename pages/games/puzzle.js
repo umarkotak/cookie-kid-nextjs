@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Shuffle, Check, Sparkles, Image, Eye, EyeOff, Images } from 'lucide-react';
 
 const PuzzleGame = () => {
-  const [imageUrl, setImageUrl] = useState('https://pbs.twimg.com/media/BeNPfJNCAAAp1DW.png');
+  const [imageUrl, setImageUrl] = useState('/images/game_ico_car.png');
   const [inputUrl, setInputUrl] = useState('');
   const [pieces, setPieces] = useState([]);
   const [selectedPiece, setSelectedPiece] = useState(null);
@@ -18,71 +18,34 @@ const PuzzleGame = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
+  // --- Sound Effects ---
+  const moveSound = useRef(null);
+  const winSound = useRef(null);
+
+  useEffect(() => {
+    // Initialize audio objects safely on the client side
+    moveSound.current = new Audio('/sounds/game_flowchart_move.mp3');
+    winSound.current = new Audio('/sounds/game_flowchart_win.mp3');
+  }, []);
+
+  // Effect to play win sound
+  useEffect(() => {
+    if (isComplete) {
+      winSound.current?.play();
+    }
+  }, [isComplete]);
+
+
   const TOTAL_PIECES = gridSize * gridSize;
   const PIECE_SIZE = 80;
 
   // Predefined image gallery
   const imageGallery = [
-    {
-      id: 1,
-      url: 'https://pbs.twimg.com/media/BeNPfJNCAAAp1DW.png',
-      title: 'Colorful Pattern',
-      category: 'Abstract'
-    },
-    {
-      id: 2,
-      url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop',
-      title: 'Mountain Lake',
-      category: 'Nature'
-    },
-    {
-      id: 3,
-      url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop',
-      title: 'Forest Path',
-      category: 'Nature'
-    },
-    {
-      id: 4,
-      url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=400&fit=crop',
-      title: 'Ocean Waves',
-      category: 'Nature'
-    },
-    {
-      id: 5,
-      url: 'https://images.unsplash.com/photo-1574169208507-84376144848b?w=400&h=400&fit=crop',
-      title: 'Autumn Leaves',
-      category: 'Nature'
-    },
-    {
-      id: 6,
-      url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=400&fit=crop',
-      title: 'Colorful Flowers',
-      category: 'Nature'
-    },
-    {
-      id: 8,
-      url: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=400&fit=crop',
-      title: 'Golden Gate Bridge',
-      category: 'Architecture'
-    },
-    {
-      id: 9,
-      url: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=400&h=400&fit=crop',
-      title: 'Cute Cat',
-      category: 'Animals'
-    },
-    {
-      id: 10,
-      url: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&h=400&fit=crop',
-      title: 'Golden Retriever',
-      category: 'Animals'
-    },
-    {
-      id: 11,
-      url: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400&h=400&fit=crop',
-      title: 'Butterfly',
-      category: 'Animals'
-    },
+    { id: 1, url: '/images/game_ico_car.png', title: 'Main mobil mobilan', category: 'Anime' },
+    { id: 2, url: '/images/game_ico_flowchart.png', title: 'Main lego', category: 'Anime' },
+    { id: 3, url: '/images/game_ico_maze.png', title: 'Menghadapi labirin', category: 'Anime' },
+    { id: 4, url: '/images/game_ico_puzzle.png', title: 'Main puzzle', category: 'Anime' },
+    { id: 5, url: '/images/game_ico_snake.png', title: 'Dikejar ular', category: 'Anime' },
   ];
 
   // Initialize puzzle pieces
@@ -149,8 +112,12 @@ const PuzzleGame = () => {
   const handleTargetClick = (targetPosition) => {
     if (!selectedPiece) return;
 
+    // Play move sound only if a piece is actually moved
+    moveSound.current?.play();
+
     setPieces(prevPieces => {
       const newPieces = prevPieces.map(piece => {
+        // Move the selected piece to the target
         if (piece.id === selectedPiece.id) {
           return {
             ...piece,
@@ -158,6 +125,7 @@ const PuzzleGame = () => {
             inSpareArea: false
           };
         }
+        // If another piece was in the target, move it to the spare area
         if (piece.currentPosition === targetPosition && piece.id !== selectedPiece.id) {
           return {
             ...piece,
@@ -178,6 +146,8 @@ const PuzzleGame = () => {
   const handleSpareAreaClick = () => {
     if (!selectedPiece || selectedPiece.inSpareArea) return;
 
+    moveSound.current?.play();
+
     setPieces(prevPieces => {
       return prevPieces.map(piece => {
         if (piece.id === selectedPiece.id) {
@@ -197,7 +167,7 @@ const PuzzleGame = () => {
 
   const checkCompletion = (currentPieces) => {
     const isCompleted = currentPieces.every(
-      piece => piece.currentPosition === piece.correctPosition
+      piece => !piece.inSpareArea && piece.currentPosition === piece.correctPosition
     );
     setIsComplete(isCompleted);
   };
@@ -206,6 +176,7 @@ const PuzzleGame = () => {
     if (inputUrl.trim()) {
       setImageUrl(inputUrl);
       setImageLoaded(false);
+      setIsImageModalOpen(false);
     }
   };
 
@@ -216,7 +187,11 @@ const PuzzleGame = () => {
     return (
       <div
         onClick={() => handlePieceClick(piece)}
-        className={`relative cursor-pointer transition-all duration-200 select-none rounded-md overflow-hidden ${
+        className={`relative cursor-pointer transition-all duration-200 select-none overflow-hidden ${
+          // Add border and rounding only when in the spare area
+          piece.inSpareArea ? 'rounded-md border border-border' : ''
+        } ${
+          // The ring effect for selection works everywhere
           isSelected
             ? 'scale-105 shadow-lg ring-2 ring-primary z-10'
             : 'hover:scale-[1.02] hover:shadow-md'
@@ -227,7 +202,6 @@ const PuzzleGame = () => {
           backgroundImage: `url(${imageUrl})`,
           backgroundSize: `${imageSize}px ${imageSize}px`,
           backgroundPosition: `-${piece.col * PIECE_SIZE}px -${piece.row * PIECE_SIZE}px`,
-          border: isSelected ? '2px solid hsl(var(--primary))' : '1px solid hsl(var(--border))'
         }}
       >
         {isSelected && (
@@ -282,7 +256,6 @@ const PuzzleGame = () => {
       <div className="relative">
         <PreviewOverlay />
         
-        {/* Compact Header */}
         <div className="mb-6">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="text-center lg:text-left">
@@ -295,7 +268,6 @@ const PuzzleGame = () => {
               )}
             </div>
 
-            {/* Controls in header */}
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-2">
                 <Label htmlFor="grid-size" className="text-sm">Size:</Label>
@@ -367,7 +339,6 @@ const PuzzleGame = () => {
                     ))}
                   </div>
                   
-                  {/* Custom URL input in modal */}
                   <div className="mt-6 pt-4 border-t">
                     <Label className="text-sm font-medium">Or use custom image URL:</Label>
                     <div className="flex gap-2 mt-2">
@@ -400,7 +371,6 @@ const PuzzleGame = () => {
           </div>
         </div>
 
-        {/* Completion Message */}
         {isComplete && (
           <div className="mb-4 text-center">
             <Badge className="text-base px-4 py-2 bg-green-500 hover:bg-green-500 animate-bounce">
@@ -409,9 +379,7 @@ const PuzzleGame = () => {
           </div>
         )}
 
-        {/* Main Game Area - Horizontal Layout */}
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
-          {/* Puzzle Pieces - Left Side */}
           <div className="xl:col-span-2">
             <Card className="h-fit">
               <CardHeader className="pb-3">
@@ -436,7 +404,6 @@ const PuzzleGame = () => {
             </Card>
           </div>
 
-          {/* Target Area - Right Side */}
           <div className="xl:col-span-3">
             <Card className="h-fit">
               <CardHeader className="pb-3">
@@ -449,12 +416,15 @@ const PuzzleGame = () => {
               </CardHeader>
               <CardContent className="flex justify-center">
                 <div className="inline-block bg-muted/30 rounded-lg p-3 border-2 border-muted-foreground/30">
+                  {/* --- IMPROVED GRID --- */}
                   <div
-                    className="grid gap-1"
+                    className="grid" // No more gap-1
                     style={{
                       gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-                      width: `${(PIECE_SIZE + 4) * gridSize}px`,
-                      height: `${(PIECE_SIZE + 4) * gridSize}px`
+                      width: `${PIECE_SIZE * gridSize}px`, // Precise width
+                      height: `${PIECE_SIZE * gridSize}px`, // Precise height
+                      overflow: 'hidden',
+                      borderRadius: '4px' // To match the parent's rounding
                     }}
                   >
                     {Array.from({ length: TOTAL_PIECES }).map((_, index) => {
@@ -465,17 +435,25 @@ const PuzzleGame = () => {
                         <div
                           key={index}
                           onClick={() => handleTargetClick(index)}
-                          className={`relative rounded-md border-2 border-dashed flex items-center justify-center transition-all cursor-pointer ${
-                            isTargetHighlighted
-                              ? 'border-primary bg-primary/10 scale-105'
-                              : 'border-muted-foreground/30 bg-muted/50 hover:bg-muted/80'
-                          }`}
-                          style={{ width: `${PIECE_SIZE}px`, height: `${PIECE_SIZE}px` }}
+                          className={`relative flex items-center justify-center transition-all cursor-pointer`}
+                          style={{
+                            width: `${PIECE_SIZE}px`,
+                            height: `${PIECE_SIZE}px`,
+                            // Use boxShadow for an 'inset' border that doesn't affect layout
+                            boxShadow: isTargetHighlighted
+                              ? 'inset 0 0 0 2px hsl(var(--primary))'
+                              : 'inset 0 0 0 1px hsl(var(--border))',
+                            backgroundColor: isTargetHighlighted ? 'hsl(var(--primary) / 0.1)' : 'hsl(var(--background))',
+                            transform: isTargetHighlighted ? 'scale(1.05)' : 'scale(1)',
+                            zIndex: isTargetHighlighted ? 1 : 0,
+                          }}
                         >
-                          {piece && <PuzzlePiece piece={piece} />}
-                          {!piece && (
+                          {/* Render the piece directly inside the cell */}
+                          {piece ? (
+                            <PuzzlePiece piece={piece} />
+                          ) : (
                             <span className="text-muted-foreground text-xs font-medium">
-                              {index + 1}
+                              {/* {index + 1} */}
                             </span>
                           )}
                         </div>

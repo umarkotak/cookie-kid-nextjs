@@ -75,7 +75,7 @@ export default function Home() {
             <h1 className='text-xl flex gap-1 items-center justify-center'><BirdIcon size={24} /> Flappy Bird</h1>
           </div>
         </Link>
-        <Link href="/games/flappybird" className='hover:scale-105 duration-300'>
+        <Link href="/games/cacing" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
               src="/images/game_ico_worm.png"

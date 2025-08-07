@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { BookOpen, BotMessageSquare, BrickWall, CarIcon, Circle, FlowerIcon, MessageCircleQuestion, Puzzle, Worm,  } from 'lucide-react'
+import { BirdIcon, BookOpen, BotMessageSquare, BrickWall, CarIcon, Circle, FlowerIcon, MessageCircleQuestion, Puzzle, Worm, WormIcon,  } from 'lucide-react'
 
 import ytkiddAPI from '@/apis/ytkidApi'
 import Utils from '@/models/Utils'
@@ -64,6 +64,24 @@ export default function Home() {
               className='w-full rounded-lg shadow-sm'
             />
             <h1 className='text-xl flex gap-1 items-center justify-center'><FlowerIcon size={24} /> Flowchart</h1>
+          </div>
+        </Link>
+        <Link href="/games/flappybird" className='hover:scale-105 duration-300'>
+          <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
+            <img
+              src="/images/game_ico_flappybird.png"
+              className='w-full rounded-lg shadow-sm'
+            />
+            <h1 className='text-xl flex gap-1 items-center justify-center'><BirdIcon size={24} /> Flappy Bird</h1>
+          </div>
+        </Link>
+        <Link href="/games/flappybird" className='hover:scale-105 duration-300'>
+          <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
+            <img
+              src="/images/game_ico_worm.png"
+              className='w-full rounded-lg shadow-sm'
+            />
+            <h1 className='text-xl flex gap-1 items-center justify-center'><WormIcon size={24} /> Cacing</h1>
           </div>
         </Link>
       </div>

@@ -21,6 +21,15 @@ export default function Home() {
             <h1 className='text-xl flex gap-1 items-center justify-center'><BrickWall size={24} /> Maze</h1>
           </div>
         </Link>
+        <Link href="/games/maze2" className='hover:scale-105 duration-300'>
+          <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
+            <img
+              src="/images/game_ico_maze.png"
+              className='w-full rounded-lg shadow-sm'
+            />
+            <h1 className='text-xl flex gap-1 items-center justify-center'><BrickWall size={24} /> Maze 2</h1>
+          </div>
+        </Link>
         <Link href="/games/snake" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img

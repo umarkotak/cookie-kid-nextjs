@@ -1,7 +1,47 @@
 import { Button } from '@/components/ui/button';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+
+// Custom hook for managing audio
+const useAudio = () => {
+  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [audioContext, setAudioContext] = useState(null);
+
+  // Initialize audio context on user interaction
+  const initAudioContext = useCallback(() => {
+    if (!audioContext) {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      setAudioContext(ctx);
+      return ctx;
+    }
+    return audioContext;
+  }, [audioContext]);
+
+  const playSound = useCallback((soundPath, volume = 0.5) => {
+    if (!audioEnabled) return;
+
+    try {
+      const ctx = initAudioContext();
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+
+      const audio = new Audio(soundPath);
+      audio.volume = volume;
+      audio.play().catch(error => {
+        console.log('Audio play failed:', error);
+      });
+    } catch (error) {
+      console.log('Audio error:', error);
+    }
+  }, [audioEnabled, initAudioContext]);
+
+  return { playSound, audioEnabled, setAudioEnabled, initAudioContext };
+};
 
 const FlowchartPuzzleGame = () => {
+  // Audio hook
+  const { playSound, audioEnabled, setAudioEnabled, initAudioContext } = useAudio();
+
   // Game state
   const [gridSize, setGridSize] = useState(6);
   const [playerPos, setPlayerPos] = useState({ x: 0, y: 0 });
@@ -71,6 +111,8 @@ const FlowchartPuzzleGame = () => {
   // Add command to sequence
   const addCommand = (command) => {
     if (isRunning) return;
+    // Initialize audio context on first user interaction
+    initAudioContext();
     setCommandSequence([...commandSequence, { ...command, uniqueId: Date.now() }]);
   };
 
@@ -113,7 +155,7 @@ const FlowchartPuzzleGame = () => {
     return !obstacles.some(obs => obs.x === x && obs.y === y);
   };
 
-  // Execute commands
+  // Execute commands with sound effects
   const executeCommands = async () => {
     if (commandSequence.length === 0) {
       setMessage('Add some commands first!');
@@ -149,11 +191,16 @@ const FlowchartPuzzleGame = () => {
       if (isValidPosition(newPos.x, newPos.y)) {
         currentPos = newPos;
         setPlayerPos(newPos);
+        
+        // Play move sound effect
+        playSound('/sounds/game_flowchart_move.mp3', 0.3);
 
         // Check if player collected the star in star mode
         if (gameMode === 'star' && !hasCollectedStar && newPos.x === starPos.x && newPos.y === starPos.y) {
           setHasCollectedStar(true);
           setMessage('⭐ Star collected! Now head to the goal! 🎯');
+          // Play star pickup sound effect
+          playSound('/sounds/game_flowchart_pickup_star.mp3', 0.6);
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
@@ -165,12 +212,16 @@ const FlowchartPuzzleGame = () => {
           if (gameMode === 'default' || (gameMode === 'star' && hasCollectedStar)) {
             setHasWon(true);
             setMessage('🎉 Congratulations! You reached the goal!');
+            // Play win sound effect
+            playSound('/sounds/game_flowchart_win.mp3', 0.7);
             setIsRunning(false);
             setCurrentCommandIndex(-1);
             setHasRun(true);
             return;
           } else if (gameMode === 'star' && !hasCollectedStar) {
             setMessage('🌟 You need to collect the star first!');
+            // Play crash sound effect
+            playSound('/sounds/game_flowchart_lose.mp3', 0.5);
             setIsRunning(false);
             setCurrentCommandIndex(-1);
             setHasRun(true);
@@ -179,6 +230,8 @@ const FlowchartPuzzleGame = () => {
         }
       } else {
         setMessage('💥 Oops! Hit an obstacle or boundary!');
+        // Play crash sound effect
+        playSound('/sounds/game_flowchart_lose.mp3', 0.5);
         setIsRunning(false);
         setCurrentCommandIndex(-1);
         setHasRun(true);
@@ -332,6 +385,10 @@ const FlowchartPuzzleGame = () => {
                     <span className="text-purple-500 mr-2">•</span>
                     Switch between Default and Pick Up Star modes for different challenges
                   </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    Toggle sound effects on/off using the audio button
+                  </li>
                 </ul>
               </div>
             </div>
@@ -396,7 +453,19 @@ const FlowchartPuzzleGame = () => {
             Click commands to program your robot's path to the goal!
           </p>
         </div>
-        <div>
+        <div className="flex items-center gap-2">
+          {/* Audio toggle button */}
+          <button
+            onClick={() => setAudioEnabled(!audioEnabled)}
+            className={`p-2 rounded-lg text-sm font-medium transition-colors ${
+              audioEnabled 
+                ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                : 'bg-red-100 text-red-800 hover:bg-red-200'
+            }`}
+            title={audioEnabled ? 'Sound: ON' : 'Sound: OFF'}
+          >
+            {audioEnabled ? '🔊' : '🔇'}
+          </button>
           <Button size="sm" onClick={() => setShowModal(true)}>
             How to play
           </Button>

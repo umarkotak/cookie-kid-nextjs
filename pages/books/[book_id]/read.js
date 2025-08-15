@@ -1,4 +1,5 @@
 import ytkiddAPI from "@/apis/ytkidApi"
+import { LoadingSpinner } from "@/components/ui/spinner"
 import { ArrowLeft, ArrowRight, FullscreenIcon, PrinterIcon, X } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
@@ -143,7 +144,7 @@ export default function Read() {
         <div className={`absolute z-20 top-0 left-0 w-full h-full bg-black bg-opacity-10 backdrop-blur-sm ${imageLoading ? "block" : "hidden"}`}>
           <div className="mx-auto text-center text-xl flex flex-col h-full justify-center">
             <div>
-              <span className="bg-white py-1 px-2 rounded-lg">Loading...</span>
+              <span className="bg-background py-1 px-2 rounded-lg flex items-center"><LoadingSpinner size={20}/> Loading...</span>
             </div>
           </div>
         </div>

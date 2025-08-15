@@ -141,7 +141,7 @@ export default function Read() {
               object-contain absolute top-0 left-0 w-full h-screen
             ` : `
               max-h-[calc(100vh-100px)] object-contain mx-auto rounded-lg
-            `} ${activePage.image_file_url === page.image_file_url ? "block" : "hidden"}`}
+            `} ${activePage.image_file_url === page.image_file_url ? "" : "invisible max-h-0"}`}
             src={activePage.image_file_url}
             onLoad={()=>ImageLoaded()}
           />

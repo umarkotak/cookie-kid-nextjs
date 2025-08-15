@@ -2,6 +2,9 @@ import ytkiddAPI from "@/apis/ytkidApi"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Switch } from "@/components/ui/switch"
 import Utils from "@/models/Utils"
 import { classNames } from "@react-pdf-viewer/core"
 import { BookIcon, PlusIcon } from "lucide-react"
@@ -18,7 +21,10 @@ const defaultBookParams = {
   description: "",
   img_format: "jpeg", // jpeg,png
   book_type: "default", // default,workbook
+  storage: "local", // local,r2
+  store_pdf: false, // Changed to boolean for switch
 }
+
 export default function DevBooks() {
   const searchParams = useSearchParams()
 
@@ -47,6 +53,14 @@ export default function DevBooks() {
     setBookParams({...bookParams, [field]: event.target.value})
   }
 
+  const handleRadioChange = (value, field) => {
+    setBookParams({...bookParams, [field]: value})
+  }
+
+  const handleSwitchChange = (checked) => {
+    setBookParams({...bookParams, store_pdf: checked})
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
 
@@ -60,6 +74,8 @@ export default function DevBooks() {
     formData.append("description", bookParams.description)
     formData.append("img_format", bookParams.img_format)
     formData.append("book_type", bookParams.book_type)
+    formData.append("storage", bookParams.storage)
+    formData.append("store_pdf", bookParams.store_pdf.toString()) // Convert boolean to string
 
     try {
       const response = await fetch(`${ytkiddAPI.Host}/ytkidd/api/books/insert_from_pdf`, {
@@ -110,85 +126,147 @@ export default function DevBooks() {
         </CardHeader>
       </Card>
 
-
       <Card>
         <CardContent className="p-6">
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            { uploadMode === "pdf" ? <div>
-              <label>Upload Pdf Book</label>
+          <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+            {uploadMode === "pdf" ? (
+              <div className="space-y-2">
+                <Label htmlFor="pdf-upload">Upload PDF Book</Label>
+                <Input
+                  id="pdf-upload"
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e)=>handleFileChange(e)}
+                />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="pdf-url">PDF URL</Label>
+                <Input
+                  id="pdf-url"
+                  type="text"
+                  placeholder="Enter PDF file URL"
+                  onChange={(e)=>handleParamsChange(e, "pdf_url")}
+                  value={bookParams.pdf_url}
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="title">Title</Label>
               <Input
-                type="file"
-                accept="application/pdf"
-                onChange={(e)=>handleFileChange(e)}
-              />
-            </div> : <div>
-              <label>Url Pdf Book</label>
-              <Input
-                type="text" placeholder="pdf file url"
-                onChange={(e)=>handleParamsChange(e, "pdf_url")}
-                value={bookParams.pdf_url}
-              />
-            </div> }
-            <div>
-              <label>Title</label>
-              <Input
-                type="text" placeholder="" className="input input-bordered w-full"
+                id="title"
+                type="text"
+                placeholder="Enter book title"
                 onChange={(e)=>handleParamsChange(e, "title")}
                 value={bookParams.title}
               />
             </div>
-            <div className="flex gap-2">
-              <div className="w-full">
-                <label>Slug</label>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="slug">Slug</Label>
                 <Input
-                  type="text" placeholder="" className="input input-bordered w-full"
+                  id="slug"
+                  type="text"
+                  placeholder="Enter slug"
                   onChange={(e)=>handleParamsChange(e, "slug")}
                   value={bookParams.slug}
                 />
               </div>
-              <div className="w-full">
-                <label>Custom Image Slug</label>
+              <div className="space-y-2">
+                <Label htmlFor="custom-image-slug">Custom Image Slug</Label>
                 <Input
-                  type="text" placeholder="" className="input input-bordered w-full"
+                  id="custom-image-slug"
+                  type="text"
+                  placeholder="Enter custom image slug"
                   onChange={(e)=>handleParamsChange(e, "custom_image_slug")}
                   value={bookParams.custom_image_slug}
                 />
               </div>
             </div>
-            <div className="flex gap-2">
-              <div className="w-full">
-                <label>Book Type</label>
-                <select
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                  onChange={(e)=>handleParamsChange(e, "book_type")}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Book Type Radio Group */}
+              <div className="space-y-3">
+                <Label>Book Type</Label>
+                <RadioGroup
                   value={bookParams.book_type}
+                  onValueChange={(value) => handleRadioChange(value, "book_type")}
                 >
-                  <option value="default">Default</option>
-                  <option value="workbook">Workbook</option>
-                </select>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="default" id="book-default" />
+                    <Label htmlFor="book-default">Default</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="workbook" id="book-workbook" />
+                    <Label htmlFor="book-workbook">Workbook</Label>
+                  </div>
+                </RadioGroup>
               </div>
-              <div className="w-full">
-                <label>Image Format</label>
-                <select
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                  onChange={(e)=>handleParamsChange(e, "img_format")}
+
+              {/* Image Format Radio Group */}
+              <div className="space-y-3">
+                <Label>Image Format</Label>
+                <RadioGroup
                   value={bookParams.img_format}
+                  onValueChange={(value) => handleRadioChange(value, "img_format")}
                 >
-                  <option value="jpeg">Jpeg</option>
-                  <option value="png">Png</option>
-                </select>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="jpeg" id="format-jpeg" />
+                    <Label htmlFor="format-jpeg">JPEG</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="png" id="format-png" />
+                    <Label htmlFor="format-png">PNG</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {/* Storage Radio Group */}
+              <div className="space-y-3">
+                <Label>Storage</Label>
+                <RadioGroup
+                  value={bookParams.storage}
+                  onValueChange={(value) => handleRadioChange(value, "storage")}
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="local" id="storage-local" />
+                    <Label htmlFor="storage-local">Local</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="r2" id="storage-r2" />
+                    <Label htmlFor="storage-r2">R2</Label>
+                  </div>
+                </RadioGroup>
               </div>
             </div>
-            <div className="w-full">
-              <label>Description</label>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
               <Input
-                type="text" placeholder=""
+                id="description"
+                type="text"
+                placeholder="Enter book description"
                 onChange={(e)=>handleParamsChange(e, "description")}
                 value={bookParams.description}
               />
             </div>
-            <div className="w-full flex justify-end">
-              <Button type="submit" variant="default" disabled={isSubmitting}>Submit</Button>
+
+            {/* Store PDF Switch */}
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="store-pdf"
+                checked={bookParams.store_pdf}
+                onCheckedChange={handleSwitchChange}
+              />
+              <Label htmlFor="store-pdf">Store PDF</Label>
+            </div>
+
+            <div className="flex justify-end">
+              <Button type="submit" variant="default" disabled={isSubmitting}>
+                {isSubmitting ? "Submitting..." : "Submit"}
+              </Button>
             </div>
           </form>
         </CardContent>

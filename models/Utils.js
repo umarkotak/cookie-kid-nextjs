@@ -43,7 +43,7 @@ class UtilsClass {
     return text
       .toLowerCase()
       .replace(/[\s_]+/g, '-') // Replace spaces and underscores with dashes
-      .replace(/[^a-z-]+/g, '') // Remove non-alphanumeric characters (except dashes)
+      .replace(/[^a-z0-9-]+/g, '') // Remove non-alphanumeric characters (except dashes)
       .replace(/^-+|-+$/g, ''); // Remove leading/trailing dashes
   }
 }

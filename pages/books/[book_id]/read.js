@@ -1,5 +1,5 @@
 import ytkiddAPI from "@/apis/ytkidApi"
-import { ArrowLeft, ArrowRight, FullscreenIcon, PrinterIcon } from "lucide-react"
+import { ArrowLeft, ArrowRight, FullscreenIcon, PrinterIcon, X } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/router"
@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 
 var tmpBookDetail = {}
 var tmpMaxPageNumber = 0
+
 export default function Read() {
   const router = useRouter()
 
@@ -16,6 +17,7 @@ export default function Read() {
   const [activePageNumber, setActivePageNumber] = useState(1)
   const [imageLoading, setImageLoading] = useState(true)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   useEffect(() => {
     tmpBookDetail = {}
@@ -101,6 +103,19 @@ export default function Read() {
     setIsFullscreen(!isFullscreen)
   }
 
+  function ToggleDrawer() {
+    setIsDrawerOpen(!isDrawerOpen)
+  }
+
+  function GoToPage(pageNumber) {
+    setImageLoading(true)
+    setIsDrawerOpen(false)
+    router.push({
+      pathname: `/books/${router.query.book_id}/read`,
+      search: `?page=${pageNumber}`
+    })
+  }
+
   function ImageLoaded() {
     setImageLoading(false)
   }
@@ -109,7 +124,7 @@ export default function Read() {
     <main className="p-2 w-full">
       <div
         className={`${isFullscreen ? `
-          absolute top-0 left-0 w-full h-screen z-50 bg-white
+          absolute top-0 left-0 w-full h-screen z-50 bg-background
         ` : `
           max-h-[calc(100vh-100px)] relative
         `}`}
@@ -123,6 +138,8 @@ export default function Read() {
           src={activePage.image_file_url}
           onLoad={()=>ImageLoaded()}
         />
+
+        {/* Loading overlay */}
         <div className={`absolute z-20 top-0 left-0 w-full h-full bg-black bg-opacity-10 backdrop-blur-sm ${imageLoading ? "block" : "hidden"}`}>
           <div className="mx-auto text-center text-xl flex flex-col h-full justify-center">
             <div>
@@ -130,36 +147,112 @@ export default function Read() {
             </div>
           </div>
         </div>
+
+        {/* Controls */}
         <div className="absolute z-10 top-2 right-2 flex justify-start items-center gap-2">
-          {bookDetail.pdf_url && bookDetail.pdf_url !== "" && <a href={bookDetail.pdf_url} target="_blank"><button
-            className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-2"
-          >
-            <span className="text-black"><PrinterIcon size={22} /></span>
-          </button></a>}
+          {bookDetail.pdf_url && bookDetail.pdf_url !== "" &&
+            <a href={bookDetail.pdf_url} target="_blank">
+              <button className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-2">
+                <span className="text-black"><PrinterIcon size={22} /></span>
+              </button>
+            </a>
+          }
           <button
-            className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-2"
+            className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-1.5 text-sm"
+            onClick={ToggleDrawer}
           >
-            <span className="text-black">{activePageNumber} / {tmpMaxPageNumber}</span>
+            Select Page
+          </button>
+          <button className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-1.5 text-sm">
+            <span className="">{activePageNumber} / {tmpMaxPageNumber}</span>
           </button>
           <button
-            className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-2"
-            onClick={()=>ToggleFullScreen()}
+            className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-1.5 text-sm"
+            onClick={ToggleFullScreen}
           >
-            <span className="text-black"><FullscreenIcon size={22} /></span>
+            <span className=""><FullscreenIcon size={20} /></span>
           </button>
         </div>
+
+        {/* Navigation arrows */}
         <button
-          className="absolute z-0 top-0 left-0 w-1/2 h-full bg-transparent hover:bg-black hover:bg-opacity-5 rounded-l-lg flex justify-start items-center"
-          onClick={()=>PrevPage()}
+          className="absolute z-0 top-0 left-0 w-1/2 h-full bg-transparent hover:cursor-w-resize hover:bg-black hover:bg-opacity-5 rounded-l-lg flex justify-start items-center"
+          onClick={PrevPage}
         >
-          <span className="bg-white opacity-50"><ArrowLeft /></span>
+          <span className="bg-white opacity-50 text-black"><ArrowLeft /></span>
         </button>
         <button
-          className="absolute z-0 top-0 right-0 w-1/2 h-full bg-transparent hover:bg-black hover:bg-opacity-5 rounded-r-lg flex justify-end items-center"
-          onClick={()=>NextPage()}
+          className="absolute z-0 top-0 right-0 w-1/2 h-full bg-transparent hover:cursor-e-resize hover:bg-black hover:bg-opacity-5 rounded-r-lg flex justify-end items-center"
+          onClick={NextPage}
         >
-          <span className="bg-white opacity-50"><ArrowRight /></span>
+          <span className="bg-white opacity-50 text-black"><ArrowRight /></span>
         </button>
+      </div>
+
+      {/* Drawer overlay */}
+      {isDrawerOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={ToggleDrawer}
+        />
+      )}
+
+      {/* Page selection drawer */}
+      <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+        isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-800">Select Page</h3>
+            <button
+              onClick={ToggleDrawer}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <X size={20} className="text-gray-600" />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-4 h-full overflow-y-auto pb-20">
+          <div className="grid grid-cols-2 gap-3">
+            {tmpBookDetail.contents && tmpBookDetail.contents.map((page, index) => (
+              <div
+                key={index}
+                className={`relative cursor-pointer group transition-all duration-200 ${
+                  activePageNumber === index + 1
+                    ? 'ring-2 ring-blue-500 ring-offset-2'
+                    : 'hover:scale-105 hover:shadow-lg'
+                }`}
+                onClick={() => GoToPage(index + 1)}
+              >
+                {/* Page preview */}
+                <div className="aspect-[3/4] overflow-hidden rounded-lg bg-gray-100">
+                  <img
+                    src={page.image_file_url}
+                    alt={`Page ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+
+                {/* Page number */}
+                <div className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+                  {index + 1}
+                </div>
+
+                {/* Active page indicator */}
+                {activePageNumber === index + 1 && (
+                  <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                    Current
+                  </div>
+                )}
+
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-blue-500 bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded-lg" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </main>
   )

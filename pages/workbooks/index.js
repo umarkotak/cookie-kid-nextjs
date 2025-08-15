@@ -31,7 +31,7 @@ export default function Books() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
         {bookList.map((oneBook) => (
           <Link
-            href={`/books/${oneBook.id}/read?page=1`}
+            href={`/workbooks/${oneBook.id}/read?page=1`}
             key={oneBook.id}
             className="group"
           >

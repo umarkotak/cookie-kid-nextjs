@@ -26,7 +26,7 @@ export default function Read() {
   }, [])
 
   useEffect(() => {
-    setImageLoading(true)
+    // setImageLoading(true)
     GetBookDetail(router.query.book_id)
   }, [router])
 
@@ -84,7 +84,7 @@ export default function Read() {
 
   function NextPage() {
     if (activePageNumber >= tmpMaxPageNumber) { return }
-    setImageLoading(true)
+    // setImageLoading(true)
     router.push({
       pathname: `/books/${router.query.book_id}/read`,
       search: `?page=${activePageNumber+1}`
@@ -93,7 +93,7 @@ export default function Read() {
 
   function PrevPage() {
     if (activePageNumber <= 1) { return }
-    setImageLoading(true)
+    // setImageLoading(true)
     router.push({
       pathname: `/books/${router.query.book_id}/read`,
       search: `?page=${activePageNumber-1}`
@@ -130,15 +130,17 @@ export default function Read() {
           max-h-[calc(100vh-100px)] relative
         `}`}
       >
-        <img
-          className={`${isFullscreen ? `
-            object-contain absolute top-0 left-0 w-full h-screen
-          ` : `
-            max-h-[calc(100vh-100px)] object-contain mx-auto rounded-lg
-          `}`}
-          src={activePage.image_file_url}
-          onLoad={()=>ImageLoaded()}
-        />
+        {bookDetail.contents && bookDetail.contents.map((page, index) => (
+          <img
+            className={`${isFullscreen ? `
+              object-contain absolute top-0 left-0 w-full h-screen
+            ` : `
+              max-h-[calc(100vh-100px)] object-contain mx-auto rounded-lg
+            `} ${activePage.image_file_url === page.image_file_url ? "block" : "hidden"}`}
+            src={activePage.image_file_url}
+            onLoad={()=>ImageLoaded()}
+          />
+        ))}
 
         {/* Loading overlay */}
         <div className={`absolute z-20 top-0 left-0 w-full h-full bg-black bg-opacity-10 backdrop-blur-sm inset-0 flex items-center justify-center ${imageLoading ? "block" : "hidden"}`}>
@@ -212,7 +214,7 @@ export default function Read() {
 
         <div className="p-4 h-full overflow-y-auto pb-20">
           <div className="grid grid-cols-2 gap-3">
-            {tmpBookDetail.contents && tmpBookDetail.contents.map((page, index) => (
+            {bookDetail.contents && bookDetail.contents.map((page, index) => (
               <div
                 key={index}
                 className={`relative cursor-pointer group transition-all duration-200 ${

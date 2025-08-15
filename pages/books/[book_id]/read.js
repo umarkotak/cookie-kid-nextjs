@@ -141,12 +141,8 @@ export default function Read() {
         />
 
         {/* Loading overlay */}
-        <div className={`absolute z-20 top-0 left-0 w-full h-full bg-black bg-opacity-10 backdrop-blur-sm ${imageLoading ? "block" : "hidden"}`}>
-          <div className="mx-auto text-center text-xl flex flex-col h-full justify-center">
-            <div>
-              <span className="bg-background py-1 px-2 rounded-lg flex items-center"><LoadingSpinner size={20}/> Loading...</span>
-            </div>
-          </div>
+        <div className={`absolute z-20 top-0 left-0 w-full h-full bg-black bg-opacity-10 backdrop-blur-sm inset-0 flex items-center justify-center ${imageLoading ? "block" : "hidden"}`}>
+          <span className="bg-background py-1 px-2 rounded-lg flex items-center gap-2"><LoadingSpinner size={20}/> Loading...</span>
         </div>
 
         {/* Controls */}
@@ -159,16 +155,16 @@ export default function Read() {
             </a>
           }
           <button
-            className="rounded-lg hover:scale-110 bg-white text-black bg-opacity-50 duration-500 p-1.5 text-sm"
+            className="rounded-lg hover:scale-110 bg-white text-black bg-opacity-50 duration-500 py-1 px-1.5 text-sm"
             onClick={ToggleDrawer}
           >
             Select Page
           </button>
-          <button className="rounded-lg hover:scale-110 bg-white text-black bg-opacity-50 duration-500 p-1.5 text-sm">
+          <button className="rounded-lg hover:scale-110 bg-white text-black bg-opacity-50 duration-500 py-1 px-1.5 text-sm">
             <span className="">{activePageNumber} / {tmpMaxPageNumber}</span>
           </button>
           <button
-            className="rounded-lg hover:scale-110 bg-white text-black bg-opacity-50 duration-500 p-1.5 text-sm"
+            className="rounded-lg hover:scale-110 bg-white text-black bg-opacity-50 duration-500 py-1 px-1.5 text-sm"
             onClick={ToggleFullScreen}
           >
             <span className=""><FullscreenIcon size={20} /></span>

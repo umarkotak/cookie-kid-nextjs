@@ -72,12 +72,14 @@ export default function Read() {
         });
       };
 
-      for(const [index, oneContent] of tmpBookDetail.contents) {
+      let index = 0
+      for(const oneContent of tmpBookDetail.contents) {
         await preloadImage(oneContent.image_file_url);
         console.log("PRELOADED", oneContent.image_file_url)
-        if (index === tmpBookDetail.contents.length / 4) {
+        if (index === parseInt(tmpMaxPageNumber / 4)) {
           setBookDetail(tmpBookDetail)
         }
+        index += 1
       }
 
     } catch (e) {

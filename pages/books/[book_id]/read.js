@@ -75,7 +75,7 @@ export default function Read() {
       let index = 0
       for(const oneContent of tmpBookDetail.contents) {
         await preloadImage(oneContent.image_file_url);
-        console.log("PRELOADED", oneContent.image_file_url)
+        console.log(`PRELOADED ${index+1} / ${tmpMaxPageNumber}`)
         if (index === parseInt(tmpMaxPageNumber / 4)) {
           setBookDetail(tmpBookDetail)
         }
@@ -132,7 +132,7 @@ export default function Read() {
         className={`${isFullscreen ? `
           absolute top-0 left-0 w-full h-screen z-50 bg-background
         ` : `
-          max-h-[calc(100vh-100px)] relative
+          h-[calc(100vh-100px)] relative
         `}`}
       >
         {bookDetail.contents && bookDetail.contents.map((page, index) => (
@@ -141,7 +141,7 @@ export default function Read() {
               object-contain absolute top-0 left-0 w-full h-screen
             ` : `
               max-h-[calc(100vh-100px)] object-contain mx-auto rounded-lg
-            `} ${activePage.image_file_url === page.image_file_url ? "" : "invisible max-h-0"}`}
+            `} ${activePage.image_file_url === page.image_file_url ? "" : "invisible h-0"}`}
             src={activePage.image_file_url}
             onLoad={()=>ImageLoaded()}
           />

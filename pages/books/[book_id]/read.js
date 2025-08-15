@@ -61,7 +61,7 @@ export default function Read() {
 
       tmpBookDetail = body.data
       tmpMaxPageNumber = tmpBookDetail.contents.length
-      setBookDetail(tmpBookDetail)
+      // setBookDetail(tmpBookDetail)
 
       const preloadImage = async (imageUrl) => {
         const image = new Image();
@@ -72,9 +72,12 @@ export default function Read() {
         });
       };
 
-      for(const oneContent of tmpBookDetail.contents) {
+      for(const [index, oneContent] of tmpBookDetail.contents) {
         await preloadImage(oneContent.image_file_url);
         console.log("PRELOADED", oneContent.image_file_url)
+        if (index === tmpBookDetail.contents.length / 4) {
+          setBookDetail(tmpBookDetail)
+        }
       }
 
     } catch (e) {

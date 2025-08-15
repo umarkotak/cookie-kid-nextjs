@@ -153,22 +153,22 @@ export default function Read() {
         <div className="absolute z-10 top-2 right-2 flex justify-start items-center gap-2">
           {bookDetail.pdf_url && bookDetail.pdf_url !== "" &&
             <a href={bookDetail.pdf_url} target="_blank">
-              <button className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-2">
+              <button className="rounded-lg hover:scale-110 bg-white text-black bg-opacity-50 duration-500 p-1.5 text-sm">
                 <span className="text-black"><PrinterIcon size={22} /></span>
               </button>
             </a>
           }
           <button
-            className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-1.5 text-sm"
+            className="rounded-lg hover:scale-110 bg-white text-black bg-opacity-50 duration-500 p-1.5 text-sm"
             onClick={ToggleDrawer}
           >
             Select Page
           </button>
-          <button className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-1.5 text-sm">
+          <button className="rounded-lg hover:scale-110 bg-white text-black bg-opacity-50 duration-500 p-1.5 text-sm">
             <span className="">{activePageNumber} / {tmpMaxPageNumber}</span>
           </button>
           <button
-            className="rounded-lg hover:scale-110 bg-white bg-opacity-50 duration-500 p-1.5 text-sm"
+            className="rounded-lg hover:scale-110 bg-white text-black bg-opacity-50 duration-500 p-1.5 text-sm"
             onClick={ToggleFullScreen}
           >
             <span className=""><FullscreenIcon size={20} /></span>

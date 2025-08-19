@@ -148,12 +148,12 @@ export default function Books() {
       title: "",
       sort: "title_asc"
     };
-    
+
     setSelectedTypes(defaultValues.types);
     setSelectedTags(defaultValues.tags);
     setTitle(defaultValues.title);
     setSort(defaultValues.sort);
-    
+
     setTempSelectedTypes(defaultValues.types);
     setTempSelectedTags(defaultValues.tags);
     setTempTitle(defaultValues.title);
@@ -177,8 +177,8 @@ export default function Books() {
         <div className="flex items-center gap-4 mb-4">
           <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
             <DialogTrigger asChild>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   resetTempFilters();
                   setIsFilterModalOpen(true);
@@ -201,7 +201,7 @@ export default function Books() {
                   Adjust your search criteria to find the perfect books.
                 </DialogDescription>
               </DialogHeader>
-              
+
               <div className="space-y-6 py-4">
                 {/* Title Search */}
                 <div>
@@ -326,38 +326,38 @@ export default function Books() {
         {hasActiveFilters && (
           <div className="flex flex-wrap gap-2">
             {selectedTags.map((tag) => (
-              <Badge 
-                key={tag} 
-                variant="secondary" 
+              <Badge
+                key={tag}
+                variant="secondary"
                 className="text-xs flex items-center gap-1"
               >
                 Tag: {tagOptions.find(t => t.value === tag)?.label}
-                <X 
-                  className="h-3 w-3 cursor-pointer hover:text-red-500" 
+                <X
+                  className="h-3 w-3 cursor-pointer hover:text-red-500"
                   onClick={() => setSelectedTags(prev => prev.filter(t => t !== tag))}
                 />
               </Badge>
             ))}
             {title && (
-              <Badge 
-                variant="secondary" 
+              <Badge
+                variant="secondary"
                 className="text-xs flex items-center gap-1"
               >
                 Title: "{title}"
-                <X 
-                  className="h-3 w-3 cursor-pointer hover:text-red-500" 
+                <X
+                  className="h-3 w-3 cursor-pointer hover:text-red-500"
                   onClick={() => setTitle("")}
                 />
               </Badge>
             )}
             {sort !== "title_asc" && (
-              <Badge 
-                variant="secondary" 
+              <Badge
+                variant="secondary"
                 className="text-xs flex items-center gap-1"
               >
                 Sort: {sortOptions.find(s => s.value === sort)?.label}
-                <X 
-                  className="h-3 w-3 cursor-pointer hover:text-red-500" 
+                <X
+                  className="h-3 w-3 cursor-pointer hover:text-red-500"
                   onClick={() => setSort("title_asc")}
                 />
               </Badge>

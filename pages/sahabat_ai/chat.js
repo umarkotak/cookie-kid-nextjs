@@ -1,18 +1,25 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import dynamic from 'next/dynamic'
-import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { BookOpen, BotMessageSquare, MessageCircleQuestion,  } from 'lucide-react'
+import { Mic, Send, Bot, User, Volume2, VolumeX } from 'lucide-react'
 import 'regenerator-runtime/runtime'
-const ReactPlayerCsr = dynamic(() => import('@/components/ReactPlayerCsr'), { ssr: false })
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
-
-import ytkiddAPI from '@/apis/ytkidApi'
-import Utils from '@/models/Utils'
 import Markdown from 'react-markdown'
+import { sentenceCase } from 'sentence-case'
+import { Toaster, toast } from 'sonner'
 
+// UI Components (assuming you use shadcn/ui or similar)
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+
+// Dynamically import the player to avoid SSR issues
+const ReactPlayerCsr = dynamic(() => import('@/components/ReactPlayerCsr'), { ssr: false })
+
+// Sentence tokenizer
 const tokenizer = require('sbd')
-
 const sentenceSplitterOpt = {
   "newline_boundaries" : true,
   "html_boundaries"    : false,
@@ -21,256 +28,275 @@ const sentenceSplitterOpt = {
   "preserve_whitespace" : false,
   "abbreviations"      : null
 }
-var chatHistories = []
 
 export default function Home() {
-  const searchParams = useSearchParams()
-
+  // --- STATE MANAGEMENT ---
   const [userInput, setUserInput] = useState('')
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState([
+    { role: 'assistant', content: "Hello! How can I help you today?" }
+  ])
   const [avatarState, setAvatarState] = useState('idle')
-  const [avatarActiveVid, setAvatarActiveVid] = useState('')
-  const playerRef = useRef(null)
-  const [playing, setPlaying] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isMuted, setIsMuted] = useState(false) // Mute state for TTS
 
-  async function handleSubmit() {
-    processText(userInput)
-  }
+  const chatContainerRef = useRef(null)
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition()
 
-  async function processText(t) {
-    setPlaying(true)
-    setUserInput('')
-    resetTranscript()
-    setMessages([{ role: 'user', content: t }, ...messages])
-
-    chatHistories.push({
-      role: "user",
-      content: t,
-    })
-
-    var params = {
-      "messages": chatHistories
-    }
-    // var params = {
-    //   "messages": [
-    //     { role: 'user', content: t }
-    //   ]
-    // }
-
-    const response = await ytkiddAPI.PostAIChat("", {}, params)
-    const body = await response.json()
-
-    var textResult = body.data.content
-
-    setMessages([{ role: 'assistant', content: body.data.content }, { role: 'user', content: t }, ...messages])
-    chatHistories.push({
-      role: "assistant",
-      content: body.data.content,
-    })
-
-    const container = document.getElementsByClassName('chat-container')
-    container.scrollTop = container.scrollHeight
-
-    nativeSpeak(textResult)
-  }
-
-  useEffect(() => {
-    if (avatarState === "idle") {
-      setAvatarActiveVid('/videos/ai-idle.m3u8')
-    } else if (avatarState === "talk") {
-      setAvatarActiveVid('/videos/ai-talk.m3u8')
-    } else {
-      setAvatarActiveVid('/videos/ai-idle.m3u8')
-    }
-  }, [avatarState])
-
-  var synth
+  // --- AVATAR & SPEECH SYNTHESIS ---
+  const synth = typeof window !== 'undefined' ? window.speechSynthesis : null
   const [voices, setVoices] = useState([])
-  if (typeof(window) !== 'undefined') {
-    synth = window.speechSynthesis
-    synth.onvoiceschanged = () => {
-      var tmpVoices = synth.getVoices()
-      setVoices(tmpVoices)
-    }
-  }
-
-  function nativeSpeak(text) {
-    setPlaying(true)
-
-    if (text === "") { return }
-    setAvatarState("talk")
-    synth.cancel()
-
-    var sentences = tokenizer.sentences(text, sentenceSplitterOpt)
-
-    text = removeEmoticons(text)
-
-    sentences.forEach((sentence, idx) => {
-      iterateArrayInBatches(`${sentence}`.split(' '), 26, function(batch) {
-        var joinedText = batch.join(" ")
-        let speech = new SpeechSynthesisUtterance()
-        speech.voice = getIDVoice()
-        speech.lang = "id-ID"
-        speech.text = joinedText
-        speech.rate = 1.4
-        speech.pitch = 1.5
-        speech.volume = 1
-        if (idx >= sentences.length-1) {
-          speech.onend = () => {setAvatarState("idle")}
-        }
-        synth.speak(speech)
-      })
-    })
-  }
-
-  function getIDVoice() {
-    voices.forEach((v)=>{
-      if (v.lang === "id-ID") {
-        return v
-      }
-    })
-  }
-
-  const commands = [
-    {
-      command: ':content (*)',
-      callback: (content, c2) => {
-        setUserInput(`${content} ${c2}`)
-        processText(`${content} ${c2}`)
-      },
-      matchInterim: false,
-    },
-  ]
-  const {transcript, listening, resetTranscript, browserSupportsSpeechRecognition} = useSpeechRecognition({commands})
 
   useEffect(() => {
-    const listener = event => {
-      if (event.code === "Enter" || event.code === "NumpadEnter") {
-        event.preventDefault()
-        processText(document.getElementById("input_params").value)
+    if (synth) {
+      const loadVoices = () => {
+        const availableVoices = synth.getVoices()
+        if (availableVoices.length > 0) {
+          setVoices(availableVoices)
+        }
       }
+      loadVoices()
+      synth.onvoiceschanged = loadVoices
     }
-    document.addEventListener("keydown", listener)
-    return () => {
-      document.removeEventListener("keydown", listener)
-    }
-  }, [])
+  }, [synth])
 
-  function startListening() {
-    synth.cancel()
-    setAvatarState("idle")
-    SpeechRecognition.startListening({ language: 'id' })
+  const nativeSpeak = useCallback((text) => {
+    if (isMuted || !text || !synth) {
+      setAvatarState('idle')
+      return
+    }
+
+    setAvatarState('talk')
+    synth.cancel() // Cancel any previous speech
+
+    const cleanedText = removeEmojis(removeEmoticons(text))
+    const sentences = tokenizer.sentences(cleanedText, sentenceSplitterOpt)
+
+    sentences.forEach((sentence, index) => {
+      const utterance = new SpeechSynthesisUtterance(sentence)
+      const googleIndonesianVoice = voices.find(v => v.lang === "id-ID" && v.name.includes("Google"))
+
+      utterance.voice = googleIndonesianVoice || voices.find(v => v.lang === "id-ID")
+      utterance.lang = "id-ID"
+      utterance.rate = 1
+      utterance.pitch = 1
+
+      // Set the avatar to idle only after the very last sentence is spoken
+      if (index === sentences.length - 1) {
+        utterance.onend = () => {
+          setAvatarState('idle')
+        }
+      }
+
+      synth.speak(utterance)
+    })
+  }, [voices, synth, isMuted])
+
+  // --- MESSAGE HANDLING ---
+  const handleSendMessage = useCallback(async (messageContent) => {
+    if (!messageContent.trim()) return
+
+    setIsLoading(true)
+    resetTranscript()
+    setUserInput('')
+
+    const newUserMessage = { role: 'user', content: messageContent }
+    const currentMessages = [...messages, newUserMessage]
+    setMessages(currentMessages)
+
+    // Stop any ongoing speech
+    if (synth) synth.cancel()
+    setAvatarState('idle')
+
+    // --- API Call Simulation ---
+    // In a real app, you would make your API call here.
+    // const response = await ytkiddAPI.PostAIChat(...)
+    // For now, we simulate a delay and a canned response.
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    const aiResponseText = "BCA Expo adalah pameran tahunan yang digelar oleh Bank Central Asia (BCA) untuk membantu masyarakat mewujudkan impian seperti memiliki hunian, mobil, dan motor. Acara ini dilaksanakan dalam format hybrid, yaitu offline dan online."
+    // --- End of API Call Simulation ---
+
+    const newAssistantMessage = { role: 'assistant', content: aiResponseText }
+    setMessages([...currentMessages, newAssistantMessage])
+
+    setIsLoading(false)
+    nativeSpeak(aiResponseText)
+
+  }, [messages, nativeSpeak, resetTranscript, synth])
+
+  // --- SPEECH RECOGNITION ---
+  const startListening = () => {
+    if (listening) {
+      SpeechRecognition.stopListening()
+    } else {
+      if (synth) synth.cancel()
+      setAvatarState('idle')
+      resetTranscript()
+      SpeechRecognition.startListening({ continuous: true, language: 'id-ID' })
+    }
   }
 
-  var vidHeight = "600px"
+  // Effect to process speech when user stops talking
+  useEffect(() => {
+    if (!listening && transcript) {
+      handleSendMessage(transcript)
+    }
+  }, [listening, transcript, handleSendMessage])
+
+  // --- UI EFFECTS ---
+  // Auto-scroll chat to the bottom
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      const { scrollHeight, clientHeight } = chatContainerRef.current
+      chatContainerRef.current.scrollTop = scrollHeight - clientHeight
+    }
+  }, [messages, isLoading])
+
+  // Browser support check
+  useEffect(() => {
+    if (!browserSupportsSpeechRecognition) {
+      toast.error("Oops! Your browser doesn't support speech recognition.")
+    }
+  }, [browserSupportsSpeechRecognition])
+
+
+  const idleVideo = '/videos/ai2-idle.mp4'
+  const talkVideo = '/videos/ai2-talk.mp4'
 
   return (
-    <main className="pb-[100px] p-4">
-      <div className='flex flex-col gap-1'>
-        <div className='w-full max-w-[480px] mx-auto mb-2'>
-          <div className='w-full rounded-lg overflow-hidden border border-black relative h-[600px]'>
-            <div className={`scale-[2.8]`}>
-              <ReactPlayerCsr
-                src={'/videos/ai-idle.m3u8'}
-                width={"100%"}
-                height={vidHeight}
-                playing={playing}
-                loop={true}
-              />
-            </div>
-            <div className={`scale-[2.8] absolute top-0 transition-opacity ease-in duration-700 ${avatarState === 'talk' ? 'opacity-100' : 'opacity-0'}`}>
-              <ReactPlayerCsr
-                src={'/videos/ai-talk.m3u8'}
-                width={"100%"}
-                height={vidHeight}
-                playing={playing}
-                loop={true}
-              />
-            </div>
-            <div className='absolute bottom-2 right-2'>
-              <button
-                type='button'
-                className="btn btn-error btn-lg text-white"
-                onClick={()=>startListening()}
-              >
-                {!listening ? "🗣️ Speak" : "🦻🏻 Listening"}
-              </button>
-            </div>
-          </div>
-        </div>
+    <>
+      <Toaster position="top-center" richColors />
+      <main className="bg-gray-900 text-white min-h-[calc(100vh-70px)] flex flex-col items-center justify-center font-sans">
+        <div className="flex flex-col md:flex-row gap-6">
 
-        <div className='w-full max-w-[480px] mx-auto mb-2'>
-          <div id="chatbox" className="chat-container h-96 overflow-y-auto p-4 bg-green-200 rounded-lg">
-            {transcript && transcript !== "" && <>
-              <div
-                className={`text-black chat-message mb-2 ${
-                  'text-right text-blue-500'
-                }`}
-              >
-                <p>
-                  <span className="font-bold">user</span>
-                </p>
-                <div className={'flex justify-end'}>
-                  <p className='text-xs bg-white p-2 rounded-lg max-w-xs shadow-sm'>
-                    {transcript}
-                  </p>
-                </div>
+          {/* AVATAR VIDEO PLAYER */}
+          <Card className="bg-gray-800 border-gray-700 shadow-2xl shadow-purple-500/10">
+            <div className="h-[700px] relative w-full aspect-[4/5] rounded-t-lg overflow-hidden">
+              <ReactPlayerCsr
+                src={idleVideo}
+                playing={true}
+                loop={true}
+                muted={true}
+                width="100%"
+                height="100%"
+                className="absolute top-0 left-0 transition-opacity duration-500"
+                style={{ opacity: avatarState === 'idle' ? 1 : 0 }}
+              />
+              <ReactPlayerCsr
+                src={talkVideo}
+                playing={true}
+                loop={true}
+                muted={true}
+                width="100%"
+                height="100%"
+                className="absolute top-0 left-0 transition-opacity duration-500"
+                style={{ opacity: avatarState === 'talk' ? 1 : 0 }}
+              />
+              <div className="absolute top-4 right-4">
+                <Button size="icon" variant="ghost" onClick={() => setIsMuted(!isMuted)}>
+                  {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                </Button>
               </div>
-            </>}
-            {messages.map((message, index) => (
-              <div
-                key={index+message}
-                className={`text-black chat-message mb-2 ${
-                  message.role === 'user' ? 'text-right text-blue-500' : 'text-left text-black'
-                }`}
-              >
-                <p className=''>
-                  <span className="font-bold">{message.role}</span>
-                </p>
-                <div className={message.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
-                  <p className='text-xs bg-white p-2 rounded-lg max-w-xs shadow-sm overflow-auto'>
-                    <Markdown>
-                      {message.content}
-                    </Markdown>
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+            </div>
+          </Card>
 
-          <div className='flex flex-col gap-1 mt-2 text-black'>
-            {/* {voices.map((v, idx)=>(
-              v.lang !== "id-ID" ? null :
-              <div className='bg-white rounded-lg p-1' key={v.lang+v.name}>
-                {idx}: {v.lang} - {v.name}
-              </div>
-            ))} */}
-          </div>
+          {/* CHAT INTERFACE */}
+          <Card className="bg-gray-800 border-gray-700 w-full shadow-2xl shadow-purple-500/10">
+            <CardHeader>
+              <CardTitle className="text-purple-300">Conversation</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              {/* CHAT MESSAGES */}
+              <ScrollArea className="h-72 pr-4" ref={chatContainerRef}>
+                <div className="flex flex-col gap-4">
+                  {messages.map((message, index) => (
+                    <div key={index} className={`flex items-start gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      {message.role === 'assistant' && (
+                        <Avatar className="w-8 h-8 border-2 border-purple-400">
+                          <AvatarFallback><Bot size={16}/></AvatarFallback>
+                        </Avatar>
+                      )}
+                      <div className={`max-w-xs md:max-w-sm rounded-xl px-4 py-2 text-sm ${
+                        message.role === 'user'
+                          ? 'bg-purple-600 text-white rounded-br-none'
+                          : 'bg-gray-700 text-gray-200 rounded-bl-none'
+                      }`}>
+                        <Markdown>{message.content}</Markdown>
+                      </div>
+                      {message.role === 'user' && (
+                        <Avatar className="w-8 h-8 border-2 border-gray-500">
+                          <AvatarFallback><User size={16}/></AvatarFallback>
+                        </Avatar>
+                      )}
+                    </div>
+                  ))}
+                  {isLoading && (
+                    <div className="flex items-start gap-3 justify-start">
+                       <Avatar className="w-8 h-8 border-2 border-purple-400">
+                          <AvatarFallback><Bot size={16}/></AvatarFallback>
+                        </Avatar>
+                      <div className="bg-gray-700 rounded-xl rounded-bl-none px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse delay-75"></span>
+                          <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse delay-150"></span>
+                          <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse delay-300"></span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+
+              {/* CHAT INPUT */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  handleSendMessage(userInput)
+                }}
+                className="flex items-center gap-2"
+              >
+                <Input
+                  id="input_params"
+                  value={listening ? sentenceCase(transcript) : userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                  placeholder={listening ? "Listening..." : "Type your message..."}
+                  disabled={isLoading}
+                  className="bg-gray-700 border-gray-600 focus-visible:ring-purple-500"
+                />
+                <Button type="submit" size="icon" disabled={isLoading || !userInput} aria-label="Send Message">
+                  <Send size={20} />
+                </Button>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant={listening ? "destructive" : "outline"}
+                  onClick={startListening}
+                  disabled={isLoading}
+                  aria-label={listening ? "Stop Listening" : "Start Listening"}
+                  className={listening ? 'border-red-500 text-red-500 animate-pulse' : 'border-gray-600'}
+                >
+                  <Mic size={20} />
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   )
 }
 
-function iterateArrayInBatches(array, batchSize, callback) {
-  for (let i = 0; i < array.length; i += batchSize) {
-    const batch = array.slice(i, i + batchSize);
-    callback(batch);
-  }
-}
-
+// --- HELPER FUNCTIONS ---
 function removeEmoticons(text) {
-  // Regular expression to match most emoticons (including variations with noses, etc.)
-  const emoticonRegex = /[:;8=xX]['"`^]?[-o\*\^]?[\)\]\(\[dDpP\/\\|@3<>]/g;
-
-  // Replace matched emoticons with an empty string
-  return removeEmojis(text.replace(emoticonRegex, ''));
+  const emoticonRegex = /[:;8=xX]['"`^]?[-o\*\^]?[\)\]\(\[dDpP\/\\|@3<>]/g
+  return text.replace(emoticonRegex, '')
 }
 
 function removeEmojis(text) {
-  // Use a regular expression to match Unicode characters in the emoji range
-  const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E0}-\u{1F1FF}]/gu;
-
-  // Replace matched emojis with an empty string
-  return text.replace(emojiRegex, '');
+  const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E0}-\u{1F1FF}]/gu
+  return text.replace(emojiRegex, '')
 }

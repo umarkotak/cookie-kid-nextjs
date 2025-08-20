@@ -25,13 +25,13 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/colla
 import { useState, useEffect } from "react"
 
 const items = [
-  { key: "item-1", title: "Home", url: "/home", icon: Home },
-  { key: "item-1", title: "Tv", url: "/tv", icon: Tv },
-  { key: "item-2", title: "Channel", url: "/channels", icon: UserCheck },
-  { key: "item-3", title: "Book", url: "/books", icon: Book },
-  { key: "item-4", title: "Workbook", url: "/workbooks", icon: Pencil },
-  // { key: "item-5", title: "Sahabat AI", url: "/sahabat_ai", icon: Bot },
-  { key: "item-6", title: "Game", url: "/games", icon: Joystick },
+  { key: "item-home", title: "Home", url: "/home", icon: Home },
+  { key: "item-tv", title: "Tv", url: "/tv", icon: Tv },
+  { key: "item-channel", title: "Channel", url: "/channels", icon: UserCheck },
+  { key: "item-book", title: "Book", url: "/books", icon: Book },
+  { key: "item-workbook", title: "Workbook", url: "/workbooks", icon: Pencil },
+  { key: "item-sahabatai", title: "Sahabat AI", url: "/sahabat_ai", icon: Bot },
+  { key: "item-game", title: "Game", url: "/games", icon: Joystick },
 ]
 
 const adminItems = [

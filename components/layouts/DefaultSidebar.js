@@ -1,4 +1,4 @@
-import { Book, Bot, Calendar, ChevronDown, GraduationCap, Home, ImageIcon, Inbox, Joystick, LayoutDashboard, Pencil, PlayIcon, Search, Settings, Slack, SlackIcon, TvIcon, UserCheck } from "lucide-react"
+import { Book, Bot, Calendar, ChevronDown, GraduationCap, Home, ImageIcon, Inbox, Joystick, LayoutDashboard, Pencil, PlayIcon, Search, Settings, Slack, SlackIcon, Tv, TvIcon, UserCheck } from "lucide-react"
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -26,6 +26,7 @@ import { useState, useEffect } from "react"
 
 const items = [
   { key: "item-1", title: "Home", url: "/home", icon: Home },
+  { key: "item-1", title: "Tv", url: "/tv", icon: Tv },
   { key: "item-2", title: "Channel", url: "/channels", icon: UserCheck },
   { key: "item-3", title: "Book", url: "/books", icon: Book },
   { key: "item-4", title: "Workbook", url: "/workbooks", icon: Pencil },

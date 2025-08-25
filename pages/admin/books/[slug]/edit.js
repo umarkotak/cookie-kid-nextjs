@@ -18,7 +18,6 @@ const AUTH_TOKEN = 'eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwiemlwIjoiREVGIn0..ah3
 export default function EditBookPage() {
   const router = useRouter();
   const params = useParams();
-  const bookSlug = params.slug;
 
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,15 +40,15 @@ export default function EditBookPage() {
   const [newAccessTag, setNewAccessTag] = useState('');
 
   useEffect(() => {
-    if (bookSlug) {
+    if (params.slug) {
       fetchBook();
     }
-  }, [bookSlug]);
+  }, [params.slug]);
 
   const fetchBook = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/book/${bookSlug}`, {
+      const response = await fetch(`${API_BASE_URL}/book/${params.slug}`, {
         headers: {
           'Authorization': `Bearer ${AUTH_TOKEN}`,
         },

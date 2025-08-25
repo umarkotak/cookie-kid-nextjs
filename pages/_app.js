@@ -8,10 +8,12 @@ import { DefaultSidebar } from "@/components/layouts/DefaultSidebar"
 import { Geist, Roboto } from 'next/font/google'
 import { ToastContainer } from "react-toastify"
 import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { ChangeThemeButton } from "@/components/utils/ChangeThemeButton"
 import { Button } from "@/components/ui/button"
 import { useCronitor } from '@cronitorio/cronitor-rum-nextjs'
+import { ChevronLeft } from "lucide-react"
+import Link from "next/link"
 
 const roboto = Geist({
   weight: '400',
@@ -62,6 +64,8 @@ function Main({ children }) {
     toggleSidebar,
   } = useSidebar()
 
+  const [backLink, setBackLink] = useState("")
+
   useEffect(() => {
     if (!pathName) { return }
 
@@ -69,27 +73,37 @@ function Main({ children }) {
         pathName.startsWith("/games/flowchart") ||
         pathName.includes("/read")) {
       setOpen(false)
-      return
+    } else {
+      setOpen(true)
     }
 
-    setOpen(true)
+    if (pathName.startsWith("/watch")) {
+      setBackLink("/tv")
+    } else if (pathName.includes("/read")) {
+      setBackLink("/books")
+    } else {
+      setBackLink("")
+    }
   }, [pathName])
 
   return(
-    <main className={`${!isMobile ? open ? "w-[calc(100%-15rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
-      <header className="sticky top-0 flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-40 bg-background pt-3 pb-2 px-3">
-        <div>
+    <main className={`${!isMobile ? open ? "w-[calc(100%-13rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
+      <header className="sticky top-0 flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-40 bg-background pt-2 pb-2 px-3 border-b">
+        <div className="flex items-center gap-2">
           <SidebarTrigger />
+          { backLink && backLink !== "" &&
+            <Link href={backLink}><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>
+          }
         </div>
         <div className="flex gap-1">
-          <a href="https://trakteer.id/marumaru">
+          {/* <a href="https://trakteer.id/marumaru">
             <Button size="smv2" variant="outline">bantu cabocil</Button>
-          </a>
+          </a> */}
           <ChangeThemeButton />
         </div>
       </header>
 
-      <div className="py-2 px-2 sm:px-3 w-full">
+      <div className="relative py-2 px-2 sm:px-3 w-full">
         {children}
       </div>
     </main>

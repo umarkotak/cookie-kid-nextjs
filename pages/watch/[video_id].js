@@ -156,13 +156,13 @@ export default function Watch() {
   }, [])
 
   return (
-    <main className='flex flex-col lg:flex-row'>
+    <main className='flex flex-col lg:flex-row gap-4'>
       <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} />
 
-      <div className='w-full mr-4 mb-4'>
-        <div ref={videoPlayerDivRef} id="video-content">
-          <div className={`relative overflow-hidden shadow-md`}>
-            <div style={{height: `${videoPlayerHeight}px`}}>
+      <div className='sticky top-10 z-10 md:block w-full bg-background'>
+        <div className='w-full' ref={videoPlayerDivRef} id="video-content">
+          <div className={`w-full md:relative overflow-hidden shadow-md`}>
+            <div className='w-full' style={{height: `${videoPlayerHeight}px`}}>
               <ReactPlayerCsr
                 ref={rPlayerRef}
                 src={`https://www.youtube.com/watch?v=${videoDetail.external_id}`}
@@ -181,26 +181,28 @@ export default function Watch() {
           </div>
         </div>
         {/* {`https://www.youtube.com/watch?v=${videoDetail.external_id}`} */}
-        <div className='p-1 mt-1'>
-          <span className="font-semibold text-lg md:text-2xl leading-relaxed">{videoDetail.title}</span>
-        </div>
-        <div className={`flex justify-between items-center p-1 mt-1`}>
-          <div className='flex items-center mr-2'>
-            <Link href={`/channels/${videoDetail.channel.id}`} className='flex-none flex items-center gap-4 hover:bg-accent'>
-              <Avatar>
-                <AvatarImage src={videoDetail.channel.image_url} />
-                <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
-              </Avatar>
-              <span className='text-sm font-semibold'>{videoDetail.channel.name}</span>
-            </Link>
+        <div className='hidden md:block'>
+          <div className='p-1 mt-1'>
+            <span className="font-semibold text-lg md:text-2xl leading-relaxed">{videoDetail.title}</span>
+          </div>
+          <div className={`flex justify-between items-center p-1 mt-1`}>
+            <div className='flex items-center mr-2'>
+              <Link href={`/channels/${videoDetail.channel.id}`} className='flex-none flex items-center gap-4 hover:bg-accent'>
+                <Avatar>
+                  <AvatarImage src={videoDetail.channel.image_url} />
+                  <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
+                </Avatar>
+                <span className='text-sm font-semibold'>{videoDetail.channel.name}</span>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      <div id="suggestion-content" className={`flex-none w-full sm:w-[402px] flex flex-col gap-5 sm:h-[calc(100vh-60px)] sm:overflow-auto`}>
+      <div id="suggestion-content" className={`flex-none w-full md:w-[402px] flex flex-col gap-5 sm:h-[calc(100vh-60px)] sm:overflow-auto`}>
         {suggestionVideos.map((oneVideo)=>(
-          <div className='group flex flex-row gap-2 hover:text-accent' key={oneVideo.id}>
-            <div className='flex-none w-[168px] h-[94px] overflow-hidden'>
+          <div className='group flex flex-row gap-2 hover:text-amber-600' key={oneVideo.id}>
+            <div className='flex-none w-[169px] h-[94px] overflow-hidden'>
               <Link href={`/watch/${oneVideo.id}`}>
                 <img
                   className={`${mobileMode ? "" : ""} shadow-md w-full h-full group-hover:scale-105 group-hover:duration-100`}

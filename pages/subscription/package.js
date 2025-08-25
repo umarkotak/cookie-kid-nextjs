@@ -1,15 +1,11 @@
 // app/purchase/page.tsx
 "use client"
-import { useEffect, useMemo, useState } from "react"
+import { use, useEffect, useMemo, useState } from "react"
 import Script from "next/script"
-import { Check, Sparkles, Zap, Book, Video, FileText, X } from "lucide-react"
-
-const API_BASE = "http://localhost:33000/ytkidd/api"
-
-// ⚠️ For local testing only. In production, DO NOT expose tokens in the browser.
-const API_BEARER_TOKEN =
-  process.env.NEXT_PUBLIC_API_TOKEN ||
-  "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwiemlwIjoiREVGIn0..ah3xBh5EsZ8hjMeo.We4iDvBz7GMFlx2DYD2aWWuzK2Cjdo2Suuch-grqUAK4-BhJd9L_4ucrCozSPqN-AQkqCMyEnmtQ5qjM8abosc5LYRcIxeebmyIh0hhX7czJ0-5Sq0g26KLUAxjsFsRHDsFcbX-4G9b6vJl0wWMrRHbLm3JvMj_A5oCIBK6V0rbEI2oiJNjxh0pQj3UMCWcDn2s938mTnkcjYiYoI93gxmQ0hU6Ctyb8H3UwDjudXpW9GC_8YI5bau6gEMDqMbvoY7HnPEU7ed30efYKmaIPh8I575rKYY2EoSOHlgauzLrtNugqUFOdsLh0rxidnSV_rYHfPJrxhNXpzlQ5cAzhvEga4YZ6duIAAXF8SHcHGVD4L1CXjUGbw-Pbx16MC9rcWqz2-CKD3b73mn9RBsafEOsZ82A81h2ruuIe0SM63vzSiq2p-qIny1FRnsfEELqP1DNUtX_902TqnU5gPAtJdQmRFmdbx3AZp2z9StprOR2F1HhKxY9z6gP6QN_vT5Rw2K4Cdlbi2KhX4u9mjhZPIQuTXcsJLjsDFAALXNxwqgqdUVd60uB-gFHPhl4CBOobx3DC7dAPcE6jBHLduhOcAJwj9dgQhE4CVCNdHP9ODGARS4rX82GgkCxyR4Xu9ImGIhcmXhXtoyE41yKZF2e4e5JqqPppiSnmHc7g6qUWSFIEgUOFXgpaNfwUX-CZqzR8fsW0gBPhmnpz2-KgKE7GORd_Koc1BhGbGcqGB8D9enC-I9lS5uSFTARkRShOUU173CcisY8v.Pmpr2M9figIG-zFb4rOW-g"
+import { Check, Sparkles, Book, Video, FileText, X } from "lucide-react"
+import ytkiddAPI from "@/apis/ytkidApi"
+import { toast } from "react-toastify"
+import { useRouter } from "next/router"
 
 const BENEFITS = [
   { icon: Video, text: "Unlimited video access", color: "text-purple-600" },
@@ -118,15 +114,14 @@ export default function PurchasePage() {
     isOpen: false,
     product: null
   })
-
-  const clientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
+  const router = useRouter()
 
   useEffect(() => {
     const load = async () => {
       setLoading(true)
       setError(null)
       try {
-        const res = await fetch(`${API_BASE}/products`, { cache: "no-store" })
+        const res = await ytkiddAPI.GetProducts("", {}, {})
         if (!res.ok) throw new Error(`Failed: ${res.status}`)
         const json = await res.json()
         if (!json.success) throw new Error("API returned success=false")
@@ -172,26 +167,6 @@ export default function PurchasePage() {
     [products]
   )
 
-  const createOrder = async product_code => {
-    const res = await fetch(`${API_BASE}/order/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_BEARER_TOKEN}`
-      },
-      body: JSON.stringify({ product_code })
-    })
-    if (!res.ok) {
-      const txt = await res.text()
-      throw new Error(`Order failed: ${res.status} ${txt}`)
-    }
-    const json = await res.json()
-    if (!json.success || !json.data?.midtrans_snap_token) {
-      throw new Error("Order API did not return a snap token")
-    }
-    return json.data
-  }
-
   const handleBuy = product => {
     setConfirmModal({ isOpen: true, product })
   }
@@ -204,62 +179,55 @@ export default function PurchasePage() {
 
     try {
       setBusyCode(product.code)
-      const order = await createOrder(product.code)
+      const res = await ytkiddAPI.PostCreateOrder(
+        "",
+        {},
+        {
+          product_code: product.code
+        }
+      )
 
-      if (!window.snap) {
-        alert("Midtrans Snap belum siap. Coba lagi sebentar.")
-        return
+      if (!res.ok) {
+        const txt = await res.text()
+        throw new Error(`Order failed: ${res.status} ${txt}`)
       }
 
-      window.snap.pay(order.midtrans_snap_token, {
-        onSuccess: () => {
-          alert(`🎉 Pembayaran berhasil!\nOrder: ${order.order_number}`)
-        },
-        onPending: () => {
-          alert("⏳ Menunggu pembayaran. Anda bisa menyelesaikannya nanti.")
-        },
-        onError: err => {
-          console.error("Snap error:", err)
-          alert("❌ Terjadi kesalahan saat memproses pembayaran.")
-        },
-        onClose: () => {
-          console.log("Snap closed by user")
-        }
-      })
+      const json = await res.json()
+      // MODIFIED: Check for the payment URL instead of the Snap token
+      if (!json.success || !json.data?.midtrans_snap_url) {
+        throw new Error("Order API did not return a payment URL")
+      }
+
+      const order = json.data
+
+      // MODIFIED: Open the payment URL in a new tab
+      window.open(order.midtrans_snap_url, "_blank")
+      // alert(
+      //   "Halaman pembayaran telah dibuka di tab baru. Silakan selesaikan pembayaran Anda di sana. ✅"
+      // )
+      router.push("/subscription")
+
     } catch (e) {
       console.error(e)
-      alert(e?.message || "Gagal membuat order")
+      toast.error(e?.message || "Gagal membuat order")
     } finally {
       setBusyCode(null)
     }
   }
 
   return (
-    <main className="min-h-[calc(100vh-70px)] bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-purple-950 dark:via-slate-950 dark:to-orange-950 text-slate-900 dark:text-slate-100">
-      {/* Midtrans Snap Script */}
-      {clientKey ? (
-        <Script
-          id="midtrans-snap"
-          src="https://app.sandbox.midtrans.com/snap/snap.js"
-          data-client-key={clientKey}
-          strategy="afterInteractive"
-        />
-      ) : (
-        <div className="bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 dark:bg-gradient-to-r dark:from-yellow-900/30 dark:to-orange-900/30 dark:text-yellow-100 p-4 text-sm text-center border-b border-yellow-200 dark:border-yellow-800">
-          <Zap className="inline w-4 h-4 mr-2" />
-          Set{" "}
-          <code className="bg-yellow-200 dark:bg-yellow-800/50 px-2 py-1 rounded">
-            NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
-          </code>{" "}
-          to use Snap.
-        </div>
-      )}
+    <main className="h-[calc(100vh-70px)] bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-purple-950 dark:via-slate-950 dark:to-orange-950 text-slate-900 dark:text-slate-100">
+      {/* Midtrans Snap Script (Optional, can be removed if not using Snap token anywhere else) */}
+      <Script
+        id="midtrans-snap"
+        src={ytkiddAPI.SnapJSUrl}
+        data-client-key={ytkiddAPI.SnapClientKey}
+        strategy="afterInteractive"
+      />
 
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          
-
           <h1 className="flex justify-center items-center gap-2 text-2xl font-bold tracking-tight mb-4 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
             Pilih Paket Berlangganan Akses Premium
           </h1>

@@ -1,4 +1,4 @@
-import { Book, Bot, Calendar, ChevronDown, GraduationCap, Home, ImageIcon, Inbox, Joystick, LayoutDashboard, Pencil, PlayIcon, Search, Settings, Slack, SlackIcon, Tv, TvIcon, UserCheck } from "lucide-react"
+import { Book, Bot, Calendar, ChevronDown, GraduationCap, HandCoins, Home, ImageIcon, Inbox, Joystick, LayoutDashboard, Pencil, PlayIcon, ReceiptText, Search, Settings, Slack, SlackIcon, Tv, TvIcon, UserCheck } from "lucide-react"
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -23,6 +23,7 @@ import { ChangeThemeButton } from "../utils/ChangeThemeButton"
 import { usePathname } from "next/navigation"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible"
 import { useState, useEffect } from "react"
+import Link from "next/link"
 
 const items = [
   { key: "item-home", title: "Home", url: "/home", icon: Home },
@@ -30,8 +31,10 @@ const items = [
   { key: "item-channel", title: "Channel", url: "/channels", icon: UserCheck },
   { key: "item-book", title: "Book", url: "/books", icon: Book },
   { key: "item-workbook", title: "Workbook", url: "/workbooks", icon: Pencil },
-  { key: "item-sahabatai", title: "Sahabat AI", url: "/sahabat_ai", icon: Bot },
+  { key: "item-subscription", title: "Subscription", url: "/subscription", icon: ReceiptText },
+  // { key: "item-sahabatai", title: "Sahabat AI", url: "/sahabat_ai", icon: Bot },
   { key: "item-game", title: "Game", url: "/games", icon: Joystick },
+  { key: "item-support", title: "Support Ca Bocil", url: "https://trakteer.id/marumaru", icon: HandCoins },
 ]
 
 const adminItems = [
@@ -52,91 +55,89 @@ export function DefaultSidebar() {
   }, [pathName])
 
   return (
-    <>
-      <Sidebar
-        collapsible="icon"
-        variant="sidebar"
-      >
-        <SidebarHeader>
-          <SidebarMenu>
-            <a href="/">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-                    <img src="/images/cookie_kid_logo_circle.png" />
-                  </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      CaBocil
-                    </span>
-                    <span className="truncate text-xs">aplikasi untuk anak</span>
-                  </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </a>
-          </SidebarMenu>
-        </SidebarHeader>
+    <Sidebar
+      collapsible="icon"
+      variant="sidebar"
+    >
+      <SidebarHeader>
+        <SidebarMenu>
+          <a href="/">
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              >
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <img src="/images/cookie_kid_logo_circle.png" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">
+                    CaBocil
+                  </span>
+                  <span className="truncate text-xs">aplikasi untuk anak</span>
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </a>
+        </SidebarMenu>
+      </SidebarHeader>
 
-        <SidebarContent>
-          <Collapsible defaultOpen className="group/collapsible">
-            <SidebarGroup>
-              <SidebarGroupLabel asChild>
-                <CollapsibleTrigger>
-                  Menu
-                  <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                </CollapsibleTrigger>
-              </SidebarGroupLabel>
-              <CollapsibleContent>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {items.map((item) => (
-                      <SidebarMenuItem key={item.key}>
-                        <SidebarMenuButton asChild isActive={`${pathName}`.startsWith(item.url)}>
-                          <a href={item.url}>
-                            <item.icon />
-                            <span>{item.title}</span>
-                          </a>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </CollapsibleContent>
-            </SidebarGroup>
-          </Collapsible>
-          {isAdminPath && <Collapsible defaultOpen className="group/collapsible">
-            <SidebarGroup>
-              <SidebarGroupLabel asChild>
-                <CollapsibleTrigger>
-                  Admin
-                  <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                </CollapsibleTrigger>
-              </SidebarGroupLabel>
-              <CollapsibleContent>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {adminItems.map((item) => (
-                      <SidebarMenuItem key={item.key}>
-                        <SidebarMenuButton asChild isActive={`${pathName}` === item.url}>
-                          <a href={item.url}>
-                            <item.icon />
-                            <span>{item.title}</span>
-                          </a>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </CollapsibleContent>
-            </SidebarGroup>
-          </Collapsible>}
-        </SidebarContent>
+      <SidebarContent>
+        <Collapsible defaultOpen className="group/collapsible">
+          <SidebarGroup>
+            <SidebarGroupLabel asChild>
+              <CollapsibleTrigger>
+                Menu
+                <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+              </CollapsibleTrigger>
+            </SidebarGroupLabel>
+            <CollapsibleContent>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {items.map((item) => (
+                    <SidebarMenuItem key={item.key}>
+                      <SidebarMenuButton asChild isActive={`${pathName}`.startsWith(item.url)}>
+                        <Link href={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </SidebarGroup>
+        </Collapsible>
+        {isAdminPath && <Collapsible defaultOpen className="group/collapsible">
+          <SidebarGroup>
+            <SidebarGroupLabel asChild>
+              <CollapsibleTrigger>
+                Admin
+                <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+              </CollapsibleTrigger>
+            </SidebarGroupLabel>
+            <CollapsibleContent>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {adminItems.map((item) => (
+                    <SidebarMenuItem key={item.key}>
+                      <SidebarMenuButton asChild isActive={`${pathName}` === item.url}>
+                        <Link href={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </SidebarGroup>
+        </Collapsible>}
+      </SidebarContent>
 
-        <DefaultSidebarFooter />
-      </Sidebar>
-    </>
+      <DefaultSidebarFooter />
+    </Sidebar>
   )
 }

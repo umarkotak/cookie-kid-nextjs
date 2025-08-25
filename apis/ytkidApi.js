@@ -2,9 +2,13 @@ class YtkiddAPI {
   constructor() {
     if (typeof(window) !== "undefined" && window.location.protocol === "https:") {
       this.Host = "https://ytkidd-api-m4.cloudflare-avatar-id-1.site"
+      this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
+      this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
     } else {
       this.Host = "https://ytkidd-api-m4.cloudflare-avatar-id-1.site"
       this.Host = "http://localhost:33000"
+      this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
+      this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
     }
   }
 
@@ -93,6 +97,26 @@ class YtkiddAPI {
     return this.Get(`/ytkidd/api/comfy_ui/output`, authToken, h, params)
   }
 
+  async PostFormInsertFromPdf(authToken, h, formData) {
+    return this.PostForm(`/ytkidd/api/books/insert_from_pdf`, authToken, h, formData)
+  }
+
+  async PostCreateOrder(authToken, h, params) {
+    return this.Post(`/ytkidd/api/order/create`, authToken, h, params)
+  }
+
+  async GetProducts(authToken, h, params) {
+    return this.Get(`/ytkidd/api/products`, authToken, h, params)
+  }
+
+  async GetOrderList(authToken, h, params) {
+    return this.Get(`/ytkidd/api/order/list`, authToken, h, params)
+  }
+
+  async GetUserSubscription(authToken, h, params) {
+    return this.Get(`/ytkidd/api/user/subscription`, authToken, h, params)
+  }
+
   // REUSABLE
 
   async Get(path, authToken, h, params) {
@@ -131,6 +155,19 @@ class YtkiddAPI {
         ...h,
       },
       body: JSON.stringify(params),
+    })
+    return response
+  }
+
+  async PostForm(path, authToken, h, formData) {
+    var uri = `${this.GenHost()}${path}`
+    const response = await fetch(uri, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
+        ...h,
+      },
+      body: formData,
     })
     return response
   }

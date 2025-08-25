@@ -85,7 +85,7 @@ export default function Channels() {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6 gap-x-5 gap-y-8">
         {channelList.map((oneChannel) => (
-          <Card key={oneChannel.id} className="group hover:text-accent">
+          <Card key={oneChannel.id} className="group hover:text-amber-600">
             <CardHeader className="p-4">
               <div className='flex items-center gap-3'>
                 <Link href={`/channels/${oneChannel.id}`}>

@@ -64,10 +64,10 @@ export function DefaultSidebarFooter() {
 
       // console.warn("USER DATA", body.data)
 
-      setUserData(body.data)
+      setUserData(body.data.user)
 
       if (pathName && pathName.startsWith("/admin")) {
-        if (!["admin", "superadmin"].includes(body.data.user_role)) {
+        if (!["admin", "superadmin"].includes(body.data.user.user_role)) {
           router.replace("/home")
         }
       }

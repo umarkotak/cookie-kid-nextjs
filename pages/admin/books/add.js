@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Switch } from "@/components/ui/switch"
 import Utils from "@/models/Utils"
 import { classNames } from "@react-pdf-viewer/core"
-import { BookIcon, PlusIcon } from "lucide-react"
+import { BookIcon, PlusIcon, XIcon } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -23,6 +23,7 @@ const defaultBookParams = {
   book_type: "default", // default,workbook
   storage: "local", // local,r2
   store_pdf: false, // Changed to boolean for switch
+  tags: "", // Added tags field
 }
 
 export default function DevBooks() {
@@ -32,6 +33,8 @@ export default function DevBooks() {
   const [uploadMode, setUploadMode] = useState("pdf")
   const [bookParams, setBookParams] = useState(defaultBookParams)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [tagInput, setTagInput] = useState("")
+  const [tags, setTags] = useState([])
 
   useEffect(() => {
   }, [])
@@ -61,6 +64,33 @@ export default function DevBooks() {
     setBookParams({...bookParams, store_pdf: checked})
   }
 
+  const handleTagInputChange = (event) => {
+    setTagInput(event.target.value)
+  }
+
+  const handleAddTag = () => {
+    const trimmedTag = tagInput.trim()
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      const newTags = [...tags, trimmedTag]
+      setTags(newTags)
+      setBookParams({...bookParams, tags: newTags.join(",")})
+      setTagInput("")
+    }
+  }
+
+  const handleRemoveTag = (tagToRemove) => {
+    const newTags = tags.filter(tag => tag !== tagToRemove)
+    setTags(newTags)
+    setBookParams({...bookParams, tags: newTags.join(",")})
+  }
+
+  const handleTagInputKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      handleAddTag()
+    }
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
 
@@ -76,12 +106,10 @@ export default function DevBooks() {
     formData.append("book_type", bookParams.book_type)
     formData.append("storage", bookParams.storage)
     formData.append("store_pdf", bookParams.store_pdf.toString()) // Convert boolean to string
+    formData.append("tags", bookParams.tags) // Added tags to form data
 
     try {
-      const response = await fetch(`${ytkiddAPI.Host}/ytkidd/api/books/insert_from_pdf`, {
-        method: 'POST',
-        body: formData,
-      })
+      const response = await ytkiddAPI.PostFormInsertFromPdf("", {}, formData)
 
       if (response.ok) {
         setIsSubmitting(false)
@@ -99,13 +127,15 @@ export default function DevBooks() {
 
     setBookPdfFile(null)
     setBookParams(defaultBookParams)
-    toast("Add book success!", {
+    setTags([]) // Reset tags
+    setTagInput("") // Reset tag input
+    toast.success("Add book success!", {
       onClose: ((reason) => {})
     })
   }
 
   return(
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto max-w-2xl flex flex-col gap-4">
       <Card>
         <CardHeader>
           <CardTitle>
@@ -251,6 +281,51 @@ export default function DevBooks() {
                 onChange={(e)=>handleParamsChange(e, "description")}
                 value={bookParams.description}
               />
+            </div>
+
+            {/* Tags Section */}
+            <div className="space-y-2">
+              <Label htmlFor="tags">Tags</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="tags"
+                  type="text"
+                  placeholder="Enter a tag and press Enter or click Add"
+                  value={tagInput}
+                  onChange={handleTagInputChange}
+                  onKeyPress={handleTagInputKeyPress}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleAddTag}
+                  disabled={!tagInput.trim()}
+                >
+                  <PlusIcon size={16} />
+                </Button>
+              </div>
+
+              {/* Display Tags */}
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {tags.map((tag, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+                    >
+                      <span>{tag}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTag(tag)}
+                        className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                      >
+                        <XIcon size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Store PDF Switch */}

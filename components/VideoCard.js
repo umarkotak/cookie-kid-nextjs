@@ -12,7 +12,7 @@ export default function VideoCard({
   creatorName,
 }) {
   return (
-    <div className='group rounded-lg hover:text-accent'>
+    <div className='group rounded-lg hover:text-amber-600'>
       <div className='overflow-hidden rounded-lg'>
         <Link href={`/watch/${ytkiddId}`}>
           <img className="w-full rounded-lg group-hover:scale-105 transition" src={videoImageUrl} alt="thumb" onLoad={(e) => {

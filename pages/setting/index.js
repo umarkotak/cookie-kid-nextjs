@@ -222,11 +222,11 @@ function MathChallenge({ onUnlock }) {
   }, [val1, val2, answer, onUnlock, generateNewProblem]);
 
   return (
-    <div className="border border-blue-200 rounded-lg p-6 mb-6">
-      <h2 className="text-xl font-semibold mb-4">
+    <div className="border border-blue-200 rounded-lg p-4 mb-4">
+      <h2 className="text-xl font-semibold mb-2">
         Verifikasi Akses Settings
       </h2>
-      <p className="mb-4">
+      <p className="mb-2">
         Selesaikan perhitungan di bawah ini untuk mengakses pengaturan:
       </p>
 
@@ -366,9 +366,9 @@ export default function Settings() {
       <div className={`transition-all duration-300 ${
         !isUnlocked ? "opacity-50 pointer-events-none" : "opacity-100"
       }`}>
-        <div className="flex gap-6">
+        <div className="flex gap-1">
           {/* Left Sidebar - Tabs */}
-          <div className="w-64 flex-shrink-0">
+          <div className="w-44 flex-shrink-0">
             <div className="sticky top-6">
               <div className="border border-gray-200 rounded-lg p-2 shadow-sm">
                 <div className="space-y-1">

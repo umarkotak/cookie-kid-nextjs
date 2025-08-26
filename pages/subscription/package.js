@@ -187,6 +187,11 @@ export default function PurchasePage() {
         }
       )
 
+      if (res.status === 401) {
+        router.push("/sign_in")
+        return
+      }
+
       if (!res.ok) {
         const txt = await res.text()
         throw new Error(`Order failed: ${res.status} ${txt}`)

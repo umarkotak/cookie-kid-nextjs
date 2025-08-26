@@ -25,6 +25,10 @@ const SubscriptionIndex = () => {
         page: page,
       })
 
+      if (response.status === 401) {
+        return
+      }
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -49,6 +53,10 @@ const SubscriptionIndex = () => {
   async function fetchUserSubscription() {
     try {
       const response = await ytkiddAPI.GetUserSubscription("", {}, {})
+
+      if (response.status === 401) {
+        return
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

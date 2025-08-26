@@ -53,7 +53,7 @@ export default function Home() {
         <nav aria-label="Main" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <MenuCard
             href="/tv"
-            label="Kids TV"
+            label="Televisi Anak"
             emoji={<Tv size={40} />}
             gradient="from-fuchsia-500 via-rose-400 to-amber-300"
             isDark={isDark}
@@ -62,7 +62,7 @@ export default function Home() {
 
           <MenuCard
             href="/books"
-            label="Its Reading Time"
+            label="Waktunya Membaca"
             emoji={<BookIcon size={40} />}
             gradient="from-sky-500 via-cyan-400 to-emerald-300"
             isDark={isDark}
@@ -71,7 +71,7 @@ export default function Home() {
 
           <MenuCard
             href="/workbooks"
-            label="Workbooks"
+            label="Belajar dan Berlatih"
             emoji={<Puzzle size={40} />}
             gradient="from-violet-500 via-indigo-400 to-blue-300"
             isDark={isDark}
@@ -80,7 +80,7 @@ export default function Home() {
 
           <MenuCard
             href="/games"
-            label="Games"
+            label="Permainan Seru"
             emoji={<Joystick size={40} />}
             gradient="from-violet-500 via-indigo-400 to-blue-300"
             isDark={isDark}
@@ -114,7 +114,7 @@ function MenuCard({ href, label, emoji, gradient, isDark, blurb }) {
         <div className="relative z-10 flex h-full items-start justify-between">
           <div>
             <div className="" aria-hidden>{emoji}</div>
-            <h3 className={`mt-3 text-2xl sm:text-3xl font-extrabold ${isDark ? 'text-white' : 'text-slate-900'}`}>{label}</h3>
+            <h3 className={`mt-3 text-2xl sm:text-2xl font-extrabold ${isDark ? 'text-white' : 'text-slate-900'}`}>{label}</h3>
             <p className={`mt-1 text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{blurb}</p>
           </div>
 

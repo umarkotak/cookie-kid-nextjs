@@ -11,9 +11,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus, Save, ArrowLeft } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-
-const API_BASE_URL = 'http://localhost:33000/ytkidd/api';
-const AUTH_TOKEN = 'eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwiemlwIjoiREVGIn0..ah3xBh5EsZ8hjMeo.We4iDvBz7GMFlx2DYD2aWWuzK2Cjdo2Suuch-grqUAK4-BhJd9L_4ucrCozSPqN-AQkqCMyEnmtQ5qjM8abosc5LYRcIxeebmyIh0hhX7czJ0-5Sq0g26KLUAxjsFsRHDsFcbX-4G9b6vJl0wWMrRHbLm3JvMj_A5oCIBK6V0rbEI2oiJNjxh0pQj3UMCWcDn2s938mTnkcjYiYoI93gxmQ0hU6Ctyb8H3UwDjudXpW9GC_8YI5bau6gEMDqMbvoY7HnPEU7ed30efYKmaIPh8I575rKYY2EoSOHlgauzLrtNugqUFOdsLh0rxidnSV_rYHfPJrxhNXpzlQ5cAzhvEga4YZ6duIAAXF8SHcHGVD4L1CXjUGbw-Pbx16MC9rcWqz2-CKD3b73mn9RBsafEOsZ82A81h2ruuIe0SM63vzSiq2p-qIny1FRnsfEELqP1DNUtX_902TqnU5gPAtJdQmRFmdbx3AZp2z9StprOR2F1HhKxY9z6gP6QN_vT5Rw2K4Cdlbi2KhX4u9mjhZPIQuTXcsJLjsDFAALXNxwqgqdUVd60uB-gFHPhl4CBOobx3DC7dAPcE6jBHLduhOcAJwj9dgQhE4CVCNdHP9ODGARS4rX82GgkCxyR4Xu9ImGIhcmXhXtoyE41yKZF2e4e5JqqPppiSnmHc7g6qUWSFIEgUOFXgpaNfwUX-CZqzR8fsW0gBPhmnpz2-KgKE7GORd_Koc1BhGbGcqGB8D9enC-I9lS5uSFTARkRShOUU173CcisY8v.Pmpr2M9figIG-zFb4rOW-g';
+import ytkiddAPI from '@/apis/ytkidApi';
 
 export default function EditBookPage() {
   const router = useRouter();
@@ -48,18 +46,14 @@ export default function EditBookPage() {
   const fetchBook = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/book/${params.slug}`, {
-        headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`,
-        },
-      });
+      const response = await ytkiddAPI.GetBookDetail("", {}, { book_id: params.slug });
 
       if (!response.ok) {
         throw new Error('Failed to fetch book');
       }
 
       const result = await response.json();
-      
+
       if (result.success && result.data) {
         setBook(result.data);
         setFormData({
@@ -132,21 +126,14 @@ export default function EditBookPage() {
       setError('');
       setSuccess('');
 
-      const response = await fetch(`${API_BASE_URL}/book/${book.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${AUTH_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await ytkiddAPI.PatchUpdateBook("", {}, formData)
 
       if (!response.ok) {
         throw new Error('Failed to update book');
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         setSuccess('Book updated successfully!');
         // Refresh book data

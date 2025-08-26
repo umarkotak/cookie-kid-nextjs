@@ -18,10 +18,10 @@ export default function Home() {
               src="/images/game_ico_maze.png"
               className='w-full rounded-lg shadow-sm'
             />
-            <h1 className='text-xl flex gap-1 items-center justify-center'><BrickWall size={24} /> Maze</h1>
+            <h1 className='text-xl flex gap-1 items-center justify-center'><BrickWall size={24} /> Labirin</h1>
           </div>
         </Link>
-        <Link href="/games/maze2" className='hover:scale-105 duration-300'>
+        {/* <Link href="/games/maze2" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
               src="/images/game_ico_cave.png"
@@ -29,8 +29,8 @@ export default function Home() {
             />
             <h1 className='text-xl flex gap-1 items-center justify-center'><BrickWall size={24} /> Pencari Harta</h1>
           </div>
-        </Link>
-        <Link href="/games/snake" className='hover:scale-105 duration-300'>
+        </Link> */}
+        {/* <Link href="/games/snake" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
               src="/images/game_ico_snake.png"
@@ -38,7 +38,7 @@ export default function Home() {
             />
             <h1 className='text-xl flex gap-1 items-center justify-center'><Worm size={24} /> Snake</h1>
           </div>
-        </Link>
+        </Link> */}
         <Link href="/games/puzzle" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
@@ -48,7 +48,7 @@ export default function Home() {
             <h1 className='text-xl flex gap-1 items-center justify-center'><Puzzle size={24} /> Puzzle</h1>
           </div>
         </Link>
-        <Link href="/games/race_avoid" className='hover:scale-105 duration-300'>
+        {/* <Link href="/games/race_avoid" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
               src="/images/game_ico_car.png"
@@ -56,17 +56,17 @@ export default function Home() {
             />
             <h1 className='text-xl flex gap-1 items-center justify-center'><CarIcon size={24} /> Car</h1>
           </div>
-        </Link>
+        </Link> */}
         <Link href="/games/flowchart" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
               src="/images/game_ico_flowchart.png"
               className='w-full rounded-lg shadow-sm'
             />
-            <h1 className='text-xl flex gap-1 items-center justify-center'><FlowerIcon size={24} /> Flowchart</h1>
+            <h1 className='text-xl flex gap-1 items-center justify-center'><FlowerIcon size={24} /> Membuat Peta</h1>
           </div>
         </Link>
-        <Link href="/games/flappybird" className='hover:scale-105 duration-300'>
+        {/* <Link href="/games/flappybird" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
               src="/images/game_ico_flappybird.png"
@@ -74,8 +74,8 @@ export default function Home() {
             />
             <h1 className='text-xl flex gap-1 items-center justify-center'><BirdIcon size={24} /> Flappy Bird</h1>
           </div>
-        </Link>
-        <Link href="/games/cacing" className='hover:scale-105 duration-300'>
+        </Link> */}
+        {/* <Link href="/games/cacing" className='hover:scale-105 duration-300'>
           <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
             <img
               src="/images/game_ico_worm.png"
@@ -83,7 +83,7 @@ export default function Home() {
             />
             <h1 className='text-xl flex gap-1 items-center justify-center'><WormIcon size={24} /> Cacing</h1>
           </div>
-        </Link>
+        </Link> */}
       </div>
     </main>
   )

@@ -39,12 +39,6 @@ export default function Books() {
   const [tempAccessTags, setTempAccessTags] = useState([])
   const [now, setNow] = useState(0)
 
-  // Available options (you can make these dynamic by fetching from API)
-  const typeOptions = [
-    { value: "default", label: "Default" },
-    { value: "workbook", label: "Workbook" },
-  ];
-
   const sortOptions = [
     { value: "title_asc", label: "A-Z" },
     { value: "title_desc", label: "Z-A" },
@@ -211,12 +205,12 @@ export default function Books() {
   return (
     <main className="">
       {/* Filter Button and Active Filters */}
-      <div className="my-2">
-        <div className="flex md:hidden items-center gap-4">
+      <div className="sticky top-11 z-30 lg:hidden my-2 bg-background py-1">
+        <div className="flex items-center gap-4">
           <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
             <DialogTrigger asChild>
               <Button
-                variant="outline"
+                variant="default"
                 onClick={() => {
                   resetTempFilters();
                   setIsFilterModalOpen(true);
@@ -400,7 +394,7 @@ export default function Books() {
       </div>
 
       <div className="flex flex-row gap-3">
-        <div className="hidden md:block w-[240px]">
+        <div className="hidden lg:block w-[240px]">
           <Card className="sticky top-14 p-3 w-full flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <span>Pencarian</span>

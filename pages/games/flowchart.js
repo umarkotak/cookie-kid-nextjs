@@ -67,10 +67,10 @@ const FlowchartPuzzleGame = () => {
 
   // Available commands
   const commands = [
-    { id: 'right', label: 'Move Right', icon: '→', colorClass: 'bg-blue-500' },
-    { id: 'up', label: 'Move Up', icon: '↑', colorClass: 'bg-green-500' },
-    { id: 'left', label: 'Move Left', icon: '←', colorClass: 'bg-yellow-500' },
-    { id: 'down', label: 'Move Down', icon: '↓', colorClass: 'bg-red-500' }
+    { id: 'right', label: 'Bergerak Ke Kanan', icon: '→', colorClass: 'bg-blue-500' },
+    { id: 'up', label: 'Bergerak Ke Atas', icon: '↑', colorClass: 'bg-green-500' },
+    { id: 'left', label: 'Bergerak Ke Kiri', icon: '←', colorClass: 'bg-yellow-500' },
+    { id: 'down', label: 'Bergerak Ke Bawah', icon: '↓', colorClass: 'bg-red-500' }
   ];
 
   // Generate random obstacles
@@ -191,7 +191,7 @@ const FlowchartPuzzleGame = () => {
       if (isValidPosition(newPos.x, newPos.y)) {
         currentPos = newPos;
         setPlayerPos(newPos);
-        
+
         // Play move sound effect
         playSound('/sounds/game_flowchart_move.mp3', 0.3);
 
@@ -446,11 +446,14 @@ const FlowchartPuzzleGame = () => {
       {/* Header */}
       <div className='flex flex-row justify-between items-start sm:items-center mb-4'>
         <div className="mb-2 sm:mb-0">
-          <h1 className="text-lg sm:text-xl font-bold text-accent mb-2">
-            🎮 Flowchart Puzzle Game
+          <h1 className="text-lg sm:text-xl font-bold mb-2">
+            🎮 Membuat Peta Untuk Robot
           </h1>
           <p className="text-xs sm:text-sm">
-            Click commands to program your robot's path to the goal!
+            Klik perintah dibawah untuk membuat urutan perintah.
+          </p>
+          <p className="text-xs sm:text-sm">
+            Kemudian klik "Jalan" untuk melihat robot bergerak mengikuti perintahmu!
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -458,8 +461,8 @@ const FlowchartPuzzleGame = () => {
           <button
             onClick={() => setAudioEnabled(!audioEnabled)}
             className={`p-2 rounded-lg text-sm font-medium transition-colors ${
-              audioEnabled 
-                ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+              audioEnabled
+                ? 'bg-green-100 text-green-800 hover:bg-green-200'
                 : 'bg-red-100 text-red-800 hover:bg-red-200'
             }`}
             title={audioEnabled ? 'Sound: ON' : 'Sound: OFF'}
@@ -467,7 +470,7 @@ const FlowchartPuzzleGame = () => {
             {audioEnabled ? '🔊' : '🔇'}
           </button>
           <Button size="sm" onClick={() => setShowModal(true)}>
-            How to play
+            Cara Bermain
           </Button>
         </div>
       </div>
@@ -479,7 +482,7 @@ const FlowchartPuzzleGame = () => {
         <div className="bg-white p-1 sm:p-2 rounded shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center w-full sm:w-auto">
             <label className="mr-2 sm:mr-4 text-gray-700 font-medium text-sm">
-              Grid: {gridSize}x{gridSize}
+              Ukuran Area: {gridSize}x{gridSize}
             </label>
             <input
               type="range"
@@ -499,7 +502,7 @@ const FlowchartPuzzleGame = () => {
               ${isRunning ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-500 cursor-pointer'}
             `}
           >
-            🎲 Regenerate
+            🎲 Buat Area Baru
           </button>
         </div>
 
@@ -538,13 +541,13 @@ const FlowchartPuzzleGame = () => {
                 : 'hover:bg-purple-700 cursor-pointer'}
             `}
           >
-            {isRunning ? 'Running...' : 'Run'} ▶
+            {isRunning ? 'Sedang Berjalan...' : 'Jalankan!'} ▶
           </button>
           <button
             onClick={resetGame}
             className="bg-red-500 text-white px-3 py-2 rounded text-xs sm:text-sm font-bold cursor-pointer hover:bg-red-600 transition-all duration-200"
           >
-            Reset 🔄
+            Mulai Ulang 🔄
           </button>
         </div>
       </div>
@@ -553,9 +556,9 @@ const FlowchartPuzzleGame = () => {
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-4'>
         {/* Available Commands */}
         <div className='lg:col-span-3 order-2 lg:order-1'>
-          <div className="p-3 rounded shadow-lg bg-white text-primary">
+          <div className="p-3 rounded shadow-lg bg-white">
             <h2 className="mb-3 font-semibold text-sm sm:text-base">
-              Available Commands
+              Daftar Perintah
             </h2>
             <div className="grid grid-cols-4 lg:grid-cols-1 gap-2">
               {commands.map(command => (
@@ -580,10 +583,10 @@ const FlowchartPuzzleGame = () => {
 
         {/* Command Sequence */}
         <div className='lg:col-span-4 order-3 lg:order-2'>
-          <div className="p-3 rounded shadow-lg bg-white text-primary">
+          <div className="p-3 rounded shadow-lg bg-white">
             <div className="flex justify-between items-center mb-3">
               <h2 className="font-semibold text-sm sm:text-base">
-                Command Sequence ({commandSequence.length})
+                Urutan Perintah ({commandSequence.length})
               </h2>
               <button
                 onClick={clearCommands}
@@ -596,7 +599,7 @@ const FlowchartPuzzleGame = () => {
             <div className="bg-gray-100 rounded-lg p-2 min-h-32 border-2 border-dashed border-gray-300 max-h-[200px] sm:max-h-[300px] lg:max-h-[400px] overflow-auto">
               {commandSequence.length === 0 ? (
                 <p className="text-center text-gray-400 my-8 text-xs sm:text-sm">
-                  Click commands to add them here
+                  Klik perintah untuk menambhakannya kesini.
                 </p>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -613,7 +616,7 @@ const FlowchartPuzzleGame = () => {
                     >
                       <div className='flex gap-1 items-center flex-1 min-w-0'>
                         <span>{cmd.icon}</span>
-                        <span className="truncate text-xs">{cmd.label.split(' ')[1]}</span>
+                        <span className="truncate text-xs">{cmd.label.split(' ')[2]}</span>
                       </div>
                       <button
                         onClick={() => removeCommand(index)}

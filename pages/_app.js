@@ -65,6 +65,7 @@ function Main({ children }) {
   } = useSidebar()
 
   const [backLink, setBackLink] = useState("")
+  const [shouldStick, setShouldStick] = useState(true)
 
   useEffect(() => {
     if (!pathName) { return }
@@ -88,7 +89,7 @@ function Main({ children }) {
 
   return(
     <main className={`${!isMobile ? open ? "w-[calc(100%-13rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
-      <header className="sticky top-0 flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-40 bg-background pt-2 pb-2 px-3 border-b">
+      <header className={`${shouldStick ? "sticky top-0" : ""} flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-40 bg-background pt-2 pb-2 px-3 border-b`}>
         <div className="flex items-center gap-2">
           <SidebarTrigger />
           { backLink && backLink !== "" &&

@@ -100,9 +100,6 @@ function Main({ children }) {
           }
         </div>
         <div className="flex gap-1">
-          {/* <a href="https://trakteer.id/marumaru">
-            <Button size="smv2" variant="outline">bantu cabocil</Button>
-          </a> */}
           <InstallButton />
           <ChangeThemeButton />
         </div>

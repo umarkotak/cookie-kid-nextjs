@@ -170,21 +170,8 @@ export default function EditBookPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-          <h1 className="text-3xl font-bold text-gray-900">Edit Book</h1>
-          <p className="text-gray-600 mt-2">Update book information and settings</p>
-        </div>
-
         {error && (
           <Alert className="mb-6 border-red-200 bg-red-50">
             <AlertDescription className="text-red-800">{error}</AlertDescription>
@@ -197,37 +184,29 @@ export default function EditBookPage() {
           </Alert>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Book Preview */}
-          <Card className="lg:col-span-1">
-            <CardHeader>
-              <CardTitle>Book Preview</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {book.cover_file_url && (
-                <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden">
-                  <img
-                    src={book.cover_file_url}
-                    alt={book.title}
-                    className="w-full h-full object-cover"
-                  />
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Book Preview */}
+            <Card className="lg:col-span-1">
+              <CardHeader>
+                <CardTitle>Book Preview</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {book.cover_file_url && (
+                  <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden">
+                    <img
+                      src={book.cover_file_url}
+                      alt={book.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <p className="text-sm">Book ID: {book.id}</p>
+                  <p className="text-sm">Current Slug: {book.slug}</p>
                 </div>
-              )}
-              <div className="space-y-2">
-                <p className="text-sm text-gray-600">Book ID: {book.id}</p>
-                <p className="text-sm text-gray-600">Current Slug: {book.slug}</p>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Edit Form */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Book Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
                   <div className="space-y-2">
                     <Label htmlFor="title">Title</Label>
                     <Input
@@ -249,137 +228,149 @@ export default function EditBookPage() {
                     />
                   </div>
                 </div>
+              </CardContent>
+            </Card>
 
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Book description"
-                    rows={4}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="pdf-url">Original PDF URL</Label>
-                  <Input
-                    id="pdf-url"
-                    value={formData.original_pdf_url}
-                    onChange={(e) => handleInputChange('original_pdf_url', e.target.value)}
-                    placeholder="https://example.com/book.pdf"
-                    type="url"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="type">Type</Label>
-                    <select
-                      id="type"
-                      value={formData.type}
-                      onChange={(e) => handleInputChange('type', e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-md"
+            {/* Edit Form */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <div className="flex flex-row items-center justify-between">
+                  <CardTitle>Book Information</CardTitle>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => router.back()}
                     >
-                      <option value="default">Default</option>
-                      <option value="workbook">Workbook</option>
-                    </select>
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      type="submit"
+                      disabled={saving}
+                    >
+                      {saving ? (
+                        <div className="flex items-center">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          Saving...
+                        </div>
+                      ) : (
+                        <div className="flex items-center">
+                          <Save className="w-4 h-4 mr-2" />
+                          Save Changes
+                        </div>
+                      )}
+                    </Button>
                   </div>
-                  <div className="flex items-center space-x-2 pt-8">
-                    <Switch
-                      id="active"
-                      checked={formData.active}
-                      onCheckedChange={(checked) => handleInputChange('active', checked)}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className='space-y-2'>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => handleInputChange('description', e.target.value)}
+                      placeholder="Book description"
+                      rows={4}
                     />
-                    <Label htmlFor="active">Active</Label>
                   </div>
-                </div>
 
-                {/* Tags Section */}
-                <div className="space-y-4">
-                  <div>
-                    <Label>Tags</Label>
-                    <div className="flex flex-wrap gap-2 mt-2 mb-3">
-                      {formData.tags.map((tag, index) => (
-                        <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                          {tag}
-                          <X
-                            className="w-3 h-3 cursor-pointer"
-                            onClick={() => removeTag(tag)}
-                          />
-                        </Badge>
-                      ))}
+                  <div className="space-y-2">
+                    <Label htmlFor="pdf-url">Original PDF URL</Label>
+                    <Input
+                      id="pdf-url"
+                      value={formData.original_pdf_url}
+                      onChange={(e) => handleInputChange('original_pdf_url', e.target.value)}
+                      placeholder="https://example.com/book.pdf"
+                      type="url"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="type">Type</Label>
+                      <select
+                        id="type"
+                        value={formData.type}
+                        onChange={(e) => handleInputChange('type', e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                      >
+                        <option value="default">Default</option>
+                        <option value="workbook">Workbook</option>
+                      </select>
                     </div>
-                    <div className="flex gap-2">
-                      <Input
-                        value={newTag}
-                        onChange={(e) => setNewTag(e.target.value)}
-                        placeholder="Add tag (e.g., level:A1, subject:math)"
-                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                    <div className="flex items-center space-x-2 pt-8">
+                      <Switch
+                        id="active"
+                        checked={formData.active}
+                        onCheckedChange={(checked) => handleInputChange('active', checked)}
                       />
-                      <Button type="button" onClick={addTag} size="sm">
-                        <Plus className="w-4 h-4" />
-                      </Button>
+                      <Label htmlFor="active">Active</Label>
                     </div>
                   </div>
 
-                  <div>
-                    <Label>Access Tags</Label>
-                    <div className="flex flex-wrap gap-2 mt-2 mb-3">
-                      {formData.access_tags.map((tag, index) => (
-                        <Badge key={index} variant="outline" className="flex items-center gap-1">
-                          {tag}
-                          <X
-                            className="w-3 h-3 cursor-pointer"
-                            onClick={() => removeAccessTag(tag)}
-                          />
-                        </Badge>
-                      ))}
+                  {/* Tags Section */}
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Tags</Label>
+                      <div className="flex flex-wrap gap-2 mt-2 mb-3">
+                        {formData.tags.map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                            {tag}
+                            <X
+                              className="w-3 h-3 cursor-pointer"
+                              onClick={() => removeTag(tag)}
+                            />
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                        <Input
+                          value={newTag}
+                          onChange={(e) => setNewTag(e.target.value)}
+                          placeholder="Add tag (e.g., level:A1, subject:math)"
+                          onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                        />
+                        <Button type="button" onClick={addTag} size="sm">
+                          <Plus className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Input
-                        value={newAccessTag}
-                        onChange={(e) => setNewAccessTag(e.target.value)}
-                        placeholder="Add access tag (e.g., free, premium)"
-                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAccessTag())}
-                      />
-                      <Button type="button" onClick={addAccessTag} size="sm">
-                        <Plus className="w-4 h-4" />
-                      </Button>
+
+                    <div>
+                      <Label>Access Tags</Label>
+                      <div className="flex flex-wrap gap-2 mt-2 mb-3">
+                        {formData.access_tags.map((tag, index) => (
+                          <Badge key={index} variant="outline" className="flex items-center gap-1">
+                            {tag}
+                            <X
+                              className="w-3 h-3 cursor-pointer"
+                              onClick={() => removeAccessTag(tag)}
+                            />
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                        <Input
+                          value={newAccessTag}
+                          onChange={(e) => setNewAccessTag(e.target.value)}
+                          placeholder="Add access tag (e.g., free, premium)"
+                          onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAccessTag())}
+                        />
+                        <Button type="button" onClick={addAccessTag} size="sm">
+                          <Plus className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
-
-                <div className="flex justify-end space-x-4 pt-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => router.back()}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={saving}
-                    className="min-w-[100px]"
-                  >
-                    {saving ? (
-                      <div className="flex items-center">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                        Saving...
-                      </div>
-                    ) : (
-                      <div className="flex items-center">
-                        <Save className="w-4 h-4 mr-2" />
-                        Save Changes
-                      </div>
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
+        </form>
       </div>
     </div>
   );

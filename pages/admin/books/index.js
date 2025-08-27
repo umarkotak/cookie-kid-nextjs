@@ -23,7 +23,7 @@ export default function Books() {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
   // Filter states
-  const [selectedTypes, setSelectedTypes] = useState(["default"]);
+  const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [title, setTitle] = useState("");
   const [sort, setSort] = useState("title_asc");
@@ -32,7 +32,7 @@ export default function Books() {
   const [accessTags, setAccessTags] = useState([])
 
   // Temporary filter states for modal (before applying)
-  const [tempSelectedTypes, setTempSelectedTypes] = useState(["default"]);
+  const [tempSelectedTypes, setTempSelectedTypes] = useState([]);
   const [tempSelectedTags, setTempSelectedTags] = useState([]);
   const [tempTitle, setTempTitle] = useState("");
   const [tempSort, setTempSort] = useState("title_asc");
@@ -395,6 +395,7 @@ export default function Books() {
                     <div className="mt-2 flex items-center justify-between">
                       {/* <span className="text-xs text-gray-500">Author</span> */}
                       <div className="flex items-center gap-1">
+                        <div className="text-xs bg-blue-50 text-gray-800 p-0.5">{oneBook.type}</div>
                         <div className="text-xs bg-blue-50 text-gray-800 p-0.5">{oneBook.tags[0]}</div>
                         {/* <span className="text-xs text-gray-600">4.5</span> */}
                       </div>

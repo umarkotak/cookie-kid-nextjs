@@ -134,24 +134,24 @@ export default function Read() {
   }
 
   return(
-    <main className="p-2 w-full">
+    <main className="">
       {errNeedSubscription &&
         <div className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert"> Kamu harus berlangganan cabocil premium untuk mengakses buku ini. <Link href="/subscription/package" className="underline">Berlangganan Sekarang</Link>.</div>
       }
-      
+
       <div
-        className={`${isFullscreen ? `
-          absolute top-0 left-0 w-full h-screen z-50 bg-background
+        className={`bg-background ${isFullscreen ? `
+          fixed top-0 left-0 w-full h-screen z-50
         ` : `
-          h-[calc(100vh-100px)] relative
+          h-[calc(100vh-60px)] relative overflow-hidden
         `}`}
       >
         {bookDetail.contents && bookDetail.contents.map((page, index) => (
           <img
-            className={`${isFullscreen ? `
+            className={`border border-gray-500 ${isFullscreen ? `
               object-contain absolute top-0 left-0 w-full h-screen
             ` : `
-              max-h-[calc(100vh-100px)] object-contain mx-auto rounded-lg
+              max-h-[calc(100vh-60px)] object-contain mx-auto
             `} ${activePage.image_file_url === page.image_file_url ? "" : "invisible h-0"}`}
             src={activePage.image_file_url}
             onLoad={()=>ImageLoaded()}
@@ -191,13 +191,13 @@ export default function Read() {
 
         {/* Navigation arrows */}
         <button
-          className="absolute z-0 top-0 left-0 w-1/2 h-full bg-transparent hover:cursor-w-resize hover:bg-black hover:bg-opacity-5 rounded-l-lg flex justify-start items-center"
+          className="absolute z-0 top-0 left-0 w-1/2 h-full bg-transparent hover:cursor-w-resize hover:bg-zinc-500 hover:bg-opacity-5 rounded-l-lg flex justify-start items-center"
           onClick={PrevPage}
         >
           <span className="bg-white opacity-50 text-black"><ArrowLeft /></span>
         </button>
         <button
-          className="absolute z-0 top-0 right-0 w-1/2 h-full bg-transparent hover:cursor-e-resize hover:bg-black hover:bg-opacity-5 rounded-r-lg flex justify-end items-center"
+          className="absolute z-0 top-0 right-0 w-1/2 h-full bg-transparent hover:cursor-e-resize hover:bg-zinc-500 hover:bg-opacity-5 rounded-r-lg flex justify-end items-center"
           onClick={NextPage}
         >
           <span className="bg-white opacity-50 text-black"><ArrowRight /></span>

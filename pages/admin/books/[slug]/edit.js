@@ -38,10 +38,14 @@ export default function EditBookPage() {
   const [newAccessTag, setNewAccessTag] = useState('');
 
   useEffect(() => {
+    if (!params) {
+      return
+    }
+
     if (params.slug) {
       fetchBook();
     }
-  }, [params.slug]);
+  }, [params]);
 
   const fetchBook = async () => {
     try {
@@ -57,6 +61,7 @@ export default function EditBookPage() {
       if (result.success && result.data) {
         setBook(result.data);
         setFormData({
+          book_id: result.data.id || 0,
           slug: result.data.slug || '',
           title: result.data.title || '',
           description: result.data.description || '',

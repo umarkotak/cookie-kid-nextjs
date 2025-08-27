@@ -11,7 +11,7 @@ const ImageDrawer = ({ imageUrl, className }) => {
   const [tool, setTool] = useState('draw'); // 'draw' or 'erase'
   const [color, setColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(5);
-  const [opacity, setOpacity] = useState(0.6);
+  const [opacity, setOpacity] = useState(0.85);
 
   // Default color palette
   const defaultColors = [

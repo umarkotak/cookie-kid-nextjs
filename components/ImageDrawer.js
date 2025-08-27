@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Pencil, Eraser, Undo, Redo, Trash2 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 const ImageDrawer = ({ imageUrl, className }) => {
   const containerRef = useRef(null);
@@ -12,6 +13,7 @@ const ImageDrawer = ({ imageUrl, className }) => {
   const [color, setColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(5);
   const [opacity, setOpacity] = useState(0.85);
+  const searchParams = useSearchParams()
 
   // Default color palette
   const defaultColors = [
@@ -27,7 +29,7 @@ const ImageDrawer = ({ imageUrl, className }) => {
     if (savedStrokes) {
       setStrokes(JSON.parse(savedStrokes));
     }
-  }, [storageKey]);
+  }, [searchParams, storageKey]);
 
   // Save to localStorage on strokes change (also clear when empty)
   useEffect(() => {

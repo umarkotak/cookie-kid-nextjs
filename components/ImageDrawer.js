@@ -29,11 +29,8 @@ const ImageDrawer = ({ imageUrl, className }) => {
     }
   }, [storageKey]);
 
-  // Save to localStorage on strokes change
+  // Save to localStorage on strokes change (also clear when empty)
   useEffect(() => {
-    if (strokes.length === 0) {
-      return
-    }
     localStorage.setItem(storageKey, JSON.stringify(strokes));
   }, [strokes, storageKey]);
 
@@ -56,6 +53,22 @@ const ImageDrawer = ({ imageUrl, className }) => {
     return () => window.removeEventListener('resize', resizeCanvas);
   }, [strokes, currentPath, tool, color, brushSize, opacity]);
 
+  // Prevent page scroll/zoom on iPad (fallback for older iOS)
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
+    const prevent = (e) => {
+      // if drawing, or just always prevent over the canvas to avoid pinch/scroll
+      e.preventDefault();
+    };
+    el.addEventListener('touchstart', prevent, { passive: false });
+    el.addEventListener('touchmove', prevent, { passive: false });
+    return () => {
+      el.removeEventListener('touchstart', prevent);
+      el.removeEventListener('touchmove', prevent);
+    };
+  }, []);
+
   const drawStrokesOnCanvas = (ctx, strokesToDraw) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     strokesToDraw.forEach((stroke) => {
@@ -76,23 +89,6 @@ const ImageDrawer = ({ imageUrl, className }) => {
     });
   };
 
-  const drawCurrentPath = (ctx) => {
-    if (currentPath.length < 2) return;
-    ctx.beginPath();
-    ctx.globalCompositeOperation = tool === 'erase' ? 'destination-out' : 'source-over';
-    ctx.strokeStyle = tool === 'draw' ? color : '#000000';
-    ctx.lineWidth = brushSize;
-    ctx.globalAlpha = opacity;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    const len = currentPath.length;
-    const p1 = currentPath[len - 2];
-    const p2 = currentPath[len - 1];
-    ctx.moveTo(p1.x * ctx.canvas.width, p1.y * ctx.canvas.height);
-    ctx.lineTo(p2.x * ctx.canvas.width, p2.y * ctx.canvas.height);
-    ctx.stroke();
-  };
-
   const drawAll = (ctx) => {
     drawStrokesOnCanvas(ctx, strokes);
     if (currentPath.length > 0) {
@@ -106,29 +102,29 @@ const ImageDrawer = ({ imageUrl, className }) => {
   const getCoordinates = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    let clientX, clientY;
-    if (e.type.startsWith('touch')) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
+    const clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
+    const clientY = e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
     const x = (clientX - rect.left) / rect.width;
     const y = (clientY - rect.top) / rect.height;
     return { x, y };
   };
 
+  // --- Pointer-events based drawing (works for mouse, pen, touch) ---
   const startDrawing = (e) => {
     e.preventDefault();
     const { x, y } = getCoordinates(e);
     setCurrentPath([{ x, y }]);
     setIsDrawing(true);
+    // keep events even if finger goes outside canvas
+    const canvas = canvasRef.current;
+    if (canvas && e.pointerId !== undefined && canvas.setPointerCapture) {
+      try { canvas.setPointerCapture(e.pointerId); } catch {}
+    }
   };
 
   const draw = (e) => {
-    e.preventDefault();
     if (!isDrawing) return;
+    e.preventDefault();
     const { x, y } = getCoordinates(e);
     setCurrentPath((prev) => [...prev, { x, y }]);
   };
@@ -149,6 +145,11 @@ const ImageDrawer = ({ imageUrl, className }) => {
     }
     setCurrentPath([]);
     setIsDrawing(false);
+
+    const canvas = canvasRef.current;
+    if (canvas && e?.pointerId !== undefined && canvas.releasePointerCapture) {
+      try { canvas.releasePointerCapture(e.pointerId); } catch {}
+    }
   };
 
   const undo = () => {
@@ -169,6 +170,8 @@ const ImageDrawer = ({ imageUrl, className }) => {
     setStrokes([]);
     setRedoStack([]);
     setCurrentPath([]);
+    // also clear persisted data
+    localStorage.removeItem(storageKey);
   };
 
   return (
@@ -312,22 +315,28 @@ const ImageDrawer = ({ imageUrl, className }) => {
       </div>
 
       {/* Canvas Container */}
-      <div ref={containerRef} className="flex-1 relative overflow-hidden">
+      <div
+        ref={containerRef}
+        className="flex-1 relative overflow-hidden select-none"
+        style={{ overscrollBehavior: 'none' }} // blocks scroll chaining on iOS
+      >
         <img
           src={imageUrl}
           alt="Background"
-          className="absolute inset-0 w-full h-full object-contain"
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
+          draggable={false}
         />
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 w-full h-full cursor-crosshair"
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
-          onMouseUp={finishDrawing}
-          onMouseLeave={finishDrawing}
-          onTouchStart={startDrawing}
-          onTouchMove={draw}
-          onTouchEnd={finishDrawing}
+          className="absolute inset-0 w-full h-full cursor-crosshair touch-none"
+          style={{ touchAction: 'none' }}               // prevent native panning/zooming
+          onContextMenu={(e) => e.preventDefault()}     // block long-press context menu
+          // Pointer Events (covers mouse/pen/touch)
+          onPointerDown={startDrawing}
+          onPointerMove={draw}
+          onPointerUp={finishDrawing}
+          onPointerCancel={finishDrawing}
+          onPointerLeave={finishDrawing}
         />
       </div>
 
@@ -363,6 +372,13 @@ const ImageDrawer = ({ imageUrl, className }) => {
           border-radius: 4px;
           background: #e5e7eb;
           border: none;
+        }
+
+        /* Small extras so images/canvas don't get selected on iOS */
+        img, canvas {
+          -webkit-user-select: none;
+                  user-select: none;
+          -webkit-touch-callout: none;
         }
       `}</style>
     </div>

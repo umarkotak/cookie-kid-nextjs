@@ -119,7 +119,7 @@ export default function Read() {
         className={`bg-background ${isFullscreen ? `
           fixed top-0 left-0 w-full h-screen z-50
         ` : `
-          h-[calc(100vh-60px)] overflow-hidden
+          h-[calc(100vh-70px)] max-h-[calc(100vh-70px)] overflow-hidden
         `}`}
       >
         <div className="relative h-full">

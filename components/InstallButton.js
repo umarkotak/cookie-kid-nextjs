@@ -13,7 +13,7 @@ export function InstallButton() {
     // Detect if the device is iOS Safari
     const isIos = () => {
       const userAgent = window.navigator.userAgent.toLowerCase()
-      return /iphone|ipad|ipod/.test(userAgent)
+      return /iphone|ipad|ipod|safari/.test(userAgent)
     }
 
     const isInStandaloneMode = () =>
@@ -44,7 +44,7 @@ export function InstallButton() {
     // Detect iOS Safari again on click
     const isIos = () => {
       const userAgent = window.navigator.userAgent.toLowerCase()
-      return /iphone|ipad|ipod/.test(userAgent)
+      return /iphone|ipad|ipod|safari/.test(userAgent)
     }
 
     if (isIos()) {

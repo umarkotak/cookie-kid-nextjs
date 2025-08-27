@@ -31,6 +31,10 @@ const ImageDrawer = ({ imageUrl, className }) => {
 
   // Save to localStorage on strokes change (also clear when empty)
   useEffect(() => {
+    if (strokes.length <= 0) {
+      return
+    }
+
     localStorage.setItem(storageKey, JSON.stringify(strokes));
   }, [strokes, storageKey]);
 

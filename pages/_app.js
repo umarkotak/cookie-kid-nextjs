@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { useCronitor } from '@cronitorio/cronitor-rum-nextjs'
 import { ChevronLeft } from "lucide-react"
 import Link from "next/link"
+import { InstallButton } from "@/components/InstallButton"
 
 const roboto = Geist({
   weight: '400',
@@ -80,8 +81,10 @@ function Main({ children }) {
 
     if (pathName.startsWith("/watch")) {
       setBackLink("/tv")
-    } else if (pathName.includes("/read")) {
+    } else if (pathName.includes("/books") && pathName.includes("/read")) {
       setBackLink("/books")
+    } else if (pathName.includes("/workbooks") && pathName.includes("/read")) {
+      setBackLink("/workbooks")
     } else {
       setBackLink("")
     }
@@ -100,6 +103,7 @@ function Main({ children }) {
           {/* <a href="https://trakteer.id/marumaru">
             <Button size="smv2" variant="outline">bantu cabocil</Button>
           </a> */}
+          <InstallButton />
           <ChangeThemeButton />
         </div>
       </header>

@@ -214,12 +214,12 @@ const ImageDrawer = ({ imageUrl, className }) => {
               <div className="lg:w-full">
                 <h3 className="text-sm font-medium text-gray-700 mb-2 hidden lg:block">Colors</h3>
                 <div className="flex lg:flex-col flex-row lg:items-stretch items-center lg:gap-3 gap-2">
-                  <div className="lg:grid lg:grid-cols-5 flex gap-1 p-1 bg-gray-100 rounded-lg lg:w-full">
+                  <div className="lg:grid lg:grid-cols-5 flex gap-1 p-1 bg-gray-100 rounded-lg lg:w-full w-40 overflow-auto">
                     {defaultColors.map((defaultColor) => (
                       <button
                         key={defaultColor}
                         onClick={() => setColor(defaultColor)}
-                        className={`w-7 h-7 lg:w-8 lg:h-8 rounded-md border-2 transition-all hover:scale-110 ${
+                        className={`flex-none w-7 h-7 lg:w-8 lg:h-8 rounded-md border-2 transition-all hover:scale-110 ${
                           color === defaultColor ? 'border-gray-900' : 'border-gray-300'
                         }`}
                         style={{ backgroundColor: defaultColor }}

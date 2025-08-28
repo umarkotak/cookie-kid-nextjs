@@ -10,7 +10,7 @@ const AffiliateLinksPage = () => {
   const [loading, setLoading] = useState(true);
 
   const affiliateLinks = [
-    'https://vt.tokopedia.com/t/ZSAu8YcLn/',
+    "https://s.shopee.co.id/AKQkYVXIEr",
     // Add more affiliate links here
   ];
 

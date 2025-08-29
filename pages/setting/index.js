@@ -78,16 +78,16 @@ const TABS = [
     icon: "❓",
     settings: QUIZ_SETTINGS
   },
-  // {
-  //   id: "general",
-  //   label: "Umum",
-  //   icon: "⚙️",
-  //   settings: GENERAL_SETTINGS
-  // }
+  {
+    id: "general",
+    label: "Umum",
+    icon: "⚙️",
+    settings: GENERAL_SETTINGS
+  }
 ];
 
-// Custom hook for localStorage management
-function useLocalStorageConfig() {
+// Custom hook for in-memory config management (localStorage alternative)
+function useConfigState() {
   const [config, setConfig] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -96,12 +96,7 @@ function useLocalStorageConfig() {
       const newConfig = {};
       const allKeys = { ...QUIZ_CONFIG_KEYS, ...GENERAL_CONFIG_KEYS };
       Object.values(allKeys).forEach(key => {
-        let val = localStorage.getItem(key);
-        if (val === undefined) {
-          val = "on";
-          localStorage.setItem(key, val);
-        }
-        newConfig[key] = val;
+        newConfig[key] = "on"; // Default value
       });
       setConfig(newConfig);
       setIsLoading(false);
@@ -115,7 +110,6 @@ function useLocalStorageConfig() {
       ...prev,
       [key]: value
     }));
-    localStorage.setItem(key, value)
   }, []);
 
   return { config, updateConfig, isLoading };
@@ -130,28 +124,28 @@ function SettingItem({ setting, value, onChange, disabled }) {
   };
 
   return (
-    <div className="flex items-start justify-between space-y-0 pb-4">
-      <div className="space-y-1 pr-4 flex-1">
+    <div className="flex items-center justify-between py-3 px-1">
+      <div className="flex-1 min-w-0 pr-3">
         <Label
           htmlFor={setting.key}
-          className="text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          className="text-sm sm:text-base font-medium leading-tight block cursor-pointer"
         >
           {setting.label}
         </Label>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs sm:text-sm mt-1 leading-tight">
           {setting.description}
         </p>
       </div>
-      <div className="flex items-center space-x-2">
-        <span className="text-sm text-muted-foreground">
-          {isOn ? "Aktif" : "Nonaktif"}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <span className="text-xs hidden sm:inline">
+          {isOn ? "On" : "Off"}
         </span>
         <Switch
           id={setting.key}
           checked={isOn}
           onCheckedChange={handleSwitchChange}
           disabled={disabled}
-          aria-describedby={`${setting.key}-description`}
+          className="scale-90 sm:scale-100"
         />
       </div>
     </div>
@@ -163,19 +157,19 @@ function TabButton({ tab, isActive, onClick }) {
   return (
     <button
       onClick={() => onClick(tab.id)}
-      className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center gap-3 ${
+      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
         isActive
           ? "bg-blue-100 text-blue-700 border border-blue-200 shadow-sm"
-          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 border border-transparent"
       }`}
     >
-      <span className="text-lg">{tab.icon}</span>
-      <span className="font-medium">{tab.label}</span>
+      <span className="text-base">{tab.icon}</span>
+      <span className="hidden sm:inline">{tab.label}</span>
     </button>
   );
 }
 
-// Math Challenge Component
+// Compact Math Challenge Component
 function MathChallenge({ onUnlock }) {
   const [val1, setVal1] = useState(0);
   const [val2, setVal2] = useState(0);
@@ -223,23 +217,23 @@ function MathChallenge({ onUnlock }) {
 
   return (
     <div className="border border-blue-200 rounded-lg p-4 mb-4">
-      <h2 className="text-xl font-semibold mb-2">
-        Verifikasi Akses Settings
+      <h2 className="text-lg sm:text-xl font-semibold mb-2 text-blue-800">
+        🔐 Verifikasi Akses
       </h2>
-      <p className="mb-2">
-        Selesaikan perhitungan di bawah ini untuk mengakses pengaturan:
+      <p className="text-sm text-blue-700 mb-4">
+        Selesaikan perhitungan untuk mengakses pengaturan:
       </p>
 
-      <div className="space-y-4">
-        <div className="flex items-center gap-3 text-lg">
-          <span className="px-3 py-2 rounded border font-mono">
+      <div className="space-y-3">
+        <div className="flex items-center justify-center gap-2 text-lg font-mono rounded-lg p-3 border">
+          <span className="px-2 py-1 rounded text-center min-w-[2rem]">
             {val1}
           </span>
-          <span className="">+</span>
-          <span className="px-3 py-2 rounded border font-mono">
+          <span>+</span>
+          <span className="px-2 py-1 rounded text-center min-w-[2rem]">
             {val2}
           </span>
-          <span className="">=</span>
+          <span>=</span>
           <input
             type="number"
             value={answer}
@@ -249,23 +243,23 @@ function MathChallenge({ onUnlock }) {
                 handleSubmit(e);
               }
             }}
-            className="w-24 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-16 px-2 py-1 border rounded-md text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="?"
             disabled={isLoading}
-            aria-label="Masukkan jawaban"
           />
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading || !answer.trim()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isLoading ? "..." : "Buka Settings"}
-          </button>
         </div>
 
+        <button
+          onClick={handleSubmit}
+          disabled={isLoading || !answer.trim()}
+          className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+        >
+          {isLoading ? "⏳ Memproses..." : "🔓 Buka Pengaturan"}
+        </button>
+
         {error && (
-          <div className="text-sm text-red-700 bg-red-50 px-3 py-2 rounded border border-red-200">
-            {error}
+          <div className="text-sm text-red-700 bg-red-50 px-3 py-2 rounded border border-red-200 text-center">
+            ❌ {error}
           </div>
         )}
       </div>
@@ -280,13 +274,13 @@ function SettingsContent({ activeTab, config, onConfigChange, isUnlocked }) {
   if (!currentTab) return null;
 
   return (
-    <div className="space-y-6">
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
+    <div className="space-y-4">
+      <div className="mb-4">
+        <h2 className="text-lg sm:text-xl font-semibold mb-1 flex items-center gap-2">
           <span>{currentTab.icon}</span>
-          Pengaturan {currentTab.label}
+          <span className="hidden sm:inline">Pengaturan</span> {currentTab.label}
         </h2>
-        <p className="text-muted-foreground">
+        <p className="text-xs sm:text-sm">
           {activeTab === 'quiz'
             ? "Kelola konfigurasi quiz dan fitur-fitur terkait"
             : "Kelola pengaturan umum aplikasi"
@@ -294,16 +288,15 @@ function SettingsContent({ activeTab, config, onConfigChange, isUnlocked }) {
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="divide-y divide-gray-100">
         {currentTab.settings.map((setting) => (
-          <div key={setting.key} className="border-b border-gray-200 pb-4 last:border-b-0">
-            <SettingItem
-              setting={setting}
-              value={config[setting.key] || "on"}
-              onChange={(value) => onConfigChange(setting.key, value)}
-              disabled={!isUnlocked}
-            />
-          </div>
+          <SettingItem
+            key={setting.key}
+            setting={setting}
+            value={config[setting.key] || "on"}
+            onChange={(value) => onConfigChange(setting.key, value)}
+            disabled={!isUnlocked}
+          />
         ))}
       </div>
     </div>
@@ -314,7 +307,7 @@ function SettingsContent({ activeTab, config, onConfigChange, isUnlocked }) {
 export default function Settings() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [activeTab, setActiveTab] = useState("quiz");
-  const { config, updateConfig, isLoading } = useLocalStorageConfig();
+  const { config, updateConfig, isLoading } = useConfigState();
 
   const handleUnlock = useCallback(() => {
     setIsUnlocked(true);
@@ -330,85 +323,74 @@ export default function Settings() {
 
   if (isLoading) {
     return (
-      <main className="p-6 max-w-6xl mx-auto">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
-          <div className="flex gap-6">
-            <div className="w-64 space-y-2">
-              {[1, 2].map(i => (
-                <div key={i} className="h-12 bg-gray-200 rounded"></div>
-              ))}
-            </div>
-            <div className="flex-1 space-y-4">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="h-20 bg-gray-200 rounded"></div>
-              ))}
-            </div>
-          </div>
+      <div className="p-4 max-w-4xl mx-auto">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-gray-200 rounded w-2/3"></div>
+          <div className="h-20 bg-gray-200 rounded"></div>
+          <div className="h-32 bg-gray-200 rounded"></div>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-          ⚙️ Pengaturan Aplikasi
+    <div className="p-3 sm:p-6 max-w-4xl mx-auto min-h-screen">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-xl sm:text-3xl font-bold mb-2 flex items-center gap-2">
+          <span className="text-lg sm:text-2xl">⚙️</span>
+          <span className="hidden sm:inline">Pengaturan Aplikasi</span>
+          <span className="sm:hidden">Pengaturan</span>
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-xs sm:text-sm">
           Kelola semua pengaturan dan konfigurasi aplikasi
         </p>
       </div>
 
+      {/* Math Challenge */}
       {!isUnlocked && <MathChallenge onUnlock={handleUnlock} />}
 
+      {/* Main Content */}
       <div className={`transition-all duration-300 ${
         !isUnlocked ? "opacity-50 pointer-events-none" : "opacity-100"
       }`}>
-        <div className="flex gap-1">
-          {/* Left Sidebar - Tabs */}
-          <div className="w-44 flex-shrink-0">
-            <div className="sticky top-6">
-              <div className="border border-gray-200 rounded-lg p-2 shadow-sm">
-                <div className="space-y-1">
-                  {TABS.map((tab) => (
-                    <TabButton
-                      key={tab.id}
-                      tab={tab}
-                      isActive={activeTab === tab.id}
-                      onClick={handleTabChange}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Right Content Area */}
-          <div className="flex-1 min-w-0">
-            <div className="border border-gray-200 rounded-lg p-6 shadow-sm">
-              <SettingsContent
-                activeTab={activeTab}
-                config={config}
-                onConfigChange={handleConfigChange}
-                isUnlocked={isUnlocked}
+        {/* Mobile Tabs - Horizontal scroll */}
+        <div className="mb-4">
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {TABS.map((tab) => (
+              <TabButton
+                key={tab.id}
+                tab={tab}
+                isActive={activeTab === tab.id}
+                onClick={handleTabChange}
               />
-            </div>
+            ))}
           </div>
         </div>
 
+        {/* Content Area */}
+        <div className="border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm">
+          <SettingsContent
+            activeTab={activeTab}
+            config={config}
+            onConfigChange={handleConfigChange}
+            isUnlocked={isUnlocked}
+          />
+        </div>
+
+        {/* Success Status */}
         {isUnlocked && (
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-green-700 font-medium">
-                ✅ Pengaturan berhasil dimuat dan siap digunakan
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
+              <span className="text-green-700 text-xs sm:text-sm font-medium">
+                ✅ Pengaturan siap digunakan
               </span>
             </div>
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

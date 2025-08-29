@@ -6,7 +6,7 @@ class YtkiddAPI {
       this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
     } else {
       this.Host = "https://ytkidd-api-m4.cloudflare-avatar-id-1.site"
-      // this.Host = "http://localhost:33000"
+      this.Host = "http://localhost:33000"
       this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
       this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
     }
@@ -130,6 +130,7 @@ class YtkiddAPI {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
+        'X-App-Session': this.GetSession(),
         ...h,
       }
     })
@@ -143,6 +144,7 @@ class YtkiddAPI {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
+        'X-App-Session': this.GetSession(),
         ...h,
       },
     })
@@ -156,6 +158,7 @@ class YtkiddAPI {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
+        'X-App-Session': this.GetSession(),
         ...h,
       },
       body: JSON.stringify(params),
@@ -169,6 +172,7 @@ class YtkiddAPI {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
+        'X-App-Session': this.GetSession(),
         ...h,
       },
       body: formData,
@@ -183,6 +187,7 @@ class YtkiddAPI {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
+        'X-App-Session': this.GetSession(),
         ...h,
       },
       body: JSON.stringify(params),
@@ -206,6 +211,18 @@ class YtkiddAPI {
     if (!localStorage) { return "" }
     if (!localStorage.getItem("CK:AT")) { return "" }
     return localStorage.getItem("CK:AT")
+  }
+
+  GetSession() {
+    if (!localStorage) {
+      return `nolocstore-${crypto.randomUUID()}`
+    }
+    if (!localStorage.getItem("CK:SS")) {
+      let ses = `ckss-${crypto.randomUUID()}`
+      localStorage.setItem("CK:SS", ses)
+      return ses
+    }
+    return localStorage.getItem("CK:SS")
   }
 }
 

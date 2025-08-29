@@ -7,22 +7,27 @@ import ytkiddAPI from '@/apis/ytkidApi'
 import VideoCard from '@/components/VideoCard'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 
 export default function Channel() {
   const router = useRouter()
 
   const [channelDetail, setChannelDetail] = useState({})
   const [videoList, setVideoList] = useState([])
+  const [queryParams, setQueryParams] = useState({
+    sort: "id_desc",
+  })
 
   useEffect(() => {
     if (!router.query.channel_id) { return }
 
     GetChannelDetail(router.query.channel_id)
-  }, [router])
+  }, [router, queryParams])
 
   async function GetChannelDetail(channelID) {
     try {
       const response = await ytkiddAPI.GetChannelDetail("", {}, {
+        ...queryParams,
         channel_id: channelID,
       })
       const body = await response.json()
@@ -50,6 +55,21 @@ export default function Channel() {
           </CardTitle>
         </CardHeader>
       </Card>
+      <div className='flex items-center justify-between'>
+        <div>
+        </div>
+        <div className='flex items-center gap-2'>
+          <span>Urutkan:</span>
+          <Button
+            variant={queryParams.sort === "id_desc" ? "default" : "outline"} size="smv2"
+            onClick={() => setQueryParams({...queryParams, sort: "id_desc"})}
+          >Terbaru</Button>
+          <Button
+            variant={queryParams.sort === "random" ? "default" : "outline"} size="smv2"
+            onClick={() => setQueryParams({...queryParams, sort: "random"})}
+          >Acak</Button>
+        </div>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-5 gap-y-8">
         {videoList.map((oneVideo) => (
           <VideoCard

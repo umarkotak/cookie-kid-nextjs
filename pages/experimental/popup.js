@@ -6,100 +6,51 @@ import { Badge } from '@/components/ui/badge';
 import { ExternalLink, Package } from 'lucide-react';
 
 const AffiliateLinksPage = () => {
-  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const affiliateLinks = [
-    "https://s.shopee.co.id/AKQkYVXIEr",
-    // Add more affiliate links here
+  // Direct products array with all properties
+  const products = [
+    {
+      url: "https://s.shopee.co.id/AKQkYVXIEr",
+      name: "Miya Himi Gouache Paint Set 18/24 Warna 30ml Cat Untuk Cat Cat Air Perlengkapan Seni Murid",
+      price: "Rp 150,000",
+      image: "https://down-id.img.susercontent.com/file/sg-11134201-7rase-mans2mjsznf57f.webp",
+      description: `【Komposisi produk】18 Warna Gouache Paint Set: --Gouache Cat *18 --Nylon Sikat *6 (Hitam, Coklat. Warna acak kirim) --Menggambar Pen *1 --Palet Warna *1`
+    },
+    {
+      url: "https://example.com/product2",
+      name: "Sample Product 2",
+      price: "130.000",
+      image: "https://example.com/image2.jpg",
+      description: "This is a sample product description for the second product with more details."
+    }
+    // Add more products here
   ];
 
-  const fetchMetaData = async (url) => {
-    try {
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-      const response = await fetch(proxyUrl);
-      const data = await response.json();
+  useEffect(() => {
+    // Simulate loading time
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
 
-      if (!data.contents) return null;
+    return () => clearTimeout(timer);
+  }, []);
 
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(data.contents, 'text/html');
+  const openPopup = (url) => {
+    const popup = window.open(
+      url,
+      'productPopup',
+      'width=800,height=600,left=' +
+      (window.screen.width / 2 - 400) +
+      ',top=' +
+      (window.screen.height / 2 - 300) +
+      ',resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no'
+    );
 
-      const getMetaContent = (selectors) => {
-        for (const selector of selectors) {
-          const content = doc.querySelector(selector)?.content;
-          if (content) return content;
-        }
-        return null;
-      };
-
-      const title = getMetaContent([
-        'meta[property="og:title"]',
-        'meta[name="twitter:title"]'
-      ]) || doc.querySelector('title')?.textContent || 'Product Title';
-
-      const image = getMetaContent([
-        'meta[property="og:image"]',
-        'meta[name="twitter:image"]'
-      ]);
-
-      const description = getMetaContent([
-        'meta[property="og:description"]',
-        'meta[name="description"]',
-        'meta[name="twitter:description"]'
-      ]) || 'No description available';
-
-      const price = getMetaContent([
-        'meta[property="product:price:amount"]',
-        'meta[property="og:price:amount"]'
-      ]) || extractPriceFromText(doc.body.textContent);
-
-      return {
-        url,
-        title: title.slice(0, 80),
-        image,
-        price,
-        description: description.slice(0, 150),
-      };
-    } catch (error) {
-      console.error(`Failed to fetch ${url}:`, error);
-      return {
-        url,
-        title: 'Unable to load product',
-        image: null,
-        price: null,
-        description: 'Product information unavailable',
-      };
+    if (popup) {
+      popup.focus();
     }
   };
-
-  const extractPriceFromText = (text) => {
-    const priceRegex = /[\$₹€£¥]\s*[\d,]+(?:\.\d{2})?|\d+[\.,]\d+\s*(?:USD|EUR|GBP|INR|IDR|Rp)/gi;
-    const matches = text.match(priceRegex);
-    return matches?.[0] || null;
-  };
-
-  useEffect(() => {
-    const loadProducts = async () => {
-      if (!affiliateLinks.length) {
-        setLoading(false);
-        return;
-      }
-
-      const productData = await Promise.allSettled(
-        affiliateLinks.map(fetchMetaData)
-      );
-
-      const validProducts = productData
-        .filter(result => result.status === 'fulfilled' && result.value)
-        .map(result => result.value);
-
-      setProducts(validProducts);
-      setLoading(false);
-    };
-
-    loadProducts();
-  }, []);
 
   const ProductSkeleton = () => (
     <Card className="overflow-hidden">
@@ -116,13 +67,13 @@ const AffiliateLinksPage = () => {
   const ProductCard = ({ product }) => (
     <Card
       className="group cursor-pointer overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 hover:shadow-accent"
-      onClick={() => window.open(product.url, '_blank', 'popup,noopener,noreferrer')}
+      onClick={() => openPopup(product.url)}
     >
-      <div className="relative bg-muted">
+      <div className="relative bg-muted h-48">
         {product.image ? (
           <img
             src={product.image}
-            alt={product.title}
+            alt={product.name}
             className="h-full w-full object-cover transition-transform"
             onError={(e) => {
               e.target.style.display = 'none';
@@ -138,9 +89,9 @@ const AffiliateLinksPage = () => {
         </div>
       </div>
 
-      <CardContent className="p-2">
+      <CardContent className="p-4">
         <h3 className="font-semibold leading-tight line-clamp-2 mb-2 text-sm">
-          {product.title}
+          {product.name}
         </h3>
 
         {product.price && (
@@ -160,7 +111,7 @@ const AffiliateLinksPage = () => {
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <Package className="h-16 w-16 text-muted-foreground mb-4" />
       <h2 className="text-2xl font-semibold mb-2">No products found</h2>
-      <p className="text-muted-foreground">Add some affiliate links to get started!</p>
+      <p className="text-muted-foreground">Add some products to get started!</p>
     </div>
   );
 
@@ -173,13 +124,13 @@ const AffiliateLinksPage = () => {
 
       <div className="">
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 mb-8">
-          <div className="container mx-auto">
+          <div className="container mx-auto px-4 py-6">
             <h1 className="text-2xl font-bold tracking-tight">My Affiliate Products</h1>
             <p className="text-muted-foreground mt-2">Discover great products and deals</p>
           </div>
         </header>
 
-        <main className="container mx-auto">
+        <main className="container mx-auto px-4">
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
               {Array(8).fill().map((_, i) => (

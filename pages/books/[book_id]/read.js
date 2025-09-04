@@ -229,6 +229,9 @@ export default function Read() {
         </div>
 
         <div className="p-4 h-full overflow-y-auto pb-20">
+          {bookDetail.can_action && <div className="mb-2">
+            {/* TODO: implement delete button */}
+          </div>}
           <div className="grid grid-cols-2 gap-3">
             {bookDetail.contents && bookDetail.contents.map((page, index) => (
               <div
@@ -252,6 +255,7 @@ export default function Read() {
 
                 {/* Page number */}
                 <div className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+                  {bookDetail.can_action && `id: ${page.id}, `}
                   {index + 1}
                 </div>
 

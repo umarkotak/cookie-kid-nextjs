@@ -166,6 +166,14 @@ export default function Books() {
     }
   };
 
+  const handleTempTypeChange = (typeVal, checked) => {
+    if (checked) {
+      setTempSelectedTypes(prev => [...prev, typeVal]);
+    } else {
+      setTempSelectedTypes(prev => prev.filter(t => t !== typeVal));
+    }
+  };
+
   const applyFilters = () => {
     setSelectedTypes(tempSelectedTypes);
     setSelectedTags(tempSelectedTags);
@@ -261,6 +269,42 @@ export default function Books() {
                 onChange={(e) => setTempTitle(e.target.value)}
                 className="mt-1"
               />
+            </div>
+
+            <div>
+              <Label>Type</Label>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    <span className="truncate">
+                      {tempSelectedTypes.length === 0
+                        ? "Select types..."
+                        : `${tempSelectedTypes.length} selected`}
+                    </span>
+                    <ChevronDown className="h-4 w-4 shrink-0" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <div className="p-4 space-y-2">
+                    {typeOptions.map((typeOption) => (
+                      <div key={typeOption} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`modal-tag-${typeOption.value}`}
+                          checked={tempSelectedTypes.includes(typeOption.value)}
+                          onCheckedChange={(checked) => handleTempTypeChange(typeOption.value, checked)}
+                        />
+                        <Label
+                          htmlFor={`modal-tag-${typeOption.value}`}
+                          className="text-sm font-normal cursor-pointer"
+                        >
+                          {typeOption.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div>
@@ -362,7 +406,7 @@ export default function Books() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="w-56">
                             <DropdownMenuGroup>
-                              <Link href={`/books/${oneBook.slug}/read?page=1`}>
+                              <Link href={`/${oneBook.type === "default" ? "books" : "books"}/${oneBook.slug}/read?page=1`}>
                                 <DropdownMenuItem>
                                   read
                                   <DropdownMenuShortcut><Eye size={14} /></DropdownMenuShortcut>

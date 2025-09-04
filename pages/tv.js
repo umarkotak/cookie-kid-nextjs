@@ -26,7 +26,8 @@ export default function Home() {
 
     GetVideoList({
       page: page,
-      exclude_ids: videoIDs.join(",")
+      exclude_ids: videoIDs.join(","),
+      sort: "random",
     })
     GetChannelList({})
   }, [searchParams])
@@ -118,6 +119,7 @@ export default function Home() {
             creatorImageUrl={oneVideo.channel.image_url}
             shortedVideoTitle={oneVideo.title}
             creatorName={oneVideo.channel.name}
+            canAction={oneVideo.can_action}
           />
         ))}
       </div>

@@ -2,11 +2,19 @@ class YtkiddAPI {
   constructor() {
     if (typeof(window) !== "undefined" && window.location.protocol === "https:") {
       this.Host = "https://ytkidd-api-m4.cloudflare-avatar-id-1.site"
+
+      // this.SnapJSUrl = "https://app.midtrans.com/snap/snap.js"
+      // this.SnapClientKey = "Mid-client-QLRT-oH6Wg3jJkjQ"
+
       this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
       this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
     } else {
       this.Host = "https://ytkidd-api-m4.cloudflare-avatar-id-1.site"
       this.Host = "http://localhost:33000"
+
+      // this.SnapJSUrl = "https://app.midtrans.com/snap/snap.js"
+      // this.SnapClientKey = "Mid-client-QLRT-oH6Wg3jJkjQ"
+
       this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
       this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
     }
@@ -71,6 +79,10 @@ class YtkiddAPI {
 
   async DeleteBook(authToken, h, params) {
     return this.Delete(`/ytkidd/api/book/${params.book_id}`, authToken, h, params)
+  }
+
+  async DeleteVideo(authToken, h, params) {
+    return this.Delete(`/ytkidd/api/youtube_videos/${params.youtube_video_id}`, authToken, h, params)
   }
 
   async PostAIChat(authToken, h, params) {

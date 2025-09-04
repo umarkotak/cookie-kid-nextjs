@@ -1,10 +1,11 @@
 import ytkiddAPI from "@/apis/ytkidApi"
 import { LoadingSpinner } from "@/components/ui/spinner"
-import { ArrowLeft, ArrowRight, FullscreenIcon, PrinterIcon, X } from "lucide-react"
+import { ArrowLeft, ArrowRight, FullscreenIcon, PrinterIcon, X, Trash2, EyeIcon } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
+import { toast } from "react-toastify"
 
 var tmpBookDetail = {}
 var tmpMaxPageNumber = 0
@@ -20,6 +21,10 @@ export default function Read() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [errNeedSubscription, setErrNeedSubscription] = useState(false)
+
+  // New states for delete functionality
+  const [selectedPageIds, setSelectedPageIds] = useState([])
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     tmpBookDetail = {}
@@ -82,7 +87,7 @@ export default function Read() {
       let index = 0
       for(const oneContent of tmpBookDetail.contents) {
         await preloadImage(oneContent.image_file_url);
-        console.log(`PRELOADED ${index+1} / ${tmpMaxPageNumber}`)
+        // console.log(`PRELOADED ${index+1} / ${tmpMaxPageNumber}`)
         if (index === parseInt(tmpMaxPageNumber / 4)) {
           setBookDetail(tmpBookDetail)
         }
@@ -91,6 +96,71 @@ export default function Read() {
 
     } catch (e) {
       console.error(e)
+    }
+  }
+
+  // New function to handle page deletion
+  async function DeleteSelectedPages() {
+    if (selectedPageIds.length === 0) {
+      alert("Please select pages to delete")
+      return
+    }
+
+    if (!confirm(`Are you sure you want to delete ${selectedPageIds.length} page(s)?`)) {
+      return
+    }
+
+    setIsDeleting(true)
+
+    try {
+      const response = await ytkiddAPI.DeleteBookPages("", {}, {
+        book_id: bookDetail.id,
+        book_content_ids: selectedPageIds
+      })
+
+      if (response.status === 200) {
+        // Refresh book detail after successful deletion
+        setSelectedPageIds([])
+        setIsDrawerOpen(false)
+
+        // Reset the temp variables to force refresh
+        tmpBookDetail = {}
+        tmpMaxPageNumber = 0
+
+        // Reload book detail
+        await GetBookDetail(router.query.book_id)
+
+        toast.success("Pages deleted successfully")
+      } else {
+        const body = await response.json()
+        toast.error(`Failed to delete pages: ${body.error?.message || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error("Error deleting pages:", error)
+      toast.error("Failed to delete pages. Please try again.")
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  // Toggle checkbox selection
+  function togglePageSelection(pageId) {
+    console.log(pageId)
+    setSelectedPageIds(prev => {
+      if (prev.includes(pageId)) {
+        return prev.filter(id => id !== pageId)
+      } else {
+        return [...prev, pageId]
+      }
+    })
+  }
+
+  // Select all pages
+  function selectAllPages() {
+    if (selectedPageIds.length === bookDetail.contents.length) {
+      setSelectedPageIds([])
+    } else {
+      setSelectedPageIds(bookDetail.contents.map(page => page.id))
     }
   }
 
@@ -118,9 +188,20 @@ export default function Read() {
 
   function ToggleDrawer() {
     setIsDrawerOpen(!isDrawerOpen)
+    // Reset selections when closing drawer
+    if (isDrawerOpen) {
+      setSelectedPageIds([])
+    }
   }
 
   function GoToPage(pageNumber) {
+    if (pageNumber === activePageNumber) { return }
+
+    if (bookDetail.can_action && selectedPageIds.length > 0) {
+      // If in delete mode, don't navigate
+      return
+    }
+
     setImageLoading(true)
     setIsDrawerOpen(false)
     router.push({
@@ -148,6 +229,7 @@ export default function Read() {
       >
         {bookDetail.contents && bookDetail.contents.map((page, index) => (
           <img
+            key={index}
             className={`border border-gray-500 ${isFullscreen ? `
               object-contain absolute top-0 left-0 w-full h-screen
             ` : `
@@ -228,10 +310,49 @@ export default function Read() {
           </div>
         </div>
 
-        <div className="p-4 h-full overflow-y-auto pb-20">
-          {bookDetail.can_action && <div className="mb-2">
-            {/* TODO: implement delete button */}
-          </div>}
+        {/* Delete controls - only show if can_action is true */}
+        {bookDetail.can_action && (
+          <div className="p-4 border-b border-gray-200 bg-gray-50">
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="select-all"
+                  checked={bookDetail.contents && selectedPageIds.length === bookDetail.contents.length}
+                  onChange={selectAllPages}
+                  className="rounded border-gray-300"
+                />
+                <label htmlFor="select-all" className="text-sm font-medium text-gray-700">
+                  Select All ({selectedPageIds.length} selected)
+                </label>
+              </div>
+
+              <button
+                onClick={DeleteSelectedPages}
+                disabled={selectedPageIds.length === 0 || isDeleting}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  selectedPageIds.length === 0 || isDeleting
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-red-500 text-white hover:bg-red-600'
+                }`}
+              >
+                {isDeleting ? (
+                  <>
+                    <LoadingSpinner size={16} />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={16} />
+                    Delete ({selectedPageIds.length})
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="p-4 h-[calc(100vh-90px)] overflow-y-auto pb-20">
           <div className="grid grid-cols-2 gap-3">
             {bookDetail.contents && bookDetail.contents.map((page, index) => (
               <div
@@ -240,11 +361,35 @@ export default function Read() {
                   activePageNumber === index + 1
                     ? 'ring-2 ring-blue-500 ring-offset-2'
                     : 'hover:scale-105 hover:shadow-lg'
+                } ${
+                  bookDetail.can_action && selectedPageIds.includes(page.id)
+                    ? 'ring-2 ring-red-500 ring-offset-2'
+                    : ''
                 }`}
-                onClick={() => GoToPage(index + 1)}
+                // onClick={() => GoToPage(index + 1)}
               >
+                {/* Checkbox for delete mode */}
+                {bookDetail.can_action && (
+                  <div
+                    className="absolute top-2 left-2 z-10"
+                    // onClick={(e) => {
+                    //   e.stopPropagation()
+                    //   togglePageSelection(page.id)
+                    // }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedPageIds.includes(page.id)}
+                      onChange={() => togglePageSelection(page.id)}
+                      className="w-4 h-4 text-red-600 bg-white border-2 border-gray-300 rounded focus:ring-red-500 focus:ring-2"
+                    />
+                  </div>
+                )}
+
                 {/* Page preview */}
-                <div className="aspect-[3/4] overflow-hidden rounded-lg bg-gray-100">
+                <div
+                  className="aspect-[3/4] overflow-hidden rounded-lg bg-gray-100"
+                >
                   <img
                     src={page.image_file_url}
                     alt={`Page ${index + 1}`}
@@ -256,18 +401,26 @@ export default function Read() {
                 {/* Page number */}
                 <div className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
                   {bookDetail.can_action && `id: ${page.id}, `}
-                  {index + 1}
+                  {page.page_number}
                 </div>
 
                 {/* Active page indicator */}
                 {activePageNumber === index + 1 && (
-                  <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                    Current
+                  <div className="absolute top-1 right-1 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                    <EyeIcon size={14} />
                   </div>
                 )}
 
+                {/* Selection indicator */}
+                {bookDetail.can_action && selectedPageIds.includes(page.id) && (
+                  <div className="absolute inset-0 bg-red-500 bg-opacity-20 rounded-lg border-2 border-red-500" />
+                )}
+
                 {/* Hover overlay */}
-                <div className="absolute inset-0 bg-blue-500 bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded-lg" />
+                <div
+                  className="absolute inset-0 bg-blue-500 bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded-lg"
+                  onClick={() => GoToPage(index + 1)}
+                />
               </div>
             ))}
           </div>

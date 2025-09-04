@@ -85,6 +85,10 @@ class YtkiddAPI {
     return this.Delete(`/ytkidd/api/youtube_videos/${params.youtube_video_id}`, authToken, h, params)
   }
 
+  async DeleteBookPages(authToken, h, params) {
+    return this.Post(`/ytkidd/api/book/${params.book_id}/page/remove`, authToken, h, params)
+  }
+
   async PostAIChat(authToken, h, params) {
     return this.Post(`/ytkidd/api/ai/chat`, authToken, h, params)
   }

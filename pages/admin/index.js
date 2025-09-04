@@ -63,10 +63,6 @@ export default function Admin() {
               <TvIcon />
               Manage Channels
             </Button></Link>
-            <Link href="/admin/videos"><Button variant="outline">
-              <PlayIcon />
-              Manage Videos
-            </Button></Link>
           </div>
         </CardContent>
       </Card>

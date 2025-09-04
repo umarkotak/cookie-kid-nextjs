@@ -14,6 +14,7 @@ import { use, useEffect, useState } from "react";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { toast } from "react-toastify";
 
 export default function Books() {
   const [bookList, setBookList] = useState([]);
@@ -85,7 +86,7 @@ export default function Books() {
       setSort(urlSort);
       setTempSort(urlSort);
     }
-    
+
     // Determine access value from URL params
     if (urlAccess === "free") {
       setAccess("free");
@@ -224,11 +225,21 @@ export default function Books() {
       const response = await ytkiddAPI.DeleteBook("", {}, {
         book_id: bookID
       })
+      const body = await response.json();
       if (response.status !== 200) {
+        toast.error(`error on delete: ${JSON.stringify(body)}`)
         return
       }
 
-      GetBookList(bookParams)
+      toast.success(`delete book success`)
+
+      const params = {
+        types: selectedTypes.join(","),
+        tags: selectedTags.join(","),
+        title: title,
+        sort: sort
+      };
+      GetBookList(params)
     } catch (e) {
       console.error(e)
     }
@@ -401,7 +412,7 @@ export default function Books() {
                         <Button variant="outline" size="smv2">{oneBook.is_free ? "FREE" : "PREMIUM"}</Button>
 
                         <DropdownMenu>
-                          <DropdownMenuTrigger>
+                          <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="icon_sm"><MoreHorizontal /></Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="w-56">
@@ -425,7 +436,6 @@ export default function Books() {
                             </DropdownMenuGroup>
                           </DropdownMenuContent>
                         </DropdownMenu>
-
                       </div>
                     </div>
                   </div>

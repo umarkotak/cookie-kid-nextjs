@@ -40,7 +40,6 @@ const items = [
 const adminItems = [
   { key: "admin-item-1", title: "Dashboard", url: "/admin", icon: LayoutDashboard },
   { key: "admin-item-2", title: "Channels", url: "/admin/channels", icon: TvIcon },
-  { key: "admin-item-3", title: "Videos", url: "/admin/videos", icon: PlayIcon },
   { key: "admin-item-4", title: "Books", url: "/admin/books", icon: Book },
   { key: "admin-item-5", title: "ComfyUI Gallery", url: "/admin/comfy_ui/gallery", icon: ImageIcon },
 ]

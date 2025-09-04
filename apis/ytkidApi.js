@@ -69,6 +69,10 @@ class YtkiddAPI {
     return this.Patch(`/ytkidd/api/book/${params.book_id}`, authToken, h, params)
   }
 
+  async PatchUpdateBookCover(authToken, h, params) {
+    return this.PatchForm(`/ytkidd/api/book/${params.get("book_id")}/cover`, authToken, h, params)
+  }
+
   async GetChannelDetail(authToken, h, params) {
     return this.Get(`/ytkidd/api/youtube_channel/${params.channel_id}`, authToken, h, params)
   }
@@ -186,6 +190,20 @@ class YtkiddAPI {
     var uri = `${this.GenHost()}${path}`
     const response = await fetch(uri, {
       method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
+        'X-App-Session': this.GetSession(),
+        ...h,
+      },
+      body: formData,
+    })
+    return response
+  }
+
+  async PatchForm(path, authToken, h, formData) {
+    var uri = `${this.GenHost()}${path}`
+    const response = await fetch(uri, {
+      method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${this.GenAuthToken(authToken)}`,
         'X-App-Session': this.GetSession(),

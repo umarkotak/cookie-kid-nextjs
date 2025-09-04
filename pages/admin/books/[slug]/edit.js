@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,19 +9,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { X, Plus, Save, ArrowLeft } from 'lucide-react';
+import { X, Plus, Save, ArrowLeft, Upload, Camera } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import ytkiddAPI from '@/apis/ytkidApi';
+import { toast } from 'react-toastify';
 
 export default function EditBookPage() {
   const router = useRouter();
   const params = useParams();
+  const fileInputRef = useRef(null);
 
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [coverPreview, setCoverPreview] = useState(null);
 
   const [formData, setFormData] = useState({
     slug: '',
@@ -71,11 +73,13 @@ export default function EditBookPage() {
           original_pdf_url: result.data.pdf_url || '',
           access_tags: result.data.access_tags || []
         });
+        // Reset cover preview when book data is refreshed
+        setCoverPreview(null);
       } else {
         throw new Error('Book not found');
       }
     } catch (err) {
-      setError('Failed to load book: ' + err.message);
+      toast.error('Failed to load book: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -122,14 +126,85 @@ export default function EditBookPage() {
     }));
   };
 
+  const handleCoverFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select a valid image file');
+        return;
+      }
+
+      // Validate file size (e.g., max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setCoverPreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+
+      // Upload the cover
+      uploadCover(file);
+    }
+  };
+
+  const uploadCover = async (file) => {
+    if (!book || !file) return;
+
+    try {
+      setUploadingCover(true);
+
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('cover_file', file);
+      formData.append('book_id', book.id)
+
+      // Make the API call using fetch directly since we need to send FormData
+      const response = await ytkiddAPI.PatchUpdateBookCover("", {}, formData)
+
+      if (!response.ok) {
+        throw new Error('Failed to upload cover');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success('Book cover updated successfully!');
+        // Refresh book data to get the new cover URL
+        await fetchBook();
+        window.location.reload()
+      } else {
+        throw new Error(result.error?.message || 'Failed to update cover');
+      }
+    } catch (err) {
+      toast.error('Failed to upload cover: ' + err.message);
+      setCoverPreview(null); // Reset preview on error
+    } finally {
+      setUploadingCover(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!book) return;
 
     try {
       setSaving(true);
-      setError('');
-      setSuccess('');
 
       const response = await ytkiddAPI.PatchUpdateBook("", {}, formData)
 
@@ -140,14 +215,13 @@ export default function EditBookPage() {
       const result = await response.json();
 
       if (result.success) {
-        setSuccess('Book updated successfully!');
         // Refresh book data
         await fetchBook();
       } else {
         throw new Error(result.error?.message || 'Failed to update book');
       }
     } catch (err) {
-      setError('Failed to save book: ' + err.message);
+      toast.error('Failed to save book: ' + err.message);
     } finally {
       setSaving(false);
     }
@@ -172,18 +246,6 @@ export default function EditBookPage() {
   return (
     <div className="">
       <div className="max-w-4xl mx-auto px-4">
-        {error && (
-          <Alert className="mb-6 border-red-200 bg-red-50">
-            <AlertDescription className="text-red-800">{error}</AlertDescription>
-          </Alert>
-        )}
-
-        {success && (
-          <Alert className="mb-6 border-green-200 bg-green-50">
-            <AlertDescription className="text-green-800">{success}</AlertDescription>
-          </Alert>
-        )}
-
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Book Preview */}
@@ -192,15 +254,64 @@ export default function EditBookPage() {
                 <CardTitle>Book Preview</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {book.cover_file_url && (
-                  <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden">
-                    <img
-                      src={book.cover_file_url}
-                      alt={book.title}
-                      className="w-full h-full object-cover"
-                    />
+                {/* Cover Image Section */}
+                <div className="space-y-3">
+                  <div className="aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden relative">
+                    {coverPreview ? (
+                      <img
+                        src={coverPreview}
+                        alt="Cover preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : book.cover_file_url ? (
+                      <img
+                        src={book.cover_file_url}
+                        alt={book.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <Camera className="w-12 h-12" />
+                      </div>
+                    )}
+
+                    {uploadingCover && (
+                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                        <div className="text-white text-center">
+                          <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                          <span className="text-sm">Uploading...</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+
+                  {/* Cover Upload Button */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={triggerFileInput}
+                    disabled={uploadingCover}
+                    className="w-full"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {uploadingCover ? 'Uploading...' : 'Update Cover'}
+                  </Button>
+
+                  {/* Hidden File Input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCoverFileSelect}
+                    className="hidden"
+                  />
+
+                  <p className="text-xs text-gray-500 text-center">
+                    Supported formats: JPG, PNG, GIF (max 5MB)
+                  </p>
+                </div>
+
                 <div className="space-y-2">
                   <p className="text-sm">Book ID: {book.id}</p>
                   <p className="text-sm">Current Slug: {book.slug}</p>
@@ -248,7 +359,7 @@ export default function EditBookPage() {
                     <Button
                       size="sm"
                       type="submit"
-                      disabled={saving}
+                      disabled={saving || uploadingCover}
                     >
                       {saving ? (
                         <div className="flex items-center">

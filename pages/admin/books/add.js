@@ -40,7 +40,13 @@ export default function DevBooks() {
   }, [])
 
   const handleFileChange = (event) => {
-    setBookPdfFile(event.target.files[0])
+    let file = event.target.files[0]
+    setBookPdfFile(file)
+    setBookParams({...bookParams,
+      "slug": Utils.Slugify(file.name),
+      "custom_image_slug": Utils.Slugify(file.name),
+      "title": file.name,
+    })
   }
 
   const handleParamsChange = (event, field) => {

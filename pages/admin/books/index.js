@@ -27,7 +27,7 @@ export default function Books() {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [title, setTitle] = useState("");
-  const [sort, setSort] = useState("title_asc");
+  const [sort, setSort] = useState("id_desc");
   const [access, setAccess] = useState("all");
   const [loading, setLoading] = useState(false);
   const [accessTags, setAccessTags] = useState([])
@@ -36,7 +36,7 @@ export default function Books() {
   const [tempSelectedTypes, setTempSelectedTypes] = useState([]);
   const [tempSelectedTags, setTempSelectedTags] = useState([]);
   const [tempTitle, setTempTitle] = useState("");
-  const [tempSort, setTempSort] = useState("title_asc");
+  const [tempSort, setTempSort] = useState("id_desc");
   const [tempAccess, setTempAccess] = useState("all");
   const [tempAccessTags, setTempAccessTags] = useState([])
   const [now, setNow] = useState(0)

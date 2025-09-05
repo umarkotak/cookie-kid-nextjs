@@ -61,6 +61,7 @@ export default function EditBookPage() {
       const result = await response.json();
 
       if (result.success && result.data) {
+        result.data.cover_file_url = result.data.cover_file_url + `?ts=${Date.now()}`
         setBook(result.data);
         setFormData({
           book_id: result.data.id || 0,
@@ -177,7 +178,6 @@ export default function EditBookPage() {
         toast.success('Book cover updated successfully!');
         // Refresh book data to get the new cover URL
         await fetchBook();
-        window.location.reload()
       } else {
         throw new Error(result.error?.message || 'Failed to update cover');
       }

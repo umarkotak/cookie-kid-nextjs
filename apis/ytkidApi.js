@@ -3,20 +3,24 @@ class YtkiddAPI {
     if (typeof(window) !== "undefined" && window.location.protocol === "https:") {
       this.Host = "https://ytkidd-api-m4.cloudflare-avatar-id-1.site"
 
-      // this.SnapJSUrl = "https://app.midtrans.com/snap/snap.js"
-      // this.SnapClientKey = "Mid-client-QLRT-oH6Wg3jJkjQ"
+      // production
+      this.SnapJSUrl = "https://app.midtrans.com/snap/snap.js"
+      this.SnapClientKey = "Mid-client-QLRT-oH6Wg3jJkjQ"
 
-      this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
-      this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
+      // integration
+      // this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
+      // this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
     } else {
       this.Host = "https://ytkidd-api-m4.cloudflare-avatar-id-1.site"
       this.Host = "http://localhost:33000"
 
-      // this.SnapJSUrl = "https://app.midtrans.com/snap/snap.js"
-      // this.SnapClientKey = "Mid-client-QLRT-oH6Wg3jJkjQ"
+      // production
+      this.SnapJSUrl = "https://app.midtrans.com/snap/snap.js"
+      this.SnapClientKey = "Mid-client-QLRT-oH6Wg3jJkjQ"
 
-      this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
-      this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
+      // integration
+      // this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
+      // this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
     }
   }
 

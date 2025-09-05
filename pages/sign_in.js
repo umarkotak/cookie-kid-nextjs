@@ -17,7 +17,7 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'
 import { toast } from "react-toastify"
 import ytkiddAPI from "@/apis/ytkidApi"
 
-const GCID = "915149914245-vd6k2rs1qgaeqddb1mticba2aumtaq4h.apps.googleusercontent.com"
+const GCID = "218571481520-eg3pfk5m2rtu846e7d90qfoh0a7jsi3d.apps.googleusercontent.com"
 
 export default function SignIn() {
   const router = useRouter()

@@ -141,9 +141,22 @@ export default function Read() {
           ))}
 
           {/* PAGE NAVIGATION */}
-          <div className="absolute z-10 bottom-2 right-2 flex gap-1 bg-white bg-opacity-80 rounded-full border border-black shadow-sm px-1 py-0.5">
+          <div className="absolute z-10 top-12 lg:top-2 left-2 lg:left-[200px] flex gap-1 bg-white bg-opacity-80 rounded-lg shadow-sm px-1 py-0.5">
             <button
+              className="rounded-lg flex justify-start items-center hover:scale-110 duration-500 p-1 bg-zinc-100"
+              onClick={()=>ToggleFullScreen()}
+            >
+              <span className="text-black"><FullscreenIcon size={18} /></span>
+            </button>
+            {bookDetail.pdf_url && bookDetail.pdf_url !== "" && <a href={bookDetail.pdf_url} target="_blank"><button
               className="rounded-lg flex justify-start items-center hover:scale-110 duration-500 p-1"
+            >
+              <span className="text-black"><Printer size={18} /></span>
+            </button></a>}
+          </div>
+          <div className="absolute z-10 top-12 lg:top-2 right-2 flex gap-1 bg-white bg-opacity-80 rounded-lg shadow-sm px-1 py-0.5">
+            <button
+              className="rounded-lg flex justify-start items-center hover:scale-110 duration-500 p-1 bg-zinc-100"
               onClick={()=>PrevPage()}
             >
               <span className="text-black"><ArrowLeft size={18} /></span>
@@ -154,22 +167,11 @@ export default function Read() {
               <span className="text-black text-[14px]">{activePageNumber} / {tmpMaxPageNumber}</span>
             </button>
             <button
-              className="rounded-lg flex justify-start items-center hover:scale-110 duration-500 p-1"
+              className="rounded-lg flex justify-start items-center hover:scale-110 duration-500 p-1 bg-zinc-100"
               onClick={()=>NextPage()}
             >
               <span className="text-black"><ArrowRight size={18} /></span>
             </button>
-            <button
-              className="rounded-lg flex justify-start items-center hover:scale-110 duration-500 p-1"
-              onClick={()=>ToggleFullScreen()}
-            >
-              <span className="text-black"><FullscreenIcon size={18} /></span>
-            </button>
-            {bookDetail.pdf_url && bookDetail.pdf_url !== "" && <a href={bookDetail.pdf_url} target="_blank"><button
-              className="rounded-lg flex justify-start items-center hover:scale-110 duration-500 p-1"
-            >
-              <span className="text-black"><Printer size={18} /></span>
-            </button></a>}
           </div>
         </div>
       </div>

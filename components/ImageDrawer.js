@@ -173,6 +173,7 @@ const ImageDrawer = ({ imageUrl, className }) => {
   };
 
   const clearCanvas = () => {
+    if (!confirm("Apakah kamu yakin untuk membersihkan halaman ini?")) { return }
     setStrokes([]);
     setRedoStack([]);
     setCurrentPath([]);
@@ -191,7 +192,7 @@ const ImageDrawer = ({ imageUrl, className }) => {
               <h3 className="text-sm font-medium text-gray-700 mb-2 hidden lg:block">Tools</h3>
               <div className="flex lg:flex-col flex-row bg-gray-100 rounded-lg p-1 lg:gap-1 gap-0">
                 <button
-                  onClick={() => setTool('draw')}
+                  onClick={() => {setTool('draw'); setBrushSize(2); setOpacity(0.88)}}
                   className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors lg:w-full lg:justify-start justify-center ${
                     tool === 'draw'
                       ? 'bg-white text-gray-900 shadow-sm'
@@ -202,7 +203,7 @@ const ImageDrawer = ({ imageUrl, className }) => {
                   <span className="lg:inline hidden">Draw</span>
                 </button>
                 <button
-                  onClick={() => setTool('erase')}
+                  onClick={() => {setTool('erase'); setBrushSize(50); setOpacity(1)}}
                   className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors lg:w-full lg:justify-start justify-center ${
                     tool === 'erase'
                       ? 'bg-white text-gray-900 shadow-sm'

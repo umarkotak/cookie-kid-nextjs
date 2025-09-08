@@ -2,7 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Pencil, Eraser, Undo, Redo, Trash2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
-const ImageDrawer = ({ imageUrl, className }) => {
+const ImageDrawer = ({
+  imageUrl, className, onImageLoad, bookID, bookContentID,
+}) => {
+
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
   const [strokes, setStrokes] = useState([]);

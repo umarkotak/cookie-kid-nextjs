@@ -244,23 +244,51 @@ class YtkiddAPI {
     }
   }
 
+  // set cookie
+  SetCookie(name, value, days) {
+    if (days === 0) { days = 3650 }
+
+    let expires = "";
+    if (days) {
+      const date = new Date();
+      date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  }
+
+  // get cookie
+  getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(";");
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === " ") c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+  }
+
+  // remove cookie
+  removeCookie(name) {
+    document.cookie = name + "=; Max-Age=0; path=/";
+  }
+
   GenAuthToken(authToken) {
-    if (authToken && authToken !== "") { return authToken }
-    if (!localStorage) { return "" }
-    if (!localStorage.getItem("CK:AT")) { return "" }
-    return localStorage.getItem("CK:AT")
+    if (authToken && authToken !== "") {
+      return authToken;
+    }
+    const storedToken = this.getCookie("CK:AT");
+    return storedToken || "";
   }
 
   GetSession() {
-    if (!localStorage) {
-      return `nolocstore-${crypto.randomUUID()}`
+    let storedSession = this.getCookie("CK:SS");
+    if (!storedSession) {
+      storedSession = `ckss-${crypto.randomUUID()}`;
+      this.SetCookie("CK:SS", storedSession, 0); // expires in 7 days
     }
-    if (!localStorage.getItem("CK:SS")) {
-      let ses = `ckss-${crypto.randomUUID()}`
-      localStorage.setItem("CK:SS", ses)
-      return ses
-    }
-    return localStorage.getItem("CK:SS")
+    return storedSession;
   }
 }
 

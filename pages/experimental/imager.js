@@ -5,7 +5,7 @@ import Image from 'next/image';
 const generateMathPages = () => {
   const baseUrl = 'https://cbdata.cloudflare-avatar-id-1.site/books/singapore-math-3pdf/';
   const pages = [];
-  
+
   for (let i = 1; i <= 100; i++) {
     pages.push({
       id: i,
@@ -14,7 +14,7 @@ const generateMathPages = () => {
       imageUrl: `${baseUrl}${i}.jpeg`,
     });
   }
-  
+
   return pages;
 };
 
@@ -44,7 +44,7 @@ const ObjectComponent = ({ object, onImageLoad }) => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
           </div>
         )}
-        
+
         {imageError ? (
           <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
             <div className="text-gray-500 text-center">
@@ -69,7 +69,7 @@ const ObjectComponent = ({ object, onImageLoad }) => {
           />
         )}
       </div>
-      
+
       <div className="p-4">
         <h3 className="text-xl font-semibold text-gray-800 mb-2">{object.title}</h3>
         <p className="text-gray-600">{object.description}</p>
@@ -120,7 +120,7 @@ export default function SequentialImageLoader({ objects = sampleObjects }) {
           <p className="text-gray-600 mb-4">
             Math book pages load one by one for better performance and faster initial visibility
           </p>
-          
+
           {/* Progress indicator */}
           <div className="bg-gray-200 rounded-full h-2 mb-4">
             <div
@@ -128,11 +128,11 @@ export default function SequentialImageLoader({ objects = sampleObjects }) {
               style={{ width: `${(visibleItems.length / objects.length) * 100}%` }}
             ></div>
           </div>
-          
+
           <p className="text-sm text-gray-500">
             Loaded {visibleItems.length} of {objects.length} pages
           </p>
-          
+
           {/* Load all button */}
           {!loadingComplete && visibleItems.length > 1 && (
             <button
@@ -191,7 +191,7 @@ export default function SequentialImageLoader({ objects = sampleObjects }) {
             transform: translateY(0);
           }
         }
-        
+
         .animate-fadeIn {
           animation: fadeIn 0.5s ease-out forwards;
         }

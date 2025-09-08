@@ -36,12 +36,12 @@ export default function SignIn() {
 
       toast.success("Login Successfull")
 
-      localStorage.setItem("CK:AT", body.data.access_token)
+      ytkiddAPI.SetCookie("CK:AT", body.data.access_token, 0)
 
       router.push("/home")
 
     } catch (e) {
-      toast.error(`error ${e}`)
+      toast.error(`catch error ${e}`)
     }
   }
 

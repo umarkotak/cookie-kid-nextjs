@@ -78,7 +78,7 @@ export function DefaultSidebarFooter() {
   }
 
   function Logout() {
-    localStorage.removeItem("CK:AT")
+    ytkiddAPI.removeCookie("CK:AT")
 
     toast.success("Logout Successfull")
 

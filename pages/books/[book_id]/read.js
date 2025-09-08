@@ -17,7 +17,6 @@ export default function Read() {
   const searchParams = useSearchParams()
   const [activePage, setActivePage] = useState({})
   const [activePageNumber, setActivePageNumber] = useState(1)
-  const [imageLoading, setImageLoading] = useState(true)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [errNeedSubscription, setErrNeedSubscription] = useState(false)
@@ -32,12 +31,14 @@ export default function Read() {
   }, [])
 
   useEffect(() => {
-    // setImageLoading(true)
+    if (bookDetail.slug === router.query.book_id) { return }
+
     GetBookDetail(router.query.book_id)
   }, [router])
 
   useEffect(() => {
     if (!tmpBookDetail.id) { return }
+
     if (!tmpBookDetail.contents) { return }
 
     var pageNumber = parseInt(searchParams.get("page"))
@@ -166,7 +167,6 @@ export default function Read() {
 
   function NextPage() {
     if (activePageNumber >= tmpMaxPageNumber) { return }
-    // setImageLoading(true)
     router.push({
       pathname: `/books/${router.query.book_id}/read`,
       search: `?page=${activePageNumber+1}`
@@ -175,7 +175,6 @@ export default function Read() {
 
   function PrevPage() {
     if (activePageNumber <= 1) { return }
-    // setImageLoading(true)
     router.push({
       pathname: `/books/${router.query.book_id}/read`,
       search: `?page=${activePageNumber-1}`
@@ -202,7 +201,6 @@ export default function Read() {
       return
     }
 
-    setImageLoading(true)
     setIsDrawerOpen(false)
     router.push({
       pathname: `/books/${router.query.book_id}/read`,
@@ -210,15 +208,41 @@ export default function Read() {
     })
   }
 
-  function ImageLoaded() {
-    setImageLoading(false)
-  }
+  const [visibleItems, setVisibleItems] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loadingComplete, setLoadingComplete] = useState(false);
+
+  // Initialize with first item
+  useEffect(() => {
+    if (bookDetail?.contents?.length > 0) {
+      setVisibleItems([bookDetail?.contents[0]]);
+    }
+  }, [bookDetail]);
+
+  // Handle when an image finishes loading
+  const handleImageLoad = (loadedId) => {
+    // Add next item if available
+    if (currentIndex + 1 < bookDetail?.contents.length) {
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      setVisibleItems(prev => [...prev, bookDetail?.contents[nextIndex]]);
+    } else {
+      setLoadingComplete(true);
+    }
+  };
 
   return(
     <main className="">
       {errNeedSubscription &&
         <div className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert"> Kamu harus berlangganan cabocil premium untuk mengakses buku ini. <Link href="/subscription/package" className="underline">Berlangganan Sekarang</Link>.</div>
       }
+
+      {!loadingComplete && <div className="bg-gray-200 h-1">
+        <div
+          className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+          style={{ width: `${(visibleItems?.length / bookDetail.contents?.length) * 100}%` }}
+        ></div>
+      </div>}
 
       <div
         className={`bg-background ${isFullscreen ? `
@@ -227,23 +251,19 @@ export default function Read() {
           h-[calc(100vh-60px)] relative overflow-hidden
         `}`}
       >
-        {bookDetail.contents && bookDetail.contents.map((page, index) => (
+        {visibleItems && visibleItems.map((page, index) => (
           <img
             key={index}
             className={`border border-gray-500 ${isFullscreen ? `
               object-contain absolute top-0 left-0 w-full h-screen
             ` : `
               max-h-[calc(100vh-60px)] object-contain mx-auto
-            `} ${activePage.image_file_url === page.image_file_url ? "" : "none"}`}
-            src={activePage.image_file_url}
-            onLoad={()=>ImageLoaded()}
+            `} ${activePage.image_file_url === page.image_file_url ? "block" : "hidden"}`}
+            src={page.image_file_url}
+            onLoad={()=>handleImageLoad()}
+            onError={()=>handleImageLoad()}
           />
         ))}
-
-        {/* Loading overlay */}
-        <div className={`absolute z-20 top-0 left-0 w-full h-full bg-black bg-opacity-10 backdrop-blur-sm inset-0 flex items-center justify-center ${imageLoading ? "block" : "hidden"}`}>
-          <span className="bg-background py-1 px-2 rounded-lg flex items-center gap-2"><LoadingSpinner size={20}/> Loading...</span>
-        </div>
 
         {/* Controls */}
         <div className="absolute z-10 top-2 right-2 flex justify-start items-center gap-2">
@@ -354,7 +374,7 @@ export default function Read() {
 
         <div className="p-4 h-[calc(100vh-90px)] overflow-y-auto pb-20">
           <div className="grid grid-cols-2 gap-3">
-            {bookDetail.contents && bookDetail.contents.map((page, index) => (
+            {visibleItems && visibleItems.map((page, index) => (
               <div
                 key={index}
                 className={`relative cursor-pointer group transition-all duration-200 ${

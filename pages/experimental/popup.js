@@ -18,11 +18,11 @@ const AffiliateLinksPage = () => {
       description: `【Komposisi produk】18 Warna Gouache Paint Set: --Gouache Cat *18 --Nylon Sikat *6 (Hitam, Coklat. Warna acak kirim) --Menggambar Pen *1 --Palet Warna *1`
     },
     {
-      url: "https://tk.tokopedia.com/ZSAEdheAe",
-      name: "ROBOT RK10 Portable Mini Wired Keyboard Computer Ultra-Thin",
-      price: "85.000",
-      image: "https://images.tokopedia.net/img/cache/1600-square/o3syd0/1997/1/1/8a47adc6ed834ae88889122f1b4a82a5~.jpeg",
-      description: "💎Keunggulan: 1. Mini wired keyboard 2. Tombol Silent 3. Kecil dan Portable 4. Desain ergonomis 📋Spesifikasi: product type : Wired keyboard"
+      url: "https://tk.tokopedia.com/ZSAEBma3r",
+      name: "Rexus Keyboard Office Membrane K278 - Hitam",
+      price: "Rp 57,000",
+      image: "https://images.tokopedia.net/img/cache/700/o3syd0/1997/1/1/8c137f5f5d63452eb1cae6e122365c21~.jpeg",
+      description: "Typing Made Easy Keyboard Office Membrane K278 hadir dengan layout 104 tombol (full size) dan daya tahan klik hingga 8 juta kali. Warna hitam solid yang elegan, serta plug-and-play melalui kabel USB, dan material HIPS yang tahan lama memastikan pengalaman mengetik yang efisien dan tetap stylish."
     }
     // Add more products here
   ];

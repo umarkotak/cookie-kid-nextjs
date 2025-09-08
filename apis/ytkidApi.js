@@ -15,12 +15,12 @@ class YtkiddAPI {
       this.Host = "http://localhost:33000"
 
       // production
-      this.SnapJSUrl = "https://app.midtrans.com/snap/snap.js"
-      this.SnapClientKey = "Mid-client-QLRT-oH6Wg3jJkjQ"
+      // this.SnapJSUrl = "https://app.midtrans.com/snap/snap.js"
+      // this.SnapClientKey = "Mid-client-QLRT-oH6Wg3jJkjQ"
 
       // integration
-      // this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
-      // this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
+      this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
+      this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
     }
   }
 

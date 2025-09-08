@@ -18,11 +18,11 @@ const AffiliateLinksPage = () => {
       description: `【Komposisi produk】18 Warna Gouache Paint Set: --Gouache Cat *18 --Nylon Sikat *6 (Hitam, Coklat. Warna acak kirim) --Menggambar Pen *1 --Palet Warna *1`
     },
     {
-      url: "https://example.com/product2",
-      name: "Sample Product 2",
-      price: "130.000",
-      image: "https://example.com/image2.jpg",
-      description: "This is a sample product description for the second product with more details."
+      url: "https://tk.tokopedia.com/ZSAEdheAe",
+      name: "ROBOT RK10 Portable Mini Wired Keyboard Computer Ultra-Thin",
+      price: "85.000",
+      image: "https://images.tokopedia.net/img/cache/1600-square/o3syd0/1997/1/1/8a47adc6ed834ae88889122f1b4a82a5~.jpeg",
+      description: "💎Keunggulan: 1. Mini wired keyboard 2. Tombol Silent 3. Kecil dan Portable 4. Desain ergonomis 📋Spesifikasi: product type : Wired keyboard"
     }
     // Add more products here
   ];

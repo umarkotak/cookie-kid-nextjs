@@ -184,6 +184,12 @@ const ImageDrawer = ({
     localStorage.removeItem(storageKey);
   };
 
+  // Handle image load to get natural dimensions
+  const handleImageLoad = (e) => {
+    const img = e.target;
+    if (onImageLoad) onImageLoad(e);
+  };
+
   return (
     <div className={`flex lg:flex-row flex-col h-full ${className || ''}`}>
       {/* Responsive Toolbar */}
@@ -335,6 +341,8 @@ const ImageDrawer = ({
           alt="Background"
           className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
           draggable={false}
+          onLoad={handleImageLoad}
+          onError={handleImageLoad}
         />
         <canvas
           ref={canvasRef}

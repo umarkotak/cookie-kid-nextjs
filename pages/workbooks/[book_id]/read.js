@@ -152,7 +152,7 @@ export default function Read() {
           {visibleItems && visibleItems.map((page, index) => (
             <div
               key={"pagekey" + index + page.image_file_url}
-              className={`relative w-full ${activePage.image_file_url === page.image_file_url ? "h-full" : "invisible h-0"}`}
+              className={`relative w-full h-full ${activePage.image_file_url === page.image_file_url ? "block" : "hidden"}`}
             >
               <div
                 className={`border border-foreground shadow-md ${isFullscreen ? `

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Pencil, Eraser, Undo, Redo, Trash2, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { Pencil, Eraser, Undo, Redo, Trash2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
 const ImageDrawer = ({
@@ -8,7 +8,6 @@ const ImageDrawer = ({
 
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
-  const imageRef = useRef(null);
   const [strokes, setStrokes] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
   const [currentPath, setCurrentPath] = useState([]);
@@ -17,17 +16,7 @@ const ImageDrawer = ({
   const [color, setColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(2);
   const [opacity, setOpacity] = useState(0.88);
-
-  // Zoom and pan states
-  const [zoom, setZoom] = useState(1);
-  const [panX, setPanX] = useState(0);
-  const [panY, setPanY] = useState(0);
-  const [imageNaturalWidth, setImageNaturalWidth] = useState(0);
-  const [imageNaturalHeight, setImageNaturalHeight] = useState(0);
-  const [isPanning, setIsPanning] = useState(false);
-  const [lastPanPoint, setLastPanPoint] = useState({ x: 0, y: 0 });
-
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()
 
   // Default color palette
   const defaultColors = [
@@ -54,50 +43,15 @@ const ImageDrawer = ({
     localStorage.setItem(storageKey, JSON.stringify(strokes));
   }, [strokes, storageKey]);
 
-  // Handle image load to get natural dimensions
-  const handleImageLoad = (e) => {
-    const img = e.target;
-    setImageNaturalWidth(img.naturalWidth);
-    setImageNaturalHeight(img.naturalHeight);
-    if (onImageLoad) onImageLoad(e);
-  };
-
-  // Calculate canvas dimensions based on container and image aspect ratio
-  const getCanvasDimensions = () => {
-    if (!containerRef.current || !imageNaturalWidth || !imageNaturalHeight) {
-      return { width: 800, height: 600 };
-    }
-
-    const containerWidth = containerRef.current.offsetWidth;
-    const containerHeight = containerRef.current.offsetHeight;
-    const imageAspectRatio = imageNaturalWidth / imageNaturalHeight;
-    const containerAspectRatio = containerWidth / containerHeight;
-
-    let canvasWidth, canvasHeight;
-
-    if (imageAspectRatio > containerAspectRatio) {
-      // Image is wider relative to container
-      canvasWidth = containerWidth;
-      canvasHeight = containerWidth / imageAspectRatio;
-    } else {
-      // Image is taller relative to container
-      canvasHeight = containerHeight;
-      canvasWidth = containerHeight * imageAspectRatio;
-    }
-
-    return { width: canvasWidth, height: canvasHeight };
-  };
-
   // Handle resize and redraw
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const resizeCanvas = () => {
-      if (containerRef.current && imageNaturalWidth && imageNaturalHeight) {
-        const { width, height } = getCanvasDimensions();
-        canvas.width = width;
-        canvas.height = height;
+      if (containerRef.current) {
+        canvas.width = containerRef.current.offsetWidth;
+        canvas.height = containerRef.current.offsetHeight;
         const ctx = canvas.getContext('2d');
         drawAll(ctx);
       }
@@ -106,74 +60,23 @@ const ImageDrawer = ({
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     return () => window.removeEventListener('resize', resizeCanvas);
-  }, [strokes, currentPath, tool, color, brushSize, opacity, imageNaturalWidth, imageNaturalHeight]);
+  }, [strokes, currentPath, tool, color, brushSize, opacity]);
 
-  // Pinch zoom handling
+  // Prevent page scroll/zoom on iPad (fallback for older iOS)
   useEffect(() => {
     const el = canvasRef.current;
     if (!el) return;
-
-    let initialDistance = 0;
-    let initialZoom = 1;
-
-    const getDistance = (touches) => {
-      const dx = touches[0].clientX - touches[1].clientX;
-      const dy = touches[0].clientY - touches[1].clientY;
-      return Math.sqrt(dx * dx + dy * dy);
+    const prevent = (e) => {
+      // if drawing, or just always prevent over the canvas to avoid pinch/scroll
+      e.preventDefault();
     };
-
-    const handleTouchStart = (e) => {
-      if (e.touches.length === 2) {
-        e.preventDefault();
-        initialDistance = getDistance(e.touches);
-        initialZoom = zoom;
-        setIsDrawing(false);
-        setCurrentPath([]);
-      } else if (e.touches.length === 1 && !isDrawing) {
-        // Single touch for panning (only when not drawing)
-        if (zoom > 1) {
-          setIsPanning(true);
-          setLastPanPoint({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-        }
-      }
-    };
-
-    const handleTouchMove = (e) => {
-      if (e.touches.length === 2) {
-        e.preventDefault();
-        const currentDistance = getDistance(e.touches);
-        const scaleChange = currentDistance / initialDistance;
-        const newZoom = Math.max(0.5, Math.min(5, initialZoom * scaleChange));
-        setZoom(newZoom);
-      } else if (e.touches.length === 1 && isPanning && zoom > 1) {
-        e.preventDefault();
-        const deltaX = e.touches[0].clientX - lastPanPoint.x;
-        const deltaY = e.touches[0].clientY - lastPanPoint.y;
-        setPanX(prev => prev + deltaX);
-        setPanY(prev => prev + deltaY);
-        setLastPanPoint({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-      }
-    };
-
-    const handleTouchEnd = (e) => {
-      if (e.touches.length < 2) {
-        initialDistance = 0;
-      }
-      if (e.touches.length === 0) {
-        setIsPanning(false);
-      }
-    };
-
-    el.addEventListener('touchstart', handleTouchStart, { passive: false });
-    el.addEventListener('touchmove', handleTouchMove, { passive: false });
-    el.addEventListener('touchend', handleTouchEnd, { passive: false });
-
+    el.addEventListener('touchstart', prevent, { passive: false });
+    el.addEventListener('touchmove', prevent, { passive: false });
     return () => {
-      el.removeEventListener('touchstart', handleTouchStart);
-      el.removeEventListener('touchmove', handleTouchMove);
-      el.removeEventListener('touchend', handleTouchEnd);
+      el.removeEventListener('touchstart', prevent);
+      el.removeEventListener('touchmove', prevent);
     };
-  }, [zoom, isPanning, lastPanPoint, isDrawing]);
+  }, []);
 
   const drawStrokesOnCanvas = (ctx, strokesToDraw) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -210,18 +113,13 @@ const ImageDrawer = ({
     const rect = canvas.getBoundingClientRect();
     const clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
     const clientY = e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
-
-    // Account for zoom and pan
-    const x = ((clientX - rect.left) / zoom - panX / zoom) / rect.width * zoom;
-    const y = ((clientY - rect.top) / zoom - panY / zoom) / rect.height * zoom;
+    const x = (clientX - rect.left) / rect.width;
+    const y = (clientY - rect.top) / rect.height;
     return { x, y };
   };
 
   // --- Pointer-events based drawing (works for mouse, pen, touch) ---
   const startDrawing = (e) => {
-    if (e.touches && e.touches.length > 1) return; // Ignore multi-touch for drawing
-    if (isPanning) return; // Don't draw while panning
-
     e.preventDefault();
     const { x, y } = getCoordinates(e);
     setCurrentPath([{ x, y }]);
@@ -234,9 +132,7 @@ const ImageDrawer = ({
   };
 
   const draw = (e) => {
-    if (!isDrawing || isPanning) return;
-    if (e.touches && e.touches.length > 1) return; // Ignore multi-touch for drawing
-
+    if (!isDrawing) return;
     e.preventDefault();
     const { x, y } = getCoordinates(e);
     setCurrentPath((prev) => [...prev, { x, y }]);
@@ -288,21 +184,11 @@ const ImageDrawer = ({
     localStorage.removeItem(storageKey);
   };
 
-  const zoomIn = () => {
-    setZoom(prev => Math.min(5, prev * 1.2));
+  // Handle image load to get natural dimensions
+  const handleImageLoad = (e) => {
+    const img = e.target;
+    if (onImageLoad) onImageLoad(e);
   };
-
-  const zoomOut = () => {
-    setZoom(prev => Math.max(0.5, prev / 1.2));
-  };
-
-  const resetZoom = () => {
-    setZoom(1);
-    setPanX(0);
-    setPanY(0);
-  };
-
-  const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
 
   return (
     <div className={`flex lg:flex-row flex-col h-full ${className || ''}`}>
@@ -408,40 +294,6 @@ const ImageDrawer = ({
               </div>
             </div>
 
-            {/* Zoom Controls */}
-            <div className="lg:w-full">
-              <h3 className="text-sm font-medium text-gray-700 mb-2 hidden lg:block">Zoom</h3>
-              <div className="flex lg:flex-col flex-row lg:gap-2 gap-1">
-                <button
-                  onClick={zoomIn}
-                  className="lg:flex lg:items-center lg:gap-2 lg:px-3 lg:py-2 lg:text-sm lg:font-medium lg:justify-start lg:w-full p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-                  title="Zoom In"
-                >
-                  <ZoomIn size={18} />
-                  <span className="lg:inline hidden">Zoom In</span>
-                </button>
-                <button
-                  onClick={zoomOut}
-                  className="lg:flex lg:items-center lg:gap-2 lg:px-3 lg:py-2 lg:text-sm lg:font-medium lg:justify-start lg:w-full p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-                  title="Zoom Out"
-                >
-                  <ZoomOut size={18} />
-                  <span className="lg:inline hidden">Zoom Out</span>
-                </button>
-                <button
-                  onClick={resetZoom}
-                  className="lg:flex lg:items-center lg:gap-2 lg:px-3 lg:py-2 lg:text-sm lg:font-medium lg:justify-start lg:w-full p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-                  title="Reset Zoom"
-                >
-                  <RotateCcw size={18} />
-                  <span className="lg:inline hidden">Reset</span>
-                </button>
-                <div className="lg:block hidden text-xs text-gray-500 text-center py-1">
-                  {Math.round(zoom * 100)}%
-                </div>
-              </div>
-            </div>
-
             {/* Action Buttons */}
             <div className="lg:w-full lg:ml-0 ml-auto">
               <h3 className="text-sm font-medium text-gray-700 mb-2 hidden lg:block">Actions</h3>
@@ -481,47 +333,29 @@ const ImageDrawer = ({
       {/* Canvas Container */}
       <div
         ref={containerRef}
-        className="flex-1 relative overflow-hidden select-none bg-gray-100 flex items-center justify-center"
-        style={{ overscrollBehavior: 'none' }}
+        className="flex-1 relative overflow-hidden select-none"
+        style={{ overscrollBehavior: 'none' }} // blocks scroll chaining on iOS
       >
-        <div
-          className="relative"
-          style={{
-            transform: `scale(${zoom}) translate(${panX}px, ${panY}px)`,
-            transformOrigin: 'center center'
-          }}
-        >
-          <img
-            ref={imageRef}
-            src={imageUrl}
-            alt="Background"
-            className="block pointer-events-none select-none"
-            style={{
-              width: `${canvasWidth}px`,
-              height: `${canvasHeight}px`,
-              objectFit: 'contain'
-            }}
-            draggable={false}
-            onLoad={handleImageLoad}
-            onError={handleImageLoad}
-          />
-          <canvas
-            ref={canvasRef}
-            className="absolute inset-0 cursor-crosshair touch-none"
-            style={{
-              touchAction: 'none',
-              width: `${canvasWidth}px`,
-              height: `${canvasHeight}px`
-            }}
-            onContextMenu={(e) => e.preventDefault()}
-            // Pointer Events (covers mouse/pen/touch)
-            onPointerDown={startDrawing}
-            onPointerMove={draw}
-            onPointerUp={finishDrawing}
-            onPointerCancel={finishDrawing}
-            onPointerLeave={finishDrawing}
-          />
-        </div>
+        <img
+          src={imageUrl}
+          alt="Background"
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
+          draggable={false}
+          onLoad={handleImageLoad}
+          onError={handleImageLoad}
+        />
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full cursor-crosshair touch-none"
+          style={{ touchAction: 'none' }}               // prevent native panning/zooming
+          onContextMenu={(e) => e.preventDefault()}     // block long-press context menu
+          // Pointer Events (covers mouse/pen/touch)
+          onPointerDown={startDrawing}
+          onPointerMove={draw}
+          onPointerUp={finishDrawing}
+          onPointerCancel={finishDrawing}
+          onPointerLeave={finishDrawing}
+        />
       </div>
 
       <style jsx>{`

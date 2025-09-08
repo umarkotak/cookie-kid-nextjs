@@ -503,6 +503,7 @@ const ImageDrawer = ({
             }}
             draggable={false}
             onLoad={handleImageLoad}
+            onError={handleImageLoad}
           />
           <canvas
             ref={canvasRef}

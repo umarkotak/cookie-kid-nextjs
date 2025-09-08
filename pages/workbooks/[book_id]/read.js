@@ -12,18 +12,10 @@ export default function Read() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const drawingCanvas = useRef(null)
   const [bookDetail, setBookDetail] = useState({})
   const [activePage, setActivePage] = useState({})
   const [activePageNumber, setActivePageNumber] = useState(1)
-  const [imageLoading, setImageLoading] = useState(true)
   const [isFullscreen, setIsFullscreen] = useState(false)
-  // state for drawing
-  const [tool, setTool] = useState('draw')
-  const [color, setColor] = useState('#ff0000')
-  const [brushSize, setBrushSize] = useState(3)
-  const [imageLoaded, setImageLoaded] = useState(new Date)
-  const [showTool, setShowTool] = useState(true)
 
   useEffect(() => {
     tmpBookDetail = {}
@@ -31,7 +23,7 @@ export default function Read() {
   }, [])
 
   useEffect(() => {
-    setImageLoading(true)
+    if (bookDetail.slug === router.query.book_id) { return }
     GetBookDetail(router.query.book_id)
   }, [router])
 
@@ -88,7 +80,6 @@ export default function Read() {
 
   function NextPage() {
     if (activePageNumber >= tmpMaxPageNumber) { return }
-    setImageLoading(true)
     router.push({
       pathname: `/workbooks/${router.query.book_id}/read`,
       search: `?page=${activePageNumber+1}`
@@ -97,7 +88,6 @@ export default function Read() {
 
   function PrevPage() {
     if (activePageNumber <= 1) { return }
-    setImageLoading(true)
     router.push({
       pathname: `/workbooks/${router.query.book_id}/read`,
       search: `?page=${activePageNumber-1}`
@@ -108,10 +98,28 @@ export default function Read() {
     setIsFullscreen(!isFullscreen)
   }
 
-  function ImageLoaded() {
-    // setImageLoading(false)
-    // setImageLoaded(new Date)
-  }
+  const [visibleItems, setVisibleItems] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loadingComplete, setLoadingComplete] = useState(false);
+
+  // Initialize with first item
+  useEffect(() => {
+    if (bookDetail?.contents?.length > 0) {
+      setVisibleItems([bookDetail?.contents[0]]);
+    }
+  }, [bookDetail]);
+
+  // Handle when an image finishes loading
+  const handleImageLoad = (e) => {
+    // Add next item if available
+    if (currentIndex + 1 < bookDetail?.contents.length) {
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      setVisibleItems(prev => [...prev, bookDetail?.contents[nextIndex]]);
+    } else {
+      setLoadingComplete(true);
+    }
+  };
 
   return(
     <main className="">
@@ -123,7 +131,7 @@ export default function Read() {
         `}`}
       >
         <div className="relative h-full">
-          {bookDetail.contents && bookDetail.contents.map((page, index) => (
+          {visibleItems && visibleItems.map((page, index) => (
             <div
               key={"pagekey" + index + page.image_file_url}
               className={`relative w-full ${activePage.image_file_url === page.image_file_url ? "h-full" : "invisible h-0"}`}
@@ -135,7 +143,12 @@ export default function Read() {
                   mx-auto h-full
                 `}`}
               >
-                <ImageDrawer imageUrl={page.image_file_url} />
+                <ImageDrawer
+                  imageUrl={page.image_file_url}
+                  onImageLoad={handleImageLoad}
+                  bookID={bookDetail.id}
+                  bookContentID={page.id}
+                />
               </div>
             </div>
           ))}

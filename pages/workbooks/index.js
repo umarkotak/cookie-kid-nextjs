@@ -266,7 +266,7 @@ export default function Workbooks() {
                         </PopoverTrigger>
                         <PopoverContent className="w-full p-0" align="start">
                           <div className="p-4 space-y-2">
-                            {tagGroup.tags.map((tag) => (
+                            {tagGroup?.tags?.map((tag) => (
                               <div key={tag} className="flex items-center space-x-2">
                                 <Checkbox
                                   id={`modal-tag-${tag}`}
@@ -435,7 +435,7 @@ export default function Workbooks() {
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">
                       <div className="p-4 space-y-2">
-                        {tagGroup.tags.map((tag) => (
+                        {tagGroup?.tags?.map((tag) => (
                           <div key={tag} className="flex items-center space-x-2">
                             <Checkbox
                               id={`modal-tag-${tag}`}

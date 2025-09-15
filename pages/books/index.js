@@ -266,7 +266,7 @@ export default function Books() {
                         </PopoverTrigger>
                         <PopoverContent className="w-full p-0" align="start">
                           <div className="p-4 space-y-2">
-                            {tagGroup.tags.map((tag) => (
+                            {tagGroup?.tags?.map((tag) => (
                               <div key={tag} className="flex items-center space-x-2">
                                 <Checkbox
                                   id={`modal-tag-${tag}`}
@@ -435,7 +435,7 @@ export default function Books() {
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">
                       <div className="p-4 space-y-2">
-                        {tagGroup.tags.map((tag) => (
+                        {tagGroup?.tags?.map((tag) => (
                           <div key={tag} className="flex items-center space-x-2">
                             <Checkbox
                               id={`modal-tag-${tag}`}
@@ -541,8 +541,8 @@ export default function Books() {
             <div className="text-center py-16">
               <div className="max-w-sm mx-auto">
                 <Filter className="h-16 w-16 text-gray-300 mx-auto mb-6" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No books found</h3>
-                <p className="text-gray-500 mb-6">Try adjusting your filters or search terms to find what you're looking for.</p>
+                <h3 className="text-xl font-semibold mb-2">No books found</h3>
+                <p className="mb-6">Try adjusting your filters or search terms to find what you're looking for.</p>
                 <Button onClick={clearFilters} variant="outline" className="px-6">
                   Clear all filters
                 </Button>

@@ -125,6 +125,10 @@ class YtkiddAPI {
     return this.Get(`/ytkidd/api/comfy_ui/output`, authToken, h, params)
   }
 
+  async GetUploadBookStatus(authToken, h, formData) {
+    return this.Get(`/ytkidd/api/books/upload_status`, authToken, h, params)
+  }
+
   async PostFormInsertFromPdf(authToken, h, formData) {
     return this.PostForm(`/ytkidd/api/books/insert_from_pdf`, authToken, h, formData)
   }

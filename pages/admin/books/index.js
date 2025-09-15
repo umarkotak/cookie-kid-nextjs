@@ -22,6 +22,7 @@ export default function Books() {
   const [enableDev, setEnableDev] = useState(false);
   const [tagOptions, setTagOptions] = useState([]);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [uploadBookStatus, setUploadBookStatus] = useState({});
 
   // Filter states
   const [selectedTypes, setSelectedTypes] = useState([]);
@@ -104,6 +105,8 @@ export default function Books() {
     } else {
       setEnableDev(false);
     }
+
+    GetUploadBookStatus()
   }, [searchParams]);
 
   // Fetch books when filters change
@@ -156,6 +159,21 @@ export default function Books() {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function GetUploadBookStatus() {
+    try {
+      const response = await ytkiddAPI.GetUploadBookStatus("", {}, {});
+      const body = await response.json();
+      if (response.status !== 200) {
+        toast.error("error fetching upload book status")
+        return;
+      }
+
+      setUploadBookStatus(body.data);
+    } catch (e) {
+    } finally {
     }
   }
 
@@ -252,7 +270,12 @@ export default function Books() {
           <CardTitle>
             <div className="flex justify-between items-center">
               <div>Manage Books</div>
-              <Link href="/admin/books/add"><Button size="sm"><PlusIcon />Add Book</Button></Link>
+              <div className="flex gap-1 items-center">
+                <pre>
+                  {JSON.stringify(uploadBookStatus)}
+                </pre>
+                <Link href="/admin/books/add"><Button size="sm"><PlusIcon />Add Book</Button></Link>
+              </div>
             </div>
           </CardTitle>
         </CardHeader>
@@ -336,7 +359,7 @@ export default function Books() {
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">
                       <div className="p-4 space-y-2">
-                        {tagGroup.tags.map((tag) => (
+                        {tagGroup?.tags?.map((tag) => (
                           <div key={tag} className="flex items-center space-x-2">
                             <Checkbox
                               id={`modal-tag-${tag}`}
@@ -465,8 +488,8 @@ export default function Books() {
             <div className="text-center py-16">
               <div className="max-w-sm mx-auto">
                 <Filter className="h-16 w-16 text-gray-300 mx-auto mb-6" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No books found</h3>
-                <p className="text-gray-500 mb-6">Try adjusting your filters or search terms to find what you're looking for.</p>
+                <h3 className="text-xl font-semibold mb-2">No books found</h3>
+                <p className="mb-6">Try adjusting your filters or search terms to find what you're looking for.</p>
                 <Button onClick={clearFilters} variant="outline" className="px-6">
                   Clear all filters
                 </Button>

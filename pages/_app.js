@@ -67,10 +67,12 @@ function Main({ children }) {
 
   const [backLink, setBackLink] = useState("")
   const [shouldStick, setShouldStick] = useState(true)
+  const [padMain, setPadMain] = useState(true)
 
   useEffect(() => {
     if (!pathName) { return }
 
+    // sidebar default open / close
     if (pathName.startsWith("/watch") ||
         pathName.startsWith("/games/flowchart") ||
         pathName.includes("/read")) {
@@ -79,6 +81,7 @@ function Main({ children }) {
       setOpen(true)
     }
 
+    // back link
     if (pathName.startsWith("/watch")) {
       setBackLink("/tv")
     } else if (pathName.includes("/books") && pathName.includes("/read")) {
@@ -88,11 +91,18 @@ function Main({ children }) {
     } else {
       setBackLink("")
     }
+
+    // add padding on content / not
+    if (pathName.startsWith("/home")) {
+      setPadMain(false)
+    } else {
+      setPadMain(true)
+    }
   }, [pathName])
 
   return(
     <main className={`${!isMobile ? open ? "w-[calc(100%-13rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
-      <header className={`${shouldStick ? "sticky top-0" : ""} flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-40 bg-background pt-2 pb-2 px-3 border-b`}>
+      <header className={`${shouldStick ? "sticky top-0" : ""} flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-40 backdrop-blur-lg bg-[hsl(43,100%,97%)] dark:bg-[hsl(240,10%,10%)] bg-opacity-80 dark:bg-opacity-80 pt-2 pb-2 px-3 border-none`}>
         <div className="flex items-center gap-2">
           <SidebarTrigger />
           { backLink && backLink !== "" &&
@@ -105,7 +115,7 @@ function Main({ children }) {
         </div>
       </header>
 
-      <div className="relative py-2 px-2 sm:px-3 w-full">
+      <div className={padMain ? "relative py-2 px-2 sm:px-3 w-full" : ""}>
         {children}
       </div>
     </main>

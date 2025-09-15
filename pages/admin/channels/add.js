@@ -17,6 +17,7 @@ export default function AddYoutubeChannel() {
 
   const [scrapChannelParams, setScrapChannelParams] = useState({
     "channel_id": "",
+    "channel_url": "",
     "page_token": "",
     "query": "",
     "max_page": 1,
@@ -62,7 +63,12 @@ export default function AddYoutubeChannel() {
             <div className="flex justify-between items-center">
               <span className="flex gap-1 items-center"><TvIcon size={18} /> Add Channel</span>
               <div className="flex gap-1">
-                <a href="https://commentpicker.com/youtube-channel-id.php" target="_blank"><Button>Get Youtube Channel ID</Button></a>
+                <div className="flex gap-1">
+                  <a href="https://commentpicker.com/youtube-channel-id.php" target="_blank"><Button size="sm">Get Youtube Channel ID</Button></a>
+                </div>
+                <div className="flex gap-1">
+                  <a href="https://www.tunepocket.com/youtube-channel-id-finder" target="_blank"><Button size="sm">Get Youtube Channel ID Alt</Button></a>
+                </div>
               </div>
             </div>
           </CardTitle>
@@ -76,6 +82,10 @@ export default function AddYoutubeChannel() {
             <div>
               <label>Channel ID</label>
               <Input name="channel_id" value={scrapChannelParams.channel_id} onChange={HandleChange} />
+            </div>
+            <div>
+              <label>Channel URL</label>
+              <Input name="channel_url" value={scrapChannelParams.channel_url} onChange={HandleChange} />
             </div>
             <div>
               <label>Page Token</label>

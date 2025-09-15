@@ -24,7 +24,7 @@ export default function AdminChannelEdit() {
     "username": "username",
     "image_url": "image_url",
     "active": "active",
-    "channel_link": "channel_link"
+    "channel_link": "#"
   })
 
   useEffect(() => {
@@ -102,7 +102,7 @@ export default function AdminChannelEdit() {
             </Avatar>
             <div className='flex flex-col'>
               <span className='text-2xl'>{channelDetail.name}</span>
-              <Link href="#"><Button size="icon_sm"><YoutubeIcon /></Button></Link>
+              <Link href={channelDetail?.channel_link || "#"}><Button size="icon_sm"><YoutubeIcon /></Button></Link>
             </div>
           </CardTitle>
         </CardHeader>

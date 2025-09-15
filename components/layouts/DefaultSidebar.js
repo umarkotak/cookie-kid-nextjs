@@ -24,6 +24,9 @@ import { usePathname } from "next/navigation"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import ytkiddAPI from "@/apis/ytkidApi"
+import { toast } from "react-toastify"
+import { useRouter } from "next/router"
 
 const items = [
   { key: "item-home", title: "Home", url: "/home", icon: Home },
@@ -47,16 +50,61 @@ const adminItems = [
 export function DefaultSidebar() {
   const pathName = usePathname()
   const [isAdminPath, setIsAdminPath] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     if (!pathName) { return }
     setIsAdminPath(pathName.startsWith("/admin"))
   }, [pathName])
 
+  const [userData, setUserData] = useState({})
+
+  useEffect(() => {
+    GetCheckAuth()
+  }, [pathName])
+
+  async function GetCheckAuth() {
+    if (ytkiddAPI.GenAuthToken() === "") { return }
+
+    try {
+      const response = await ytkiddAPI.GetCheckAuth("", {}, {})
+      const body = await response.json()
+
+      if (response.status !== 200) {
+        Logout()
+        // toast.error(`error ${JSON.stringify(body)}`)
+        return
+      }
+
+      // console.warn("USER DATA", body.data)
+
+      setUserData(body.data.user)
+
+      if (pathName && pathName.startsWith("/admin")) {
+        if (!["admin", "superadmin"].includes(body.data.user.user_role)) {
+          router.replace("/home")
+        }
+      }
+
+    } catch (e) {
+      // Logout()
+      toast.error(`error ${e}`)
+    }
+  }
+
+  function Logout() {
+    ytkiddAPI.removeCookie("CK:AT")
+
+    toast.success("Logout Successfull")
+
+    router.reload()
+  }
+
   return (
     <Sidebar
       collapsible="icon"
       variant="sidebar"
+      className="border-none"
     >
       <SidebarHeader>
         <SidebarMenu>
@@ -136,7 +184,7 @@ export function DefaultSidebar() {
         </Collapsible>}
       </SidebarContent>
 
-      <DefaultSidebarFooter />
+      <DefaultSidebarFooter userData={userData} />
     </Sidebar>
   )
 }

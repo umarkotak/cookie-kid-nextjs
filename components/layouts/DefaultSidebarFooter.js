@@ -33,49 +33,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
 import ytkiddAPI from "@/apis/ytkidApi"
 import { useRouter } from "next/router"
 import { toast } from "react-toastify"
 
-export function DefaultSidebarFooter() {
+export function DefaultSidebarFooter({
+  userData,
+}) {
   const router = useRouter()
-  const pathName = usePathname()
   const { isMobile } = useSidebar()
-  const [userData, setUserData] = useState({})
-
-  useEffect(() => {
-    GetCheckAuth()
-  }, [pathName])
-
-  async function GetCheckAuth() {
-    if (ytkiddAPI.GenAuthToken() === "") { return }
-
-    try {
-      const response = await ytkiddAPI.GetCheckAuth("", {}, {})
-      const body = await response.json()
-
-      if (response.status !== 200) {
-        toast.error(`error ${JSON.stringify(body)}`)
-        return
-      }
-
-      // console.warn("USER DATA", body.data)
-
-      setUserData(body.data.user)
-
-      if (pathName && pathName.startsWith("/admin")) {
-        if (!["admin", "superadmin"].includes(body.data.user.user_role)) {
-          router.replace("/home")
-        }
-      }
-
-    } catch (e) {
-      toast.error(`error ${e}`)
-    }
-  }
 
   function Logout() {
     ytkiddAPI.removeCookie("CK:AT")

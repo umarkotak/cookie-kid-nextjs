@@ -24,7 +24,7 @@ export default function Home() {
   }, [resolvedTheme])
 
   return (
-    <main className={`min-h-[calc(100vh-70px)] overflow-hidden transition-colors duration-300 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-pink-100 via-sky-100 to-emerald-100'}`}>
+    <main className={`min-h-[calc(100vh-48px)] overflow-hidden transition-colors duration-300 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-pink-100 via-sky-100 to-emerald-100'}`}>
       {/* Background decorative shapes */}
       <Bubbles isDark={isDark} />
 
@@ -50,7 +50,7 @@ export default function Home() {
         </p>
 
         {/* Menu Cards */}
-        <nav aria-label="Main" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <nav aria-label="Main" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <MenuCard
             href="/tv"
             label="Televisi Anak"
@@ -117,14 +117,6 @@ function MenuCard({ href, label, emoji, gradient, isDark, blurb }) {
             <h3 className={`mt-3 text-2xl sm:text-2xl font-extrabold ${isDark ? 'text-white' : 'text-slate-900'}`}>{label}</h3>
             <p className={`mt-1 text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{blurb}</p>
           </div>
-
-          <span
-            className={`self-end rounded-full px-3 py-1 text-xs font-bold tracking-wide transition-transform group-hover:translate-x-1 ${
-              isDark ? 'bg-white/10 text-white' : 'bg-slate-900/5 text-slate-700'
-            }`}
-          >
-            Start →
-          </span>
         </div>
       </div>
     </Link>

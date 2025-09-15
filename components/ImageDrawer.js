@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Pencil, Eraser, Undo, Redo, Trash2, ChevronDown } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
+import { Pencil, Eraser, Undo, Redo, Trash2 } from 'lucide-react';
 import ytkiddAPI from '@/apis/ytkidApi';
 import useDebounce from './useDebounce';
 
@@ -11,7 +10,7 @@ const ImageDrawer = ({
   const canvasRef = useRef(null);
   const imgRef = useRef(null);
   const activePointerIdRef = useRef(null);
-  const touchCountRef = useRef(0); // Track number of active touches
+  const touchCountRef = useRef(0);
 
   const [containerSize, setContainerSize] = useState(0)
   const [strokes, setStrokes] = useState([]);
@@ -29,7 +28,10 @@ const ImageDrawer = ({
   const [opacity, setOpacity] = useState(0.88);
   const [brushSizeDropdownOpen, setBrushSizeDropdownOpen] = useState(false);
 
-  const searchParams = useSearchParams();
+  // ✨ NEW: State for the eraser cursor preview
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 }); // Start off-screen
+  const [isCursorVisible, setIsCursorVisible] = useState(false);
+
   const debouncedStrokes = useDebounce(strokes, 500);
 
   const defaultColors = [
@@ -37,7 +39,6 @@ const ImageDrawer = ({
     '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'
   ];
 
-  // Brush size options for dropdown
   const brushSizeOptions = {
     draw: [1, 2, 3, 4, 5, 8, 10, 12, 15, 20],
     erase: [10, 15, 20, 25, 30, 35, 40, 45, 50]
@@ -113,8 +114,9 @@ const ImageDrawer = ({
     canvas.style.left = `${leftOffset}px`;
     canvas.style.top = `${topOffset}px`;
 
-    const drawPath = (stroke) => {
-      if (stroke.points.length < 1) return;
+    const drawSmoothPath = (stroke) => {
+      const points = stroke.points;
+      if (points.length < 2) return;
 
       ctx.beginPath();
       ctx.globalCompositeOperation = stroke.tool === 'erase' ? 'destination-out' : 'source-over';
@@ -124,18 +126,31 @@ const ImageDrawer = ({
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
-      const [firstPoint, ...restPoints] = stroke.points;
-      ctx.moveTo(firstPoint.x * renderedWidth, firstPoint.y * renderedHeight);
-      restPoints.forEach(point => {
-        ctx.lineTo(point.x * renderedWidth, point.y * renderedHeight);
-      });
+      ctx.moveTo(points[0].x * renderedWidth, points[0].y * renderedHeight);
+
+      if (points.length === 2) {
+        ctx.lineTo(points[1].x * renderedWidth, points[1].y * renderedHeight);
+      } else {
+        for (let i = 1; i < points.length - 1; i++) {
+          const p0 = points[i];
+          const p1 = points[i + 1];
+          const midPointX = (p0.x + p1.x) / 2 * renderedWidth;
+          const midPointY = (p0.y + p1.y) / 2 * renderedHeight;
+
+          ctx.quadraticCurveTo(p0.x * renderedWidth, p0.y * renderedHeight, midPointX, midPointY);
+        }
+
+        const lastPoint = points[points.length - 1];
+        ctx.lineTo(lastPoint.x * renderedWidth, lastPoint.y * renderedHeight);
+      }
+
       ctx.stroke();
     };
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    strokes.forEach(drawPath);
+    strokes.forEach(drawSmoothPath);
     if (currentPath.length > 0) {
-      drawPath({
+      drawSmoothPath({
         tool,
         color: tool === 'draw' ? color : undefined,
         relativeSize: brushSize / renderedWidth,
@@ -165,11 +180,8 @@ const ImageDrawer = ({
     return { x: Math.max(0, Math.min(1, x)), y: Math.max(0, Math.min(1, y)) };
   };
 
-  // Enhanced touch start handler
   const handleTouchStart = useCallback((e) => {
     touchCountRef.current = e.touches.length;
-
-    // Block drawing if more than one touch
     if (e.touches.length > 1) {
       e.preventDefault();
       if (isDrawing) {
@@ -178,10 +190,7 @@ const ImageDrawer = ({
       }
       return;
     }
-
-    // Prevent text selection and default behaviors
     e.preventDefault();
-
     const touch = e.touches[0];
     const coords = getCanvasCoordinates({ clientX: touch.clientX, clientY: touch.clientY });
     if (coords) {
@@ -192,14 +201,11 @@ const ImageDrawer = ({
   }, [isDrawing]);
 
   const handleTouchMove = useCallback((e) => {
-    // Block if more than one touch
     if (e.touches.length > 1 || touchCountRef.current > 1) {
       e.preventDefault();
       return;
     }
-
     if (!isDrawing) return;
-
     e.preventDefault();
     const touch = e.touches[0];
     const coords = getCanvasCoordinates({ clientX: touch.clientX, clientY: touch.clientY });
@@ -210,20 +216,15 @@ const ImageDrawer = ({
 
   const handleTouchEnd = useCallback((e) => {
     touchCountRef.current = e.touches.length;
-
-    // If there are still touches remaining, don't end drawing
     if (e.touches.length > 0) {
       e.preventDefault();
       return;
     }
-
     e.preventDefault();
     setIsDrawing(false);
-
     if (currentPath.length > 0) {
       const canvas = canvasRef.current;
       const renderedWidth = parseFloat(canvas.style.width);
-
       const newStroke = {
         tool,
         color: tool === 'draw' ? color : undefined,
@@ -236,16 +237,11 @@ const ImageDrawer = ({
     setCurrentPath([]);
   }, [currentPath, tool, color, brushSize, opacity]);
 
-  // Fallback pointer events for non-touch devices
   const handlePointerDown = useCallback((e) => {
-    // Skip if this is a touch event (handled by touch handlers)
     if (e.pointerType === 'touch') return;
-
     if (!e.isPrimary) return;
-
     e.target.setPointerCapture(e.pointerId);
     activePointerIdRef.current = e.pointerId;
-
     const coords = getCanvasCoordinates(e);
     if (coords) {
       setCurrentPath([coords]);
@@ -257,7 +253,6 @@ const ImageDrawer = ({
   const handlePointerMove = useCallback((e) => {
     if (e.pointerType === 'touch') return;
     if (!isDrawing || e.pointerId !== activePointerIdRef.current) return;
-
     const coords = getCanvasCoordinates(e);
     if (coords) {
       setCurrentPath(prev => [...prev, coords]);
@@ -267,15 +262,12 @@ const ImageDrawer = ({
   const handlePointerUp = useCallback((e) => {
     if (e.pointerType === 'touch') return;
     if (e.pointerId !== activePointerIdRef.current) return;
-
     e.target.releasePointerCapture(e.pointerId);
     activePointerIdRef.current = null;
     setIsDrawing(false);
-
     if (currentPath.length > 0) {
       const canvas = canvasRef.current;
       const renderedWidth = parseFloat(canvas.style.width);
-
       const newStroke = {
         tool,
         color: tool === 'draw' ? color : undefined,
@@ -292,6 +284,24 @@ const ImageDrawer = ({
     if (onImageLoad) { onImageLoad(e) };
     setImageLoaded(true);
   }, [onImageLoad]);
+
+  // ✨ NEW: Handlers to track the cursor for the eraser preview
+  const handlePointerEnter = () => {
+    setIsCursorVisible(true);
+  };
+
+  const handlePointerLeave = () => {
+    setIsCursorVisible(false);
+  };
+
+  const handlePointerMoveForCursor = (e) => {
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setCursorPos({ x, y });
+  };
 
   // --- Toolbar Actions ---
   const undo = useCallback(() => {
@@ -319,7 +329,6 @@ const ImageDrawer = ({
   async function checkWidth() {
     for (let index = 0; index < 15; index++) {
       if (!focus) { return }
-      console.log(bookContentID, "width", containerRef.current?.offsetWidth)
       setContainerSize(containerRef.current?.offsetWidth)
       await sleep(500);
     }
@@ -330,20 +339,17 @@ const ImageDrawer = ({
     checkWidth()
   }, [focus])
 
-  // Handle brush size selection
   const handleBrushSizeChange = (size) => {
     setBrushSize(size);
     setBrushSizeDropdownOpen(false);
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest('.brush-size-dropdown')) {
         setBrushSizeDropdownOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -419,7 +425,6 @@ const ImageDrawer = ({
             <div className="lg:w-full">
               <h3 className="text-sm font-medium text-gray-700 mb-2 hidden lg:block">Brush Settings</h3>
               <div className="flex lg:flex-col flex-row lg:gap-4 gap-3">
-                {/* Brush Size Dropdown */}
                 <div className="flex lg:flex-col flex-row lg:items-start items-center lg:gap-2 gap-2">
                   <label className="text-sm font-medium text-gray-700 lg:mb-0">Size</label>
                   <div className="brush-size-dropdown">
@@ -494,7 +499,10 @@ const ImageDrawer = ({
       {/* --- Enhanced Canvas Container --- */}
       <div
         ref={containerRef}
-        className="flex-1 relative overflow-hidden select-none bg-background"
+        className="flex-1 relative overflow-hidden select-none bg-background cursor-crosshair"
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+        onPointerMove={handlePointerMoveForCursor}
         style={{
           touchAction: 'none',
           userSelect: 'none',
@@ -517,7 +525,7 @@ const ImageDrawer = ({
         {imageLoaded && (
           <canvas
             ref={canvasRef}
-            className="absolute cursor-crosshair"
+            className="absolute"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -532,6 +540,21 @@ const ImageDrawer = ({
               touchAction: 'none',
               userSelect: 'none',
               WebkitUserSelect: 'none'
+            }}
+          />
+        )}
+
+        {/* ✨ NEW: Eraser cursor preview */}
+        {tool === 'erase' && isCursorVisible && (
+          <div
+            className="absolute rounded-full border border-gray-500 bg-gray-500 bg-opacity-20"
+            style={{
+              left: `${cursorPos.x}px`,
+              top: `${cursorPos.y}px`,
+              width: `${brushSize}px`,
+              height: `${brushSize}px`,
+              transform: 'translate(-50%, -50%)',
+              pointerEvents: 'none', // Allows clicking through the div
             }}
           />
         )}

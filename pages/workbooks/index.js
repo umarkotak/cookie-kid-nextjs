@@ -505,7 +505,7 @@ export default function Workbooks() {
                   {/* Square Image Container */}
                   <div className="relative aspect-square overflow-hidden bg-gray-100">
                     <img
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                       src={oneBook.cover_file_url}
                       alt={`Cover of ${oneBook.title}`}
                       loading="lazy"

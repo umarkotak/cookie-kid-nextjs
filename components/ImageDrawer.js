@@ -422,29 +422,18 @@ const ImageDrawer = ({
                 {/* Brush Size Dropdown */}
                 <div className="flex lg:flex-col flex-row lg:items-start items-center lg:gap-2 gap-2">
                   <label className="text-sm font-medium text-gray-700 lg:mb-0">Size</label>
-                  <div className="relative brush-size-dropdown">
-                    <button
-                      onClick={() => setBrushSizeDropdownOpen(!brushSizeDropdownOpen)}
-                      className="flex items-center justify-between lg:w-full w-16 px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  <div className="brush-size-dropdown">
+                    <select
+                      value={brushSize}
+                      onChange={(e) => handleBrushSizeChange(e.target.value)}
+                      className="w-12 lg:w-full p-1 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                     >
-                      <span>{brushSize}</span>
-                      <ChevronDown size={16} className={`transition-transform ${brushSizeDropdownOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    {brushSizeDropdownOpen && (
-                      <div className="absolute top-full left-0 mt-1 lg:w-full w-20 bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
-                        {brushSizeOptions[tool].map((size) => (
-                          <button
-                            key={size}
-                            onClick={() => handleBrushSizeChange(size)}
-                            className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 ${
-                              brushSize === size ? 'bg-blue-100 text-blue-900' : ''
-                            }`}
-                          >
-                            {size}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                      {brushSizeOptions[tool].map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

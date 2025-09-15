@@ -166,6 +166,7 @@ export default function Read() {
                   onImageLoad={handleImageLoad}
                   bookID={bookDetail.id}
                   bookContentID={page.id}
+                  focus={activePage.image_file_url === page.image_file_url}
                 />
               </div>
             </div>

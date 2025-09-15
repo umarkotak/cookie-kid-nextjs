@@ -145,6 +145,14 @@ class YtkiddAPI {
     return this.Get(`/ytkidd/api/user/subscription`, authToken, h, params)
   }
 
+  async GetUserStroke(authToken, h, params) {
+    return this.Get(`/ytkidd/api/book/user_stroke`, authToken, h, params)
+  }
+
+  async PostUserStroke(authToken, h, params) {
+    return this.Post(`/ytkidd/api/book/user_stroke`, authToken, h, params)
+  }
+
   // REUSABLE
 
   async Get(path, authToken, h, params) {

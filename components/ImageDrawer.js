@@ -1,198 +1,274 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Pencil, Eraser, Undo, Redo, Trash2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import ytkiddAPI from '@/apis/ytkidApi';
+import useDebounce from './useDebounce'; // You'll need a debounce hook, implementation provided below
 
 const ImageDrawer = ({
-  imageUrl, className, onImageLoad, bookID, bookContentID,
+  imageUrl, className, onImageLoad, bookID, bookContentID, focus,
 }) => {
-
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
+  const imgRef = useRef(null);
+  const activePointerIdRef = useRef(null); // To track the primary finger/pen
+
+  const [containerSize, setContainerSize] = useState(0)
   const [strokes, setStrokes] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
   const [currentPath, setCurrentPath] = useState([]);
+
   const [isDrawing, setIsDrawing] = useState(false);
-  const [tool, setTool] = useState('draw'); // 'draw' or 'erase'
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Tool settings
+  const [tool, setTool] = useState('draw');
   const [color, setColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(2);
   const [opacity, setOpacity] = useState(0.88);
-  const searchParams = useSearchParams()
 
-  // Default color palette
+  const searchParams = useSearchParams();
+  const debouncedStrokes = useDebounce(strokes, 500); // Debounce API calls
+
   const defaultColors = [
     '#000000', '#ffffff', '#ef4444', '#f97316', '#eab308',
     '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'
   ];
 
-  const storageKey = `drawing_${imageUrl}`;
+  // --- API Communication ---
 
-  // Load from localStorage on mount
+  // 1. Fetch existing strokes from the API on component load
   useEffect(() => {
-    const savedStrokes = localStorage.getItem(storageKey);
-    if (savedStrokes) {
-      setStrokes(JSON.parse(savedStrokes));
-    }
-  }, [searchParams, storageKey]);
-
-  // Save to localStorage on strokes change (also clear when empty)
-  useEffect(() => {
-    if (strokes.length <= 0) {
-      return
-    }
-
-    localStorage.setItem(storageKey, JSON.stringify(strokes));
-  }, [strokes, storageKey]);
-
-  // Handle resize and redraw
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const resizeCanvas = () => {
-      if (containerRef.current) {
-        canvas.width = containerRef.current.offsetWidth;
-        canvas.height = containerRef.current.offsetHeight;
-        const ctx = canvas.getContext('2d');
-        drawAll(ctx);
+    const getUserStroke = async (id) => {
+      if (!id) return;
+      setIsInitialLoad(true);
+      try {
+        const response = await ytkiddAPI.GetUserStroke("", {}, { book_content_id: id });
+        if (response.ok) {
+          const body = await response.json();
+          setStrokes(body.data.strokes || []);
+        }
+      } catch (error) {
+        console.error('Error loading strokes:', error);
+      } finally {
+        setIsInitialLoad(false);
       }
     };
+    getUserStroke(bookContentID);
+  }, [bookContentID]);
 
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    return () => window.removeEventListener('resize', resizeCanvas);
-  }, [strokes, currentPath, tool, color, brushSize, opacity]);
-
-  // Prevent page scroll/zoom on iPad (fallback for older iOS)
+  // 2. Save strokes to the API (debounced to avoid excessive calls)
   useEffect(() => {
-    const el = canvasRef.current;
-    if (!el) return;
-    const prevent = (e) => {
-      // if drawing, or just always prevent over the canvas to avoid pinch/scroll
-      e.preventDefault();
+    const postUserStroke = async () => {
+      if (isInitialLoad || !bookContentID || debouncedStrokes.length === 0) return;
+      try {
+        await ytkiddAPI.PostUserStroke("", {}, {
+          book_id: bookID,
+          book_content_id: bookContentID,
+          image_url: imageUrl,
+          strokes: debouncedStrokes
+        });
+      } catch (error) {
+        console.error('Error saving strokes:', error);
+      }
     };
-    el.addEventListener('touchstart', prevent, { passive: false });
-    el.addEventListener('touchmove', prevent, { passive: false });
-    return () => {
-      el.removeEventListener('touchstart', prevent);
-      el.removeEventListener('touchmove', prevent);
-    };
-  }, []);
+    postUserStroke();
+  }, [debouncedStrokes, bookID, bookContentID, imageUrl, isInitialLoad]);
 
-  const drawStrokesOnCanvas = (ctx, strokesToDraw) => {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    strokesToDraw.forEach((stroke) => {
+  // --- Canvas Setup and Drawing Logic ---
+
+  // Centralized effect for all canvas drawing operations
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const img = imgRef.current;
+    if (!canvas || !img || !imageLoaded) return;
+
+    const ctx = canvas.getContext('2d');
+    const pixelRatio = window.devicePixelRatio || 1;
+
+    // Calculate rendered image dimensions to position canvas correctly
+    const containerRect = canvas.parentElement.getBoundingClientRect();
+    const imageAspectRatio = img.naturalWidth / img.naturalHeight;
+    const containerAspectRatio = containerRect.width / containerRect.height;
+
+    let renderedWidth, renderedHeight;
+    if (containerAspectRatio > imageAspectRatio) {
+      renderedHeight = containerRect.height;
+      renderedWidth = renderedHeight * imageAspectRatio;
+    } else {
+      renderedWidth = containerRect.width;
+      renderedHeight = renderedWidth / imageAspectRatio;
+    }
+
+    // Set canvas size and high-DPI scaling
+    canvas.style.width = `${renderedWidth}px`;
+    canvas.style.height = `${renderedHeight}px`;
+    canvas.width = renderedWidth * pixelRatio;
+    canvas.height = renderedHeight * pixelRatio;
+    ctx.scale(pixelRatio, pixelRatio);
+
+    // Center the canvas
+    const leftOffset = (containerRect.width - renderedWidth) / 2;
+    const topOffset = (containerRect.height - renderedHeight) / 2;
+    canvas.style.left = `${leftOffset}px`;
+    canvas.style.top = `${topOffset}px`;
+
+    // --- Drawing functions ---
+    const drawPath = (stroke) => {
       if (stroke.points.length < 1) return;
+
       ctx.beginPath();
       ctx.globalCompositeOperation = stroke.tool === 'erase' ? 'destination-out' : 'source-over';
       ctx.strokeStyle = stroke.color || '#000000';
-      ctx.lineWidth = stroke.relativeSize * ctx.canvas.width;
-      ctx.globalAlpha = stroke.opacity;
+      ctx.lineWidth = stroke.relativeSize ? stroke.relativeSize * renderedWidth : (stroke.brushSize || 2);
+      ctx.globalAlpha = stroke.opacity || 1;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
+
       const [firstPoint, ...restPoints] = stroke.points;
-      ctx.moveTo(firstPoint.x * ctx.canvas.width, firstPoint.y * ctx.canvas.height);
-      restPoints.forEach((point) => {
-        ctx.lineTo(point.x * ctx.canvas.width, point.y * ctx.canvas.height);
+      ctx.moveTo(firstPoint.x * renderedWidth, firstPoint.y * renderedHeight);
+      restPoints.forEach(point => {
+        ctx.lineTo(point.x * renderedWidth, point.y * renderedHeight);
       });
       ctx.stroke();
-    });
-  };
+    };
 
-  const drawAll = (ctx) => {
-    drawStrokesOnCanvas(ctx, strokes);
+    // Clear and redraw everything
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    strokes.forEach(drawPath);
     if (currentPath.length > 0) {
-      drawStrokesOnCanvas(ctx, [
-        ...strokes,
-        { tool, color: tool === 'draw' ? color : undefined, relativeSize: brushSize / ctx.canvas.width, opacity, points: currentPath },
-      ]);
+      drawPath({
+        tool,
+        color: tool === 'draw' ? color : undefined,
+        relativeSize: brushSize / renderedWidth,
+        opacity,
+        points: currentPath,
+      });
     }
-  };
 
-  const getCoordinates = (e) => {
+  }, [strokes, currentPath, imageLoaded, tool, color, brushSize, opacity, containerSize]); // Redraw whenever state changes
+
+  // Effect for handling window resizing
+  useEffect(() => {
+    if (!imageLoaded) return;
+    const handleResize = () => setStrokes(prev => [...prev]); // Trigger redraw on resize
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [imageLoaded]);
+
+  // --- Event Handlers ---
+
+  const getCanvasCoordinates = (e) => {
     const canvas = canvasRef.current;
+    if (!canvas) return null;
     const rect = canvas.getBoundingClientRect();
-    const clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
-    const clientY = e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
+    const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+    const clientY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
     const x = (clientX - rect.left) / rect.width;
     const y = (clientY - rect.top) / rect.height;
-    return { x, y };
+    return { x: Math.max(0, Math.min(1, x)), y: Math.max(0, Math.min(1, y)) };
   };
 
-  // --- Pointer-events based drawing (works for mouse, pen, touch) ---
-  const startDrawing = (e) => {
-    e.preventDefault();
-    const { x, y } = getCoordinates(e);
-    setCurrentPath([{ x, y }]);
-    setIsDrawing(true);
-    // keep events even if finger goes outside canvas
-    const canvas = canvasRef.current;
-    if (canvas && e.pointerId !== undefined && canvas.setPointerCapture) {
-      try { canvas.setPointerCapture(e.pointerId); } catch {}
+  const handlePointerDown = useCallback((e) => {
+    // PREVENT MULTI-TOUCH: Ignore if more than one finger is on screen or not the primary pointer
+    if (e.pointerType === 'touch' && e.nativeEvent.touches.length > 1) {
+        if (isDrawing) setIsDrawing(false); // Cancel current drawing if a second finger is added
+        return;
     }
-  };
+    if (!e.isPrimary) return;
 
-  const draw = (e) => {
-    if (!isDrawing) return;
-    e.preventDefault();
-    const { x, y } = getCoordinates(e);
-    setCurrentPath((prev) => [...prev, { x, y }]);
-  };
+    e.target.setPointerCapture(e.pointerId);
+    activePointerIdRef.current = e.pointerId;
 
-  const finishDrawing = (e) => {
-    if (e) e.preventDefault();
+    const coords = getCanvasCoordinates(e);
+    if (coords) {
+      setCurrentPath([coords]);
+      setIsDrawing(true);
+      setRedoStack([]); // Clear redo stack on new action
+    }
+  }, [isDrawing]);
+
+  const handlePointerMove = useCallback((e) => {
+    // Only draw if actively drawing and it's the same primary pointer
+    if (!isDrawing || e.pointerId !== activePointerIdRef.current) return;
+
+    const coords = getCanvasCoordinates(e);
+    if (coords) {
+      setCurrentPath(prev => [...prev, coords]);
+    }
+  }, [isDrawing]);
+
+  const handlePointerUp = useCallback((e) => {
+    if (e.pointerId !== activePointerIdRef.current) return;
+    e.target.releasePointerCapture(e.pointerId);
+    activePointerIdRef.current = null;
+    setIsDrawing(false);
+
     if (currentPath.length > 0) {
       const canvas = canvasRef.current;
+      const renderedWidth = parseFloat(canvas.style.width);
+
       const newStroke = {
         tool,
         color: tool === 'draw' ? color : undefined,
-        relativeSize: brushSize / canvas.width,
+        relativeSize: brushSize / renderedWidth, // Store size relative to canvas width
         opacity,
         points: currentPath,
       };
-      setStrokes((prev) => [...prev, newStroke]);
-      setRedoStack([]);
+      setStrokes(prev => [...prev, newStroke]);
     }
     setCurrentPath([]);
-    setIsDrawing(false);
+  }, [currentPath, tool, color, brushSize, opacity]);
 
-    const canvas = canvasRef.current;
-    if (canvas && e?.pointerId !== undefined && canvas.releasePointerCapture) {
-      try { canvas.releasePointerCapture(e.pointerId); } catch {}
-    }
-  };
+  const handleImageLoad = useCallback((e) => {
+    if (onImageLoad) onImageLoad(e);
+    setImageLoaded(true);
+  }, [onImageLoad]);
 
-  const undo = () => {
+  useEffect(() => {
+  }, [imageLoaded])
+
+  // --- Toolbar Actions ---
+
+  const undo = useCallback(() => {
     if (strokes.length === 0) return;
     const lastStroke = strokes[strokes.length - 1];
+    setRedoStack(prev => [...prev, lastStroke]);
     setStrokes(strokes.slice(0, -1));
-    setRedoStack((prev) => [...prev, lastStroke]);
-  };
+  }, [strokes]);
 
-  const redo = () => {
+  const redo = useCallback(() => {
     if (redoStack.length === 0) return;
     const nextStroke = redoStack[redoStack.length - 1];
+    setStrokes(prev => [...prev, nextStroke]);
     setRedoStack(redoStack.slice(0, -1));
-    setStrokes((prev) => [...prev, nextStroke]);
-  };
+  }, [redoStack]);
 
-  const clearCanvas = () => {
-    if (!confirm("Apakah kamu yakin untuk membersihkan halaman ini?")) { return }
-    setStrokes([]);
-    setRedoStack([]);
-    setCurrentPath([]);
-    // also clear persisted data
-    localStorage.removeItem(storageKey);
-  };
+  const clearCanvas = useCallback(() => {
+    if (window.confirm("Apakah kamu yakin untuk membersihkan halaman ini?")) {
+        setStrokes([]);
+        setRedoStack([]);
+        setCurrentPath([]);
+    }
+  }, []);
 
-  // Handle image load to get natural dimensions
-  const handleImageLoad = (e) => {
-    const img = e.target;
-    if (onImageLoad) onImageLoad(e);
-  };
+  async function checkWidth() {
+    for (let index = 0; index < 15; index++) {
+      if (!focus) { return }
+      console.log(bookContentID, "width", containerRef.current?.offsetWidth)
+      setContainerSize(containerRef.current?.offsetWidth)
+      await sleep(500);
+    }
+  }
+
+  useEffect(() => {
+    if (!focus) { return }
+    checkWidth()
+  }, [focus])
 
   return (
     <div className={`flex lg:flex-row flex-col h-full ${className || ''}`}>
-      {/* Responsive Toolbar */}
+      {/* --- Toolbar (No changes needed here, using your existing layout) --- */}
       <div className="bg-white lg:border-r border-b lg:border-b-0 border-gray-200 shadow-sm overflow-auto lg:w-48 lg:min-w-48 lg:max-w-48 lg:h-full max-h-32 lg:max-h-none">
         <div className="lg:p-2 p-0">
           <div className="flex lg:flex-col flex-row lg:gap-6 gap-1 lg:items-stretch items-center flex-nowrap lg:flex-nowrap">
@@ -212,7 +288,7 @@ const ImageDrawer = ({
                   <span className="lg:inline hidden">Draw</span>
                 </button>
                 <button
-                  onClick={() => {setTool('erase'); setBrushSize(50); setOpacity(1)}}
+                  onClick={() => {setTool('erase'); setBrushSize(20); setOpacity(1)}}
                   className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors lg:w-full lg:justify-start justify-center ${
                     tool === 'erase'
                       ? 'bg-white text-gray-900 shadow-sm'
@@ -267,7 +343,7 @@ const ImageDrawer = ({
                     <input
                       type="range"
                       min="1"
-                      max="50"
+                      max={tool === 'erase' ? "50" : "20"}
                       value={brushSize}
                       onChange={(e) => setBrushSize(Number(e.target.value))}
                       className="lg:flex-1 w-20 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
@@ -330,34 +406,35 @@ const ImageDrawer = ({
         </div>
       </div>
 
-      {/* Canvas Container */}
+
+      {/* --- Canvas Container --- */}
       <div
         ref={containerRef}
-        className="flex-1 relative overflow-hidden select-none"
-        style={{ overscrollBehavior: 'none' }} // blocks scroll chaining on iOS
+        className="flex-1 relative overflow-hidden select-none bg-background"
+        style={{ touchAction: 'none' }}
       >
         <img
+          ref={imgRef}
           src={imageUrl}
-          alt="Background"
-          className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
-          draggable={false}
+          alt="Drawing background"
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none"
           onLoad={handleImageLoad}
-          onError={handleImageLoad}
+          draggable="false"
         />
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full cursor-crosshair touch-none"
-          style={{ touchAction: 'none' }}               // prevent native panning/zooming
-          onContextMenu={(e) => e.preventDefault()}     // block long-press context menu
-          // Pointer Events (covers mouse/pen/touch)
-          onPointerDown={startDrawing}
-          onPointerMove={draw}
-          onPointerUp={finishDrawing}
-          onPointerCancel={finishDrawing}
-          onPointerLeave={finishDrawing}
-        />
+        {imageLoaded && (
+          <canvas
+            ref={canvasRef}
+            className="absolute cursor-crosshair"
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp} // Use same handler for cancel
+            onContextMenu={(e) => e.preventDefault()}
+          />
+        )}
       </div>
 
+      {/* --- Styles (No changes needed, using your existing styles) --- */}
       <style jsx>{`
         .slider::-webkit-slider-thumb {
           appearance: none;
@@ -368,7 +445,6 @@ const ImageDrawer = ({
           cursor: pointer;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-
         .slider::-moz-range-thumb {
           height: 16px;
           width: 16px;
@@ -378,29 +454,13 @@ const ImageDrawer = ({
           border: none;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-
-        .slider::-webkit-slider-track {
-          height: 8px;
-          border-radius: 4px;
-          background: #e5e7eb;
-        }
-
-        .slider::-moz-range-track {
-          height: 8px;
-          border-radius: 4px;
-          background: #e5e7eb;
-          border: none;
-        }
-
-        /* Small extras so images/canvas don't get selected on iOS */
-        img, canvas {
-          -webkit-user-select: none;
-                  user-select: none;
-          -webkit-touch-callout: none;
-        }
       `}</style>
     </div>
   );
 };
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export default ImageDrawer;

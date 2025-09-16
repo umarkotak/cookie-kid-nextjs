@@ -85,6 +85,25 @@ export default function Read() {
     }
   }
 
+  useEffect(() => {
+    RecordBookActivity()
+  }, [activePage])
+
+  async function RecordBookActivity() {
+    if (!bookDetail.id || bookDetail.id === 0) { return }
+
+    ytkiddAPI.PostUserActivity("", {}, {
+      book_id: bookDetail.id,
+      book_content_id: 0,
+      metadata: {
+        last_read_book_content_id: activePage.id,
+        current_progress: activePage.page_number,
+        min_progress: 0,
+        max_progress: tmpBookDetail?.contents?.length || 0
+      }
+    })
+  }
+
   function NextPage() {
     if (activePageNumber >= tmpMaxPageNumber) { return }
     router.push({

@@ -36,7 +36,6 @@ export default function Books() {
   const [tempTitle, setTempTitle] = useState("");
   const [tempSort, setTempSort] = useState("title_asc");
   const [tempAccess, setTempAccess] = useState("all");
-  const [tempAccessTags, setTempAccessTags] = useState([])
   const [now, setNow] = useState(0)
 
   const sortOptions = [
@@ -78,7 +77,7 @@ export default function Books() {
       setSort(urlSort);
       setTempSort(urlSort);
     }
-    
+
     // Determine access value from URL params
     if (urlAccess === "free") {
       setAccess("free");

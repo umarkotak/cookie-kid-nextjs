@@ -1,15 +1,11 @@
 import { useRef, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import YouTube, { YouTubeProps } from 'react-youtube'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import {Img} from 'react-image'
-import ReactPlayer from 'react-player'
 const ReactPlayerCsr = dynamic(() => import('@/components/ReactPlayerCsr'), { ssr: false })
+import ReactPlayer from 'react-player'
 import { useRouter } from 'next/router'
 
-import YtVideo from '@/models/YtVideo'
-import Utils from '@/models/Utils'
 import VideoQuiz from '@/components/VideoQuiz'
 import ytkiddAPI from '@/apis/ytkidApi'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -24,7 +20,6 @@ export default function Watch() {
 
   const [videoPlayerHeight, setVideoPlayerHeight] = useState(0)
   const [mobileMode, setMobileMode] = useState(true)
-  const [smallWebMode, setSmallWebMode] = useState(true)
   const [videoDetail, setVideoDetail] = useState({channel: {}})
   const [suggestionVideos, setSuggestionVideos] = useState([])
   const [blockVideoRecomm, setBlockVideoRecomm] = useState(false)
@@ -37,30 +32,30 @@ export default function Watch() {
 
   const intervalRef = useRef(null)
 
+  // --- Start of added code ---
+  const [videoDuration, setVideoDuration] = useState(0);
+  const lastRecordedTimeRef = useRef(0);
+  // --- End of added code ---
+
+
   useEffect(() => {
     if (typeof(window) === "undefined") { return }
 
     if (window.innerWidth <= mobileModeLimit) {
       setMobileMode(true)
-      setSmallWebMode(true)
     } else if (window.innerWidth <= smallWebLimit) {
       setMobileMode(false)
-      setSmallWebMode(true)
     } else {
       setMobileMode(false)
-      setSmallWebMode(false)
     }
 
     const onResize = () => {
       if (window.innerWidth <= mobileModeLimit) {
         setMobileMode(true)
-        setSmallWebMode(true)
       } else if (window.innerWidth <= smallWebLimit) {
         setMobileMode(false)
-        setSmallWebMode(true)
       } else {
         setMobileMode(false)
-        setSmallWebMode(false)
       }
     }
 
@@ -126,12 +121,6 @@ export default function Watch() {
     }
   }
 
-  function videoContainerClass(tmpMobileMode, tmpSmallWebMode) {
-    if (tmpMobileMode) { return "w-full" }
-    if (tmpSmallWebMode) { return "w-full" }
-    return "w-full"
-  }
-
   useEffect(() => {
     const execCallback = () => {
       if (localStorage.getItem("COOKIEKID:QUIZ:ENABLE") === "off") {
@@ -155,6 +144,32 @@ export default function Watch() {
     return () => clearInterval(intervalRef.current)
   }, [])
 
+  async function RecordVideoWatchActivity(currentTs, maxTs) {
+    ytkiddAPI.PostUserActivity("", {}, {
+      youtube_video_id: videoDetail.id,
+      metadata: {
+        current_progress: currentTs,
+        min_progress: 0,
+        max_progress: maxTs
+      }
+    })
+  }
+
+  // var sendInterval = 5 // in second
+  const handleVideoProgress = (progress) => {
+    // console.warn("tick", Math.floor(rPlayerRef.current.currentTime))
+
+    const currentSeconds = Math.floor(rPlayerRef.current.currentTime);
+
+    // if (currentSeconds > lastRecordedTimeRef.current + sendInterval) {
+      RecordVideoWatchActivity(currentSeconds, Math.floor(rPlayerRef.current.duration));
+      // Update the ref to the current time
+      // lastRecordedTimeRef.current = currentSeconds;
+
+      // console.warn("REF", Math.floor(rPlayerRef.current.currentTime), Math.floor(rPlayerRef.current.duration))
+    // }
+  };
+
   return (
     <main className='flex flex-col lg:flex-row gap-4'>
       <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} />
@@ -163,13 +178,15 @@ export default function Watch() {
         <div className='w-full' ref={videoPlayerDivRef} id="video-content">
           <div className={`w-full md:relative overflow-hidden shadow-md`}>
             <div className='w-full' style={{height: `${videoPlayerHeight}px`}}>
-              <ReactPlayerCsr
+              <ReactPlayer
                 ref={rPlayerRef}
                 src={`https://www.youtube.com/watch?v=${videoDetail.external_id}`}
-                width="100%"
-                height="100%"
+                style={{ width: '100%', height: 'auto', aspectRatio: '16/9' }}
                 playing={playerPlaying}
                 controls={true}
+                // --- Start of added/modified code ---
+                onProgress={handleVideoProgress}
+                // --- End of added/modified code ---
               />
             </div>
             <div

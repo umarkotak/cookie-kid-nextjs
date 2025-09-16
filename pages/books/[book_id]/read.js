@@ -144,6 +144,23 @@ export default function Read() {
     }
   }
 
+  useEffect(() => {
+    RecordBookActivity()
+  }, [activePage])
+
+  async function RecordBookActivity() {
+    ytkiddAPI.PostUserActivity("", {}, {
+      book_id: bookDetail.id,
+      book_content_id: 0,
+      metadata: {
+        last_read_book_content_id: activePage.id,
+        current_progress: activePage.page_number,
+        min_progress: 0,
+        max_progress: tmpBookDetail?.contents?.length || 0
+      }
+    })
+  }
+
   // Toggle checkbox selection
   function togglePageSelection(pageId) {
     console.log(pageId)

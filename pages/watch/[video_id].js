@@ -5,6 +5,19 @@ import Link from 'next/link'
 const ReactPlayerCsr = dynamic(() => import('@/components/ReactPlayerCsr'), { ssr: false })
 import ReactPlayer from 'react-player'
 import { useRouter } from 'next/router'
+import {
+  MediaController,
+  MediaControlBar,
+  MediaTimeRange,
+  MediaTimeDisplay,
+  MediaVolumeRange,
+  MediaPlaybackRateButton,
+  MediaPlayButton,
+  MediaSeekBackwardButton,
+  MediaSeekForwardButton,
+  MediaMuteButton,
+  MediaFullscreenButton,
+} from "media-chrome/react";
 
 import VideoQuiz from '@/components/VideoQuiz'
 import ytkiddAPI from '@/apis/ytkidApi'
@@ -172,29 +185,48 @@ export default function Watch() {
 
   return (
     <main className='flex flex-col lg:flex-row gap-4'>
-      <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} />
+      {/* <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} /> */}
 
       <div className='sticky top-10 z-10 md:block w-full bg-background'>
         <div className='w-full' ref={videoPlayerDivRef} id="video-content">
           <div className={`w-full md:relative overflow-hidden shadow-md`}>
             <div className='w-full' style={{height: `${videoPlayerHeight}px`}}>
-              <ReactPlayer
-                ref={rPlayerRef}
-                src={`https://www.youtube.com/watch?v=${videoDetail.external_id}`}
-                style={{ width: '100%', height: 'auto', aspectRatio: '16/9' }}
-                playing={playerPlaying}
-                controls={true}
-                // --- Start of added/modified code ---
-                onProgress={handleVideoProgress}
-                // --- End of added/modified code ---
-              />
+              <MediaController
+                style={{
+                  width: "100%",
+                  aspectRatio: "16/9",
+                }}
+              >
+                <ReactPlayer
+                  slot="media"
+                  ref={rPlayerRef}
+                  src={`https://www.youtube.com/watch?v=${videoDetail.external_id}`}
+                  style={{ width: '100%', height: '100%', "--controls": "none" }}
+                  // playing={playerPlaying}
+                  controls={false}
+                  // --- Start of added/modified code ---
+                  onProgress={handleVideoProgress}
+                  // --- End of added/modified code ---
+                />
+                <MediaControlBar>
+                  <MediaPlayButton />
+                  <MediaSeekBackwardButton seekOffset={10} />
+                  <MediaSeekForwardButton seekOffset={10} />
+                  <MediaTimeRange />
+                  <MediaTimeDisplay showDuration />
+                  <MediaMuteButton />
+                  <MediaVolumeRange />
+                  <MediaPlaybackRateButton />
+                  <MediaFullscreenButton />
+                </MediaControlBar>
+              </MediaController>
             </div>
-            <div
+            {/* <div
               className='absolute right-[55px] bottom-0 w-28 rounded h-8 bg-red-100 bg-opacity-0'
             ></div>
             <div
               className={`${blockVideoRecomm ? "absolute left-0 bottom-14 w-full bg-black bg-opacity-90 h-full" : ""}`}
-            ></div>
+            ></div> */}
           </div>
         </div>
         {/* {`https://www.youtube.com/watch?v=${videoDetail.external_id}`} */}

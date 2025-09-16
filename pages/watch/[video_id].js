@@ -183,6 +183,9 @@ export default function Watch() {
     // }
   };
 
+  function handlePause() {
+  }
+
   return (
     <main className='flex flex-col lg:flex-row gap-4'>
       {/* <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} /> */}
@@ -207,6 +210,7 @@ export default function Watch() {
                   // --- Start of added/modified code ---
                   onProgress={handleVideoProgress}
                   // --- End of added/modified code ---
+                  onPause={handlePause}
                 />
                 <MediaControlBar>
                   <MediaPlayButton />

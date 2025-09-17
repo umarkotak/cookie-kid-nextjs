@@ -187,14 +187,14 @@ export default function Watch() {
   }
 
   return (
-    <main className='flex flex-col lg:flex-row gap-4'>
+    <main className='flex flex-col lg:flex-row gap-4 mt-[-8px] mx-[-8px] sm:mt-0 '>
       {/* <VideoQuiz ts={quizTs} setTs={setQuizTs} setPlayerPlaying={setPlayerPlaying} /> */}
 
-      <div className='sticky top-10 z-10 md:block w-full bg-background'>
+      <div className='sticky top-[44px] z-10 md:block w-full bg-background'>
         <div className='w-full' ref={videoPlayerDivRef} id="video-content">
           <div className={`w-full md:relative overflow-hidden shadow-md`}>
             <div className='w-full' style={{height: `${videoPlayerHeight}px`}}>
-              <MediaController
+              {/* <MediaController
                 style={{
                   width: "100%",
                   aspectRatio: "16/9",
@@ -223,7 +223,16 @@ export default function Watch() {
                   <MediaPlaybackRateButton />
                   <MediaFullscreenButton />
                 </MediaControlBar>
-              </MediaController>
+              </MediaController> */}
+                <ReactPlayer
+                  ref={rPlayerRef}
+                  src={`https://www.youtube.com/watch?v=${videoDetail.external_id}`}
+                  style={{ width: '100%', height: '100%' }}
+                  playing={playerPlaying}
+                  controls={true}
+                  onProgress={handleVideoProgress}
+                  onPause={handlePause}
+                />
             </div>
             {/* <div
               className='absolute right-[55px] bottom-0 w-28 rounded h-8 bg-red-100 bg-opacity-0'

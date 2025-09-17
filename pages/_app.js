@@ -149,10 +149,10 @@ function Main({ children }) {
         </div>
       </header>
 
+      {/* ${isDark ? "dark:bg-slate-900": "bg-gradient-to-br from-pink-100 via-sky-100 to-emerald-100"} */}
       <div
         className={`transition-colors duration-300
         min-h-[calc(100vh-44px)]
-        ${isDark ? "dark:bg-slate-900": "bg-gradient-to-br from-pink-100 via-sky-100 to-emerald-100"}
         ${padMain ? "relative py-2 px-2 sm:px-3 w-full" : ""}`}
       >
         {children}

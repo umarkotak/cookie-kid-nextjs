@@ -7,12 +7,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, Filter, Search, X } from "lucide-react";
+import { CalendarIcon, ChevronDown, Filter, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Workbooks() {
   const [bookList, setBookList] = useState([]);
@@ -496,43 +502,56 @@ export default function Workbooks() {
           {/* Books Grid - Modern Tokopedia-style layout */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
             {bookList.map((oneBook) => (
-              <Link
-                href={`/workbooks/${oneBook.slug}/read?page=1`}
-                key={oneBook.id}
-                className="group block"
-              >
-                <div className="bg-white hover:shadow-lg transition-shadow duration-200 rounded-lg overflow-hidden">
-                  {/* Square Image Container */}
-                  <div className="relative aspect-square overflow-hidden bg-gray-100">
-                    <img
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                      src={oneBook.cover_file_url}
-                      alt={`Cover of ${oneBook.title}`}
-                      loading="lazy"
-                    />
-                    {oneBook.is_free ? (
-                      <div className="absolute top-2 right-2 text-xs py-1 px-2 rounded-md bg-green-600 text-white font-medium">FREE</div>
-                    ) : (
-                      <div className="absolute top-2 right-2 text-xs py-1 px-2 rounded-md bg-yellow-600 text-white font-medium">PREMIUM</div>
-                    )}
-                  </div>
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <Link
+                    href={`/workbooks/${oneBook.slug}/read?page=1`}
+                    key={oneBook.id}
+                    className="group block"
+                  >
+                    <div className="flex h-full flex-col rounded-lg border border-slate-200 bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1 overflow-hidden">
+                      {/* --- Image Container --- */}
+                      <div className="relative aspect-[3/4] overflow-hidden">
+                        <img
+                          className="h-full w-full object-fit transition-transform duration-300 group-hover:scale-105"
+                          src={oneBook.cover_file_url}
+                          alt={`Cover of ${oneBook.title}`}
+                          loading="lazy"
+                        />
+                        {/* --- Status Badge --- */}
+                        <div
+                          className={`absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-semibold text-white ${
+                            oneBook.is_free ? 'bg-emerald-500' : 'bg-blue-500'
+                          }`}
+                        >
+                          {oneBook.is_free ? 'FREE' : 'PREMIUM'}
+                        </div>
+                      </div>
 
-                  {/* Book Info */}
-                  <div className="p-3">
-                    <h3 className="text-sm text-gray-900 line-clamp-2 leading-tight font-medium group-hover:text-blue-600 transition-colors">
-                      {oneBook.title}
-                    </h3>
+                      {/* --- Book Info --- */}
+                      <div className="flex flex-1 flex-col p-4">
+                        {/* --- Category Tag --- */}
+                        {oneBook.tags?.[0] && (
+                          <span className="mb-2 inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                            {oneBook.tags[0]}
+                          </span>
+                        )}
 
-                    <div className="mt-2 flex items-center justify-between">
-                      {/* <span className="text-xs text-gray-500">Author</span> */}
-                      <div className="flex items-center gap-1">
-                        <div className="text-xs bg-blue-50 text-gray-800 p-0.5">{oneBook.tags[0]}</div>
-                        {/* <span className="text-xs text-gray-600">4.5</span> */}
+                        {/* --- Title --- */}
+                        <h3 className="text-sm line-clamp-2 text-slate-800 transition-colors group-hover:text-blue-600">
+                          {/* The min-h-[3rem] ensures consistent card height even for shorter, single-line titles */}
+                          {oneBook.title}
+                        </h3>
                       </div>
                     </div>
+                  </Link>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="flex justify-between gap-4">
+                    {oneBook.title}
                   </div>
-                </div>
-              </Link>
+                </HoverCardContent>
+              </HoverCard>
             ))}
           </div>
 

@@ -15,6 +15,7 @@ import { useCronitor } from '@cronitorio/cronitor-rum-nextjs'
 import { ChevronLeft } from "lucide-react"
 import Link from "next/link"
 import { InstallButton } from "@/components/InstallButton"
+import { useTheme } from "next-themes"
 
 const roboto = Geist({
   weight: '400',
@@ -57,6 +58,23 @@ export default function App({ Component, pageProps }) {
 }
 
 function Main({ children }) {
+  const { resolvedTheme } = useTheme();
+  const [isDark, setIsDark] = useState(true);
+
+  // apply theme to <html>
+  useEffect(() => {
+    setIsDark(resolvedTheme === 'dark');
+    if (typeof document === 'undefined') return
+    const root = document.documentElement
+    if (resolvedTheme === 'dark') {
+      root.classList.add('dark')
+      localStorage.setItem('theme', 'dark')
+    } else if (resolvedTheme === 'light') {
+      root.classList.remove('dark')
+      localStorage.setItem('theme', 'light')
+    }
+  }, [resolvedTheme])
+
   const pathName = usePathname()
   const {
     state,
@@ -117,7 +135,7 @@ function Main({ children }) {
   }, [pathName])
 
   return(
-    <main className={`${!isMobile ? open ? "w-[calc(100%-13rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
+    <div className={`${!isMobile ? open ? "w-[calc(100%-13rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
       <header className={`${shouldStick ? "sticky top-0" : ""} flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-40 backdrop-blur-lg bg-[hsl(43,100%,97%)] dark:bg-[hsl(240,10%,10%)] bg-opacity-80 dark:bg-opacity-80 pt-2 pb-2 px-3 border-none`}>
         <div className="flex items-center gap-2">
           {showSidebarTrigger && <SidebarTrigger />}
@@ -131,9 +149,14 @@ function Main({ children }) {
         </div>
       </header>
 
-      <div className={padMain ? "relative py-2 px-2 sm:px-3 w-full" : ""}>
+      <div
+        className={`transition-colors duration-300
+        min-h-[calc(100vh-44px)]
+        ${isDark ? "dark:bg-slate-900": "bg-gradient-to-br from-pink-100 via-sky-100 to-emerald-100"}
+        ${padMain ? "relative py-2 px-2 sm:px-3 w-full" : ""}`}
+      >
         {children}
       </div>
-    </main>
+    </div>
   )
 }

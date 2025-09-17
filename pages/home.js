@@ -24,16 +24,7 @@ export default function Home() {
   }, [resolvedTheme])
 
   return (
-    <main className={`min-h-[calc(100vh-48px)] overflow-hidden transition-colors duration-300 ${isDark ? 'bg-slate-900' : 'bg-gradient-to-br from-pink-100 via-sky-100 to-emerald-100'}`}>
-      {/* Background decorative shapes */}
-      <Bubbles isDark={isDark} />
-
-      {/* <img
-        src="/images/char1.png"
-        alt="Friendly character"
-        className="hidden md:block pointer-events-none select-none absolute bottom-0 left-44 w-40 sm:w-56 lg:w-64 drop-shadow-xl"
-      /> */}
-
+    <div>
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <header className="flex items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
@@ -94,7 +85,7 @@ export default function Home() {
           <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>for your kids</span>
         </footer>
       </div>
-    </main>
+    </div>
   )
 }
 
@@ -120,16 +111,5 @@ function MenuCard({ href, label, emoji, gradient, isDark, blurb }) {
         </div>
       </div>
     </Link>
-  )
-}
-
-function Bubbles({ isDark }) {
-  // purely decorative bubbles
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
-      <div className={`absolute -left-10 -top-10 h-56 w-56 rounded-full mix-blend-multiply blur-3xl opacity-30 ${isDark ? 'bg-sky-400/30' : 'bg-pink-300'}`} />
-      <div className={`absolute right-0 top-24 h-72 w-72 rounded-full mix-blend-multiply blur-3xl opacity-30 ${isDark ? 'bg-fuchsia-400/30' : 'bg-yellow-300'}`} />
-      <div className={`absolute -bottom-10 left-20 h-64 w-64 rounded-full mix-blend-multiply blur-3xl opacity-30 ${isDark ? 'bg-emerald-400/30' : 'bg-sky-300'}`} />
-    </div>
   )
 }

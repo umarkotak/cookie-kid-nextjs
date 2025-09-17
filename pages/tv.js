@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 import ChannelList from '@/components/ChannelList'
 import VideoCard from '@/components/VideoCard'
@@ -10,87 +10,126 @@ import { HomeIcon, Link } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import AdsenseAd from '@/components/AdsenseAd'
 
-var videoIDs = []
-var page = 1
-var onApiCall = false
-var tmpVideoList = []
-
 export default function Home() {
   const [videoList, setVideoList] = useState([])
   const [channelList, setChannelList] = useState([])
+  const [videoIDs, setVideoIDs] = useState([])
+  const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+
   const searchParams = useSearchParams()
+  const isInitialLoad = useRef(true)
 
+  // Reset state when search params change
   useEffect(() => {
-    videoIDs = []
-    page = 1
+    setVideoList([])
+    setVideoIDs([])
+    setPage(1)
+    setLoading(false)
+    setHasMore(true)
+    isInitialLoad.current = true
 
-    GetVideoList({
-      page: page,
-      exclude_ids: videoIDs.join(","),
-      sort: "random",
-    })
+    // Load initial data
+    loadMoreVideos(1, [])
     GetChannelList({})
   }, [searchParams])
 
-  async function GetVideoList(params) {
-    try {
-      if (onApiCall) {
-        return
-      }
-
-      onApiCall = true
-      const response = await ytkiddAPI.GetVideos("", {}, params)
-      const body = await response.json()
-      if (response.status !== 200) {
-        return
-      }
-
-      tmpVideoList = [...tmpVideoList, ...body.data.videos]
-      setVideoList(tmpVideoList)
-
-      page += 1
-      videoIDs = videoIDs.concat(body.data.videos.map((oneVideo) => (oneVideo.id)))
-      onApiCall = false
-    } catch (e) {
-      console.error(e)
-      onApiCall = false
+  const loadMoreVideos = useCallback(async (currentPage, currentVideoIDs) => {
+    if (loading || !hasMore) {
+      return
     }
-  }
+
+    try {
+      setLoading(true)
+
+      const response = await ytkiddAPI.GetVideos("", {}, {
+        page: currentPage,
+        exclude_ids: currentVideoIDs.join(","),
+        sort: "random",
+      })
+
+      const body = await response.json()
+
+      if (response.status !== 200) {
+        setLoading(false)
+        return
+      }
+
+      const newVideos = body.data.videos || []
+
+      // If no new videos, we've reached the end
+      if (newVideos.length === 0) {
+        setHasMore(false)
+        setLoading(false)
+        return
+      }
+
+      const newVideoIDs = newVideos.map(video => video.id)
+
+      setVideoList(prev => [...prev, ...newVideos])
+      setVideoIDs(prev => [...prev, ...newVideoIDs])
+      setPage(currentPage + 1)
+      setLoading(false)
+
+    } catch (e) {
+      console.error('Error loading videos:', e)
+      setLoading(false)
+    }
+  }, [loading, hasMore])
 
   async function GetChannelList(params) {
     try {
       const response = await ytkiddAPI.GetChannels("", {}, params)
       const body = await response.json()
+
       if (response.status !== 200) {
         return
       }
 
       setChannelList(Utils.ShuffleArray(body.data))
     } catch (e) {
-      console.error(e)
+      console.error('Error loading channels:', e)
     }
   }
 
-  const handleScroll = () => {
-    var position = window.pageYOffset
-    var maxPosition = document.documentElement.scrollHeight - document.documentElement.clientHeight
+  // Throttled scroll handler
+  const handleScroll = useCallback(() => {
+    if (loading || !hasMore) return
 
-    console.log(maxPosition - position)
-    if (maxPosition - position <= 1200) {
+    const scrollTop = window.pageYOffset
+    const windowHeight = window.innerHeight
+    const documentHeight = document.documentElement.scrollHeight
 
-      GetVideoList({
-        page: page,
-        exclude_ids: videoIDs.join(",")
-      })
+    // Trigger when user is within 1200px of the bottom
+    if (scrollTop + windowHeight >= documentHeight - 1200) {
+      loadMoreVideos(page, videoIDs)
     }
-  }
+  }, [loading, hasMore, page, videoIDs, loadMoreVideos])
 
+  // Throttle scroll events for better performance
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
+    let timeoutId = null
+
+    const throttledScrollHandler = () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+
+      timeoutId = setTimeout(() => {
+        handleScroll()
+      }, 100) // 100ms throttle
     }
-  }, [])
+
+    window.addEventListener('scroll', throttledScrollHandler, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', throttledScrollHandler)
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
+  }, [handleScroll])
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -123,6 +162,18 @@ export default function Home() {
           />
         ))}
       </div>
+
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      )}
+
+      {!hasMore && videoList.length > 0 && (
+        <div className="text-center py-8 text-gray-500">
+          No more videos to load
+        </div>
+      )}
     </div>
   )
 }

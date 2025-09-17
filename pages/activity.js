@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { PlayCircle, BookOpen, RefreshCw, Clock } from 'lucide-react'
 import ytkiddAPI from '@/apis/ytkidApi'
 import { toast } from 'react-toastify'
+import { useTheme } from 'next-themes'
 
 /**
  * Modernized Activities Page
@@ -42,7 +43,7 @@ function MediaThumb({ src, title, icon, redir }) {
         <img
           src={src || FALLBACK_THUMB}
           alt={title || 'media thumbnail'}
-          className="w-full h-full object-contain bg-muted"
+          className="group-hover:scale-105 transition-transform w-full h-full object-contain bg-muted"
           onError={(e) => {
             // @ts-ignore – HTMLImageElement target
             e.currentTarget.src = FALLBACK_THUMB
@@ -76,7 +77,7 @@ function VideoCard({ activity }) {
   }, [redirect, router])
 
   return (
-    <Card className="group relative overflow-hidden rounded-2xl border-muted/40 hover:border-foreground/20 hover:shadow-lg transition-all duration-300">
+    <Card className="group relative overflow-hidden rounded-2xl border-muted/40 hover:border-foreground/20 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
       <CardContent className="p-4 sm:p-5">
         <div className="flex gap-3 sm:gap-4">
           <MediaThumb
@@ -160,7 +161,7 @@ function BookCard({ activity }) {
   }, [redirect, router])
 
   return (
-    <Card className="group relative overflow-hidden rounded-2xl border-muted/40 hover:border-foreground/20 hover:shadow-lg transition-all duration-300">
+    <Card className="group relative overflow-hidden rounded-2xl border-muted/40 hover:border-foreground/20 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
       <CardContent className="p-4 sm:p-5">
         <div className="flex gap-3 sm:gap-4">
           <MediaThumb
@@ -232,6 +233,23 @@ function ActivitySkeleton() {
 }
 
 export default function UserActivitiesPage() {
+  const { resolvedTheme } = useTheme();
+  const [isDark, setIsDark] = useState(true);
+
+  // apply theme to <html>
+  useEffect(() => {
+    setIsDark(resolvedTheme === 'dark');
+    if (typeof document === 'undefined') return
+    const root = document.documentElement
+    if (resolvedTheme === 'dark') {
+      root.classList.add('dark')
+      localStorage.setItem('theme', 'dark')
+    } else if (resolvedTheme === 'light') {
+      root.classList.remove('dark')
+      localStorage.setItem('theme', 'light')
+    }
+  }, [resolvedTheme])
+
   const [activities, setActivities] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -263,48 +281,49 @@ export default function UserActivitiesPage() {
   const hasItems = activities?.length > 0
 
   return (
-    <div className="container mx-auto max-w-5xl">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Aktivitas Ku</h1>
-          <p className="text-muted-foreground">Lanjutkan aktivitas</p>
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={fetchActivities}
-          className="inline-flex items-center gap-2"
-          disabled={refreshing}
-        >
-          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-          {refreshing ? 'Refreshing' : 'Refresh'}
-        </Button>
-      </div>
+    <div>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            📝 Aktivitas Ku
+          </h1>
 
-      {/* Body */}
-      {loading ? (
-        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <ActivitySkeleton key={`skeleton-${i}`} />
-          ))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchActivities}
+            className="inline-flex items-center gap-2"
+            disabled={refreshing}
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            {refreshing ? 'Refreshing' : 'Refresh'}
+          </Button>
         </div>
-      ) : hasItems ? (
-        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-2">
-          {activities.map((activity, idx) => {
-            const key =
-              activity?.id ||
-              `${activity?.activity_type || 'item'}-${activity?.youtube_video_id || 'y'}-${activity?.book_id || 'b'}-${idx}`
-            return (activity?.activity_type === 'video' ? (
-              <VideoCard key={key} activity={activity} />
-            ) : (
-              <BookCard key={key} activity={activity} />
-            ))
-          })}
-        </div>
-      ) : (
-        <EmptyState />
-      )}
+
+        {/* Body */}
+        {loading ? (
+          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <ActivitySkeleton key={`skeleton-${i}`} />
+            ))}
+          </div>
+        ) : hasItems ? (
+          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+            {activities.map((activity, idx) => {
+              const key =
+                activity?.id ||
+                `${activity?.activity_type || 'item'}-${activity?.youtube_video_id || 'y'}-${activity?.book_id || 'b'}-${idx}`
+              return (activity?.activity_type === 'video' ? (
+                <VideoCard key={key} activity={activity} />
+              ) : (
+                <BookCard key={key} activity={activity} />
+              ))
+            })}
+          </div>
+        ) : (
+          <EmptyState />
+        )}
+      </div>
     </div>
   )
 }

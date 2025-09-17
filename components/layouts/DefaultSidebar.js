@@ -1,4 +1,4 @@
-import { Book, Bot, Calendar, ChevronDown, GraduationCap, HandCoins, Home, ImageIcon, Inbox, Joystick, LayoutDashboard, Pencil, PlayIcon, ReceiptText, Search, Settings, Slack, SlackIcon, Tv, TvIcon, UserCheck } from "lucide-react"
+import { Book, Bot, Calendar, ChevronDown, GalleryHorizontalEnd, GraduationCap, HandCoins, Home, ImageIcon, Inbox, Joystick, LayoutDashboard, Pencil, PlayIcon, ReceiptText, Search, Settings, Slack, SlackIcon, Tv, TvIcon, UserCheck } from "lucide-react"
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -30,13 +30,14 @@ import { useRouter } from "next/router"
 
 const items = [
   { key: "item-home", title: "Home", url: "/home", icon: Home },
+  { key: "item-activity", title: "Activity", url: "/activity", icon: GalleryHorizontalEnd },
   { key: "item-tv", title: "Tv", url: "/tv", icon: Tv },
   { key: "item-channel", title: "Channel", url: "/channels", icon: UserCheck },
   { key: "item-book", title: "Book", url: "/books", icon: Book },
   { key: "item-workbook", title: "Workbook", url: "/workbooks", icon: Pencil },
-  { key: "item-subscription", title: "Subscription", url: "/subscription", icon: ReceiptText },
   // { key: "item-sahabatai", title: "Sahabat AI", url: "/sahabat_ai", icon: Bot },
   { key: "item-game", title: "Game", url: "/games", icon: Joystick },
+  { key: "item-subscription", title: "Subscription", url: "/subscription", icon: ReceiptText },
   { key: "item-support", title: "Support Ca Bocil", url: "https://trakteer.id/marumaru", icon: HandCoins },
 ]
 

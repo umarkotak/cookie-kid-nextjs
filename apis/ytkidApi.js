@@ -141,6 +141,10 @@ class YtkiddAPI {
     return this.Post(`/ytkidd/api/user/activity`, authToken, h, params)
   }
 
+  async GetUserActivity(authToken, h, params) {
+    return this.Get(`/ytkidd/api/user/activities`, authToken, h, params)
+  }
+
   async GetProducts(authToken, h, params) {
     return this.Get(`/ytkidd/api/products`, authToken, h, params)
   }

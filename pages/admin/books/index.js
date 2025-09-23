@@ -64,6 +64,8 @@ export default function Books() {
 
   // Initialize filters from URL params
   useEffect(() => {
+    GetUploadBookStatus()
+
     const urlTypes = searchParams.get("types");
     const urlTags = searchParams.get("tags");
     const urlTitle = searchParams.get("title");
@@ -106,7 +108,6 @@ export default function Books() {
       setEnableDev(false);
     }
 
-    GetUploadBookStatus()
   }, [searchParams]);
 
   // Fetch books when filters change

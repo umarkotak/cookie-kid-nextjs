@@ -64,8 +64,6 @@ export default function Books() {
 
   // Initialize filters from URL params
   useEffect(() => {
-    GetUploadBookStatus()
-
     const urlTypes = searchParams.get("types");
     const urlTags = searchParams.get("tags");
     const urlTitle = searchParams.get("title");
@@ -109,6 +107,10 @@ export default function Books() {
     }
 
   }, [searchParams]);
+
+  useEffect(() => {
+    GetUploadBookStatus()
+  }, [])
 
   // Fetch books when filters change
   useEffect(() => {
@@ -166,7 +168,9 @@ export default function Books() {
   async function GetUploadBookStatus() {
     try {
       const response = await ytkiddAPI.GetUploadBookStatus("", {}, {});
+
       const body = await response.json();
+
       if (response.status !== 200) {
         toast.error("error fetching upload book status")
         return;
@@ -174,7 +178,7 @@ export default function Books() {
 
       setUploadBookStatus(body.data);
     } catch (e) {
-    } finally {
+      toast.error(e)
     }
   }
 

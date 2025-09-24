@@ -61,12 +61,20 @@ export default function SignIn() {
             <div className="flex flex-col">
               <GoogleOAuthProvider clientId={GCID}>
                 <GoogleLogin
-                  onSuccess={credentialResponse => {
-                    PostSignUp(credentialResponse)
+                  onSuccess={(credentialResponse) => {
+                    // credentialResponse.credential is a JWT string from Google
+                    PostSignUp(credentialResponse);
                   }}
-                  onError={() => {
-                    toast.error('Sorry, Login Failed')
-                  }}
+                  onError={() => toast.error("Sorry, Login Failed")}
+                  // 🔽 styling options
+                  theme="filled_black"      // "outline" | "filled_blue" | "filled_black"
+                  size="large"              // "small" | "medium" | "large"
+                  shape="pill"              // "rectangular" | "pill" | "circle" | "square"
+                  text="signin_with"        // "signin_with" | "signup_with" | "continue_with" | "signin"
+                  logo_alignment="left"     // "left" | "center"
+                  width="100%"              // px as string
+                  locale="en"               // or "id" etc.
+                  useOneTap                 // enable One Tap (optional)
                 />
               </GoogleOAuthProvider>
             </div>

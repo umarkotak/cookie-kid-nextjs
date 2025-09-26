@@ -10,12 +10,6 @@ export default function Document() {
       <Head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6813236705463574"
-          crossorigin="anonymous"
-        />
-        <meta name="google-adsense-account" content="ca-pub-6813236705463574" />
       </Head>
       <body className="antialiased">
         <Main />

@@ -251,7 +251,7 @@ export default function Read() {
   return(
     <main className="">
       {errNeedSubscription &&
-        <div className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert"> Kamu harus berlangganan cabocil premium untuk mengakses buku ini. <Link href="/subscription/package" className="underline">Berlangganan Sekarang</Link>.</div>
+        <div className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert"> Kamu harus berlangganan ca bocil premium untuk mengakses buku ini. <Link href="/subscription/package" className="underline">Berlangganan Sekarang</Link>.</div>
       }
 
       {!loadingComplete && <div className="bg-gray-200 h-1">

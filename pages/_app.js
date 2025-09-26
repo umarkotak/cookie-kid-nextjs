@@ -3,19 +3,11 @@ import "@/styles/globals.css"
 import { ThemeProvider } from "@/components/layouts/ThemeProvider"
 import { CookiesProvider } from "react-cookie"
 import Head from "next/head"
-import { usePathname } from "next/navigation"
-import { DefaultSidebar } from "@/components/layouts/DefaultSidebar"
-import { Geist, Roboto } from 'next/font/google'
+import { Geist } from 'next/font/google'
 import { ToastContainer } from "react-toastify"
-import { SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
-import { useEffect, useState } from "react"
-import { ChangeThemeButton } from "@/components/utils/ChangeThemeButton"
-import { Button } from "@/components/ui/button"
 import { useCronitor } from '@cronitorio/cronitor-rum-nextjs'
-import { ChevronLeft } from "lucide-react"
-import Link from "next/link"
-import { InstallButton } from "@/components/InstallButton"
-import { useTheme } from "next-themes"
+import AppLayout from "@/components/layouts/app-layout"
+import { SidebarProvider } from "@/components/ui/sidebar"
 
 const roboto = Geist({
   weight: '400',
@@ -23,14 +15,13 @@ const roboto = Geist({
 })
 
 export default function App({ Component, pageProps }) {
-  const pathName = usePathname()
   useCronitor('3f97b0a02f683b7af499e046f0495786')
 
   return (
     <>
       <Head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <title>CaBocil</title>
+        <title>Ca Bocil</title>
       </Head>
 
       <CookiesProvider defaultSetOptions={{ path: '/' }} />
@@ -46,117 +37,11 @@ export default function App({ Component, pageProps }) {
           className={roboto.className}
           defaultOpen={false}
         >
-          <DefaultSidebar />
-
-          <Main>
+          <AppLayout>
             <Component {...pageProps} />
-          </Main>
+          </AppLayout>
         </SidebarProvider>
       </ThemeProvider>
     </>
-  )
-}
-
-function Main({ children }) {
-  const { resolvedTheme } = useTheme();
-  const [isDark, setIsDark] = useState(true);
-
-  // apply theme to <html>
-  useEffect(() => {
-    setIsDark(resolvedTheme === 'dark');
-    if (typeof document === 'undefined') return
-    const root = document.documentElement
-    if (resolvedTheme === 'dark') {
-      root.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
-    } else if (resolvedTheme === 'light') {
-      root.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-    }
-  }, [resolvedTheme])
-
-  const pathName = usePathname()
-  const {
-    state,
-    open,
-    setOpen,
-    openMobile,
-    setOpenMobile,
-    isMobile,
-    toggleSidebar,
-  } = useSidebar()
-
-  const [backLink, setBackLink] = useState("")
-  const [shouldStick, setShouldStick] = useState(true)
-  const [padMain, setPadMain] = useState(true)
-  const [showSidebarTrigger, setShowSidebarTrigger] = useState(true)
-
-  useEffect(() => {
-    if (!pathName) { return }
-
-    // sidebar default open / close
-    if (
-      pathName.startsWith("/watch")
-      || pathName.startsWith("/games/flowchart")
-      || (pathName.includes("/books") && pathName.includes("/read"))
-      || (pathName.includes("/workbooks") && pathName.includes("/read"))
-    ) {
-      setOpen(false)
-    } else {
-      setOpen(true)
-    }
-
-    // back link
-    if (pathName.startsWith("/watch")) {
-      setBackLink("/tv")
-    } else if (pathName.includes("/books") && pathName.includes("/read")) {
-      setBackLink("/books")
-    } else if (pathName.includes("/workbooks") && pathName.includes("/read")) {
-      setBackLink("/workbooks")
-    } else {
-      setBackLink("")
-    }
-
-    // add padding on content / not
-    if (pathName.startsWith("/home")) {
-      setPadMain(false)
-    } else {
-      setPadMain(true)
-    }
-
-    // sidebar trigger
-    if (
-      (pathName.includes("/workbooks") && pathName.includes("/read"))
-    ) {
-      setShowSidebarTrigger(false)
-    } else {
-      setShowSidebarTrigger(true)
-    }
-  }, [pathName])
-
-  return(
-    <div className={`${!isMobile ? open ? "w-[calc(100%-13rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
-      <header className={`${shouldStick ? "sticky top-0" : ""} flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-40 backdrop-blur-lg bg-[hsl(43,100%,97%)] dark:bg-[hsl(240,10%,10%)] bg-opacity-80 dark:bg-opacity-80 pt-2 pb-2 px-3 border-none`}>
-        <div className="flex items-center gap-2">
-          {showSidebarTrigger && <SidebarTrigger />}
-          { backLink && backLink !== "" &&
-            <Link href={backLink}><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>
-          }
-        </div>
-        <div className="flex gap-1">
-          <InstallButton />
-          <ChangeThemeButton />
-        </div>
-      </header>
-
-      {/* ${isDark ? "dark:bg-slate-900": "bg-gradient-to-br from-pink-100 via-sky-100 to-emerald-100"} */}
-      <div
-        className={`transition-colors duration-300
-        min-h-[calc(100vh-44px)]
-        ${padMain ? "relative py-2 px-2 sm:px-3 w-full" : ""}`}
-      >
-        {children}
-      </div>
-    </div>
   )
 }

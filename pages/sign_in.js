@@ -50,7 +50,7 @@ export default function SignIn() {
       <div className="flex w-full max-w-sm flex-col gap-6">
         <Link href="/" className="flex items-center self-center font-medium">
           <img src="/images/cookie_kid_logo_circle.png" className="h-16 w-16" />
-          CaBocil
+          Ca Bocil
         </Link>
 
         <Card>

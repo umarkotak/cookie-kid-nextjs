@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { BookIcon, Heart, Joystick, Puzzle, Tv } from 'lucide-react';
+import ActivityBar from '@/components/ActivityBar';
 
 export default function Home() {
   const { resolvedTheme } = useTheme();
@@ -39,6 +40,10 @@ export default function Home() {
         <p className={`mb-8 text-lg sm:text-xl max-w-2xl ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
           Selamat datang di cabocil.com, silahkan pilih aktivitas yang ingin kamu lakukan hari ini!
         </p>
+
+        <div className='mb-8'>
+          <ActivityBar />
+        </div>
 
         {/* Menu Cards */}
         <nav aria-label="Main" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

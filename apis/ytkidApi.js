@@ -12,7 +12,7 @@ class YtkiddAPI {
       // this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
     } else {
       this.Host = "https://ytkidd-api-m4.cloudflare-avatar-id-1.site"
-      this.Host = "http://localhost:33000"
+      // this.Host = "http://localhost:33000"
 
       // production
       // this.SnapJSUrl = "https://app.midtrans.com/snap/snap.js"
@@ -125,7 +125,7 @@ class YtkiddAPI {
     return this.Get(`/ytkidd/api/comfy_ui/output`, authToken, h, params)
   }
 
-  async GetUploadBookStatus(authToken, h, formData) {
+  async GetUploadBookStatus(authToken, h, params) {
     return this.Get(`/ytkidd/api/books/upload_status`, authToken, h, params)
   }
 

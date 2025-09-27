@@ -75,39 +75,35 @@ export default function Channels() {
     <main>
       <div className="mb-6 flex flex-row items-center justify-between">
         <div>
-          <h1 className="text-xl">Channel List</h1>
-          <small>you can enable or disable channel into your needs</small>
+          <h1 className="text-xl">Daftar Channel</h1>
+          <small>kamu dapat memilih channel mana yang akan muncul pada rekomendasi mu</small>
         </div>
         <div className='flex gap-2'>
           <Button onClick={()=>checkAll()}>Check All</Button>
           <Button onClick={()=>unCheckAll()}>Uncheck All</Button>
         </div>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6 gap-x-5 gap-y-8">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-x-5 gap-y-8">
         {channelList.map((oneChannel) => (
-          <Card key={oneChannel.id} className="group hover:text-amber-600">
-            <CardHeader className="p-4">
+          <Card key={oneChannel.id} className="p-4">
+            <Link href={`/channels/${oneChannel.id}`} className='group'>
               <div className='flex items-center gap-3'>
-                <Link href={`/channels/${oneChannel.id}`}>
-                  <Avatar className="h-20 w-20 group-hover:scale-105">
-                    <AvatarImage src={oneChannel.image_url}/>
-                    <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
-                  </Avatar>
-                </Link>
-                <Link href={`/channels/${oneChannel.id}`}>
-                  <span>{oneChannel.name}</span>
-                  <small className="">{oneChannel.string_tags}</small>
-                </Link>
+                <Avatar className="h-14 w-14 group-hover:scale-105">
+                  <AvatarImage src={oneChannel.image_url}/>
+                  <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
+                </Avatar>
+                <span className='group-hover:text-amber-600'>{oneChannel.name}</span>
+                <small className="">{oneChannel.string_tags}</small>
               </div>
-              <div className="flex justify-end">
-                <Switch
-                  type="checkbox"
-                  defaultChecked={!blacklistChannelMap[oneChannel.id]}
-                  checked={!blacklistChannelMap[oneChannel.id]}
-                  onClick={(e) => handleCheckChange(e, oneChannel.id)}
-                />
-              </div>
-            </CardHeader>
+            </Link>
+            <div className="flex justify-end mt-3">
+              <Switch
+                type="checkbox"
+                defaultChecked={!blacklistChannelMap[oneChannel.id]}
+                checked={!blacklistChannelMap[oneChannel.id]}
+                onClick={(e) => handleCheckChange(e, oneChannel.id)}
+              />
+            </div>
           </Card>
         ))}
       </div>

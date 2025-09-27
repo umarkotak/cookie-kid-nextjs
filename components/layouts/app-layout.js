@@ -70,7 +70,7 @@ export default function AppLayout({ children }) {
     }
 
     // add padding on content / not
-    if (pathName.startsWith("/home")) {
+    if (["/home","/activity","/games"].includes(pathName)) {
       setPadMain(false)
     } else {
       setPadMain(true)

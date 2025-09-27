@@ -509,39 +509,28 @@ export default function Workbooks() {
                     key={oneBook.id}
                     className="group block"
                   >
-                    <div className="flex h-full flex-col rounded-lg border border-slate-200 bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1 overflow-hidden">
-                      {/* --- Image Container --- */}
-                      <div className="relative aspect-[3/4] overflow-hidden">
+                    <div className="flex h-full flex-col rounded-lg border border-slate-200 bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1 overflow-hidden group-hover:shadow-md group-hover:shadow-accent">
+                      <div className="relative aspect-[2/3] overflow-hidden">
                         <img
-                          className="h-full w-full object-fit transition-transform duration-300 group-hover:scale-105"
+                          className="h-full w-full object-fit transition-transform duration-300"
                           src={oneBook.cover_file_url}
                           alt={`Cover of ${oneBook.title}`}
                           loading="lazy"
                         />
-                        {/* --- Status Badge --- */}
-                        <div
-                          className={`absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-semibold text-white ${
+                        {/* <div
+                          className={`absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-semibold text-white border border-accent ${
                             oneBook.is_free ? 'bg-emerald-500' : 'bg-blue-500'
                           }`}
                         >
                           {oneBook.is_free ? 'FREE' : 'PREMIUM'}
-                        </div>
-                      </div>
-
-                      {/* --- Book Info --- */}
-                      <div className="flex flex-1 flex-col p-4">
-                        {/* --- Category Tag --- */}
-                        {oneBook.tags?.[0] && (
-                          <span className="mb-2 inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                            {oneBook.tags[0]}
-                          </span>
-                        )}
-
-                        {/* --- Title --- */}
-                        <h3 className="text-sm line-clamp-2 text-slate-800 transition-colors group-hover:text-blue-600">
-                          {/* The min-h-[3rem] ensures consistent card height even for shorter, single-line titles */}
-                          {oneBook.title}
-                        </h3>
+                        </div> */}
+                        {oneBook.is_free && <div class="absolute top-0 right-0 w-24 h-24 overflow-hidden">
+                          <div
+                            class="absolute top-3 right-[-73px] rotate-45 bg-accent text-white text-center text-xs font-semibold w-48 py-1 shadow-md"
+                          >
+                            FREE
+                          </div>
+                        </div>}
                       </div>
                     </div>
                   </Link>

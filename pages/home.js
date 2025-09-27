@@ -28,7 +28,7 @@ export default function Home() {
     <div className="w-full max-w-[1024px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`text-2xl sm:text-3xl tracking-wide dark:text-white text-slate-900`}>
             Selamat Datang Di CaBocil! 👋
           </h1>
         </div>

@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PlayCircle, BookOpen, RefreshCw, Clock } from 'lucide-react'
+import { PlayCircle, BookOpen, RefreshCw, Clock, GalleryHorizontalEnd } from 'lucide-react'
 import ytkiddAPI from '@/apis/ytkidApi'
 import { toast } from 'react-toastify'
 import { useTheme } from 'next-themes'
@@ -67,78 +67,32 @@ function VideoCard({ activity }) {
   const title = data?.title || 'Untitled'
   const redirect = data?.redirect_path
 
-  const onOpen = useCallback(() => {
-    if (!redirect) return
-    try {
-      router.push(redirect)
-    } catch {
-      window.location.href = redirect
-    }
-  }, [redirect, router])
-
   return (
-    <Card className="group relative overflow-hidden rounded-2xl border-muted/40 hover:border-foreground/20 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-      <CardContent className="p-4 sm:p-5">
-        <div className="flex gap-3 sm:gap-4">
-          <MediaThumb
-            src={data?.image_url}
-            title={title}
-            icon={<PlayCircle className="w-7 h-7 text-white drop-shadow-md" />}
-            redir={redirect}
-          />
+    <Link href={redirect} className='shadow-md rounded border border-accent overflow-hidden group hover:border-primary'>
+      <div className={`flex-none h-[100px]`}>
+        <div className="flex flex-row gap-2 h-full">
+          <div className="relative flex-none">
+            <img
+              className={`flex-none object-contain bg-zinc-100 dark:bg-zinc-900 h-full w-[100px]`}
+              src={data?.image_url}
+              alt="thumb"
+            />
+            {/* {props.show_last_access && <div className="absolute bottom-0 w-full bg-black bg-opacity-50 text-[10px] p-0.5">
+              {utils.GetTimeElapsed(props.anime.last_watch_at)}
+            </div>} */}
+          </div>
+          <div className="w-full flex flex-col justify-between p-2">
+            <p className="text-sm leading-1 line-clamp-2">{title}</p>
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-3 mb-1.5">
-              <h3 className="font-semibold text-sm sm:text-base leading-tight line-clamp-2">{title}</h3>
-              <Badge variant="default" className="text-[10px] sm:text-xs rounded-full">Video</Badge>
-            </div>
-
-            {(data?.channel_name || data?.channel_image_url) ? (
-              <div className="flex items-center gap-2 mb-3 min-h-5">
-                {data?.channel_image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={data.channel_image_url}
-                    alt={data?.channel_name || 'Channel'}
-                    className="w-4 h-4 rounded-full"
-                    onError={(e) => {
-                      // @ts-ignore
-                      e.currentTarget.style.display = 'none'
-                    }}
-                  />
-                ) : null}
-                {data?.channel_name ? (
-                  <span className="text-xs text-muted-foreground truncate">{data.channel_name}</span>
-                ) : null}
-              </div>
-            ) : (
-              <div className="mb-3 min-h-5"><span className="sr-only">No secondary info</span></div>
-            )}
-
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" />Progress</span>
-                {/* <span aria-label="progress label">{progressLabel(current, max)} • {pct}%</span> */}
-                <span aria-label="progress label">{pct}%</span>
-              </div>
-              <Progress value={pct} className="h-2" />
-            </div>
-
-            <div className="mt-3 sm:mt-4">
-              {redirect ? (
-                <Button variant="secondary" size="sm" className="w-full h-9 text-xs sm:text-sm" onClick={onOpen}>
-                  {pct === 100 ? 'Tonton Ulang' : 'Lanjutkan Menonton'}
-                </Button>
-              ) : (
-                <Button variant="ghost" size="sm" className="w-full h-9 text-xs sm:text-sm" disabled>
-                  No link available
-                </Button>
-              )}
+            <div className="flex justify-between pb-1">
+              <span className='text-xs'>{pct}%</span>
+              <span className='text-xs'>lanjut nonton</span>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      <Progress value={pct} className="h-1 rounded-none" />
+    </Link>
   )
 }
 
@@ -151,66 +105,32 @@ function BookCard({ activity }) {
   const title = data?.title || `Book ${activity?.book_id ?? ''}`
   const redirect = data?.redirect_path || "#"
 
-  const onOpen = useCallback(() => {
-    if (!redirect) return
-    try {
-      router.push(redirect)
-    } catch {
-      window.location.href = redirect
-    }
-  }, [redirect, router])
-
   return (
-    <Card className="group relative overflow-hidden rounded-2xl border-muted/40 hover:border-foreground/20 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-      <CardContent className="p-4 sm:p-5">
-        <div className="flex gap-3 sm:gap-4">
-          <MediaThumb
-            src={data?.image_url}
-            title={title}
-            icon={<BookOpen className="w-7 h-7 text-white drop-shadow-md" />}
-            redir={redirect}
-          />
+    <Link href={redirect} className='shadow-md rounded border border-accent overflow-hidden group hover:border-primary'>
+      <div className={`flex-none h-[100px]`}>
+        <div className="flex flex-row gap-2 h-full">
+          <div className="relative flex-none">
+            <img
+              className={`flex-none object-contain bg-zinc-100 dark:bg-zinc-900 h-full w-[100px]`}
+              src={data?.image_url}
+              alt="thumb"
+            />
+            {/* {props.show_last_access && <div className="absolute bottom-0 w-full bg-black bg-opacity-50 text-[10px] p-0.5">
+              {utils.GetTimeElapsed(props.anime.last_watch_at)}
+            </div>} */}
+          </div>
+          <div className="w-full flex flex-col justify-between p-2">
+            <p className="text-sm leading-1 line-clamp-2">{title}</p>
 
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-3 mb-1.5">
-              <h3 className="font-semibold text-sm sm:text-base leading-tight line-clamp-2">{title}</h3>
-              <Badge variant="secondary" className="text-[10px] sm:text-xs rounded-full">Book</Badge>
-            </div>
-
-            <div className="mb-3 min-h-5">
-              {/* {activity?.book_id ? (
-                <span className="text-xs text-muted-foreground">Book ID: {activity.book_id}</span>
-              ) : (
-                <span className="sr-only">No secondary info</span>
-              )} */}
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" />Progress</span>
-                {/* <span aria-label="progress label">{progressLabel(current, max)} • {pct}%</span> */}
-                <span aria-label="progress label">{progressLabel(current, max)}</span>
-              </div>
-              <Progress value={pct} className="h-2" />
-            </div>
-
-            <div className="mt-3 sm:mt-4">
-              {redirect ? (
-                <Link href={redirect}>
-                  <Button variant="secondary" size="sm" className="w-full h-9 text-xs sm:text-sm">
-                    {pct === 100 ? 'Baca Ulang' : 'Lanjutkan Membaca'}
-                  </Button>
-                </Link>
-              ) : (
-                <Button variant="ghost" size="sm" className="w-full h-9 text-xs sm:text-sm" disabled>
-                  No link available
-                </Button>
-              )}
+            <div className="flex justify-between pb-1">
+              <span className='text-xs'>{progressLabel(current, max)}</span>
+              <span className='text-xs'>lanjut baca</span>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      <Progress value={pct} className="h-1 rounded-none" />
+    </Link>
   )
 }
 
@@ -281,49 +201,41 @@ export default function UserActivitiesPage() {
   const hasItems = activities?.length > 0
 
   return (
-    <div>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex items-center justify-between gap-3 mb-6">
-          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            📝 Aktivitas Ku
+    <div className="w-full max-w-[1024px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <GalleryHorizontalEnd />
+          <h1 className={`text-2xl sm:text-3xl tracking-wide dark:text-white text-slate-900`}>
+            Aktivitas Ku
           </h1>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={fetchActivities}
-            className="inline-flex items-center gap-2"
-            disabled={refreshing}
-          >
-            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-            {refreshing ? 'Refreshing' : 'Refresh'}
-          </Button>
         </div>
 
-        {/* Body */}
-        {loading ? (
-          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-2">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <ActivitySkeleton key={`skeleton-${i}`} />
-            ))}
-          </div>
-        ) : hasItems ? (
-          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-            {activities.map((activity, idx) => {
-              const key =
-                activity?.id ||
-                `${activity?.activity_type || 'item'}-${activity?.youtube_video_id || 'y'}-${activity?.book_id || 'b'}-${idx}`
-              return (activity?.activity_type === 'video' ? (
-                <VideoCard key={key} activity={activity} />
-              ) : (
-                <BookCard key={key} activity={activity} />
-              ))
-            })}
-          </div>
-        ) : (
-          <EmptyState />
-        )}
+        <div></div>
       </div>
+
+      {/* Body */}
+      {loading ? (
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <ActivitySkeleton key={`skeleton-${i}`} />
+          ))}
+        </div>
+      ) : hasItems ? (
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {activities.map((activity, idx) => {
+            const key =
+              activity?.id ||
+              `${activity?.activity_type || 'item'}-${activity?.youtube_video_id || 'y'}-${activity?.book_id || 'b'}-${idx}`
+            return (activity?.activity_type === 'video' ? (
+              <VideoCard key={key} activity={activity} />
+            ) : (
+              <BookCard key={key} activity={activity} />
+            ))
+          })}
+        </div>
+      ) : (
+        <EmptyState />
+      )}
     </div>
   )
 }

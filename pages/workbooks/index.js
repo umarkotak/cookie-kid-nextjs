@@ -500,7 +500,7 @@ export default function Workbooks() {
 
         <div className="flex-1">
           {/* Books Grid - Modern Tokopedia-style layout */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-5 gap-3">
             {bookList.map((oneBook) => (
               <HoverCard>
                 <HoverCardTrigger asChild>

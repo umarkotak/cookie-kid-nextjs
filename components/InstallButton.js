@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
+import { DropdownMenuItem } from "./ui/dropdown-menu"
+import { Download } from "lucide-react"
 
 export function InstallButton() {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
@@ -71,8 +73,8 @@ export function InstallButton() {
   }
 
   return (
-    <Button size="smv2" variant="outline" onClick={onClick}>
-      Install App
-    </Button>
+    <DropdownMenuItem onClick={onClick}>
+      <Download /> Install App
+    </DropdownMenuItem>
   )
 }

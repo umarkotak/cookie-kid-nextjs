@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PlayCircle, BookOpen, RefreshCw, Clock } from 'lucide-react'
+import { PlayCircle, BookOpen, RefreshCw, Clock, GalleryHorizontalEnd } from 'lucide-react'
 import ytkiddAPI from '@/apis/ytkidApi'
 import { toast } from 'react-toastify'
 import { useTheme } from 'next-themes'
@@ -68,8 +68,8 @@ function VideoCard({ activity }) {
   const redirect = data?.redirect_path
 
   return (
-    <Link href={redirect}>
-      <div className={`flex-none w-[220px] h-[100px] cursor-pointer hover:border hover:border-primary`}>
+    <Link href={redirect} className='shadow-md rounded border border-accent overflow-hidden group hover:border-primary'>
+      <div className={`flex-none w-[220px] h-[100px]`}>
         <div className="flex flex-row gap-2 h-full">
           <div className="relative flex-none">
             <img
@@ -84,14 +84,14 @@ function VideoCard({ activity }) {
           <div className="flex flex-col justify-between">
             <p className="text-xs leading-1 line-clamp-2">{title}</p>
 
-            {/* <div className="flex flex-col pb-4">
-              <span className="text-xs">{props.anime.latest_episode !== 0 ? `ep ${props.anime.latest_episode}` : "Read"}</span>
-              <span className="text-xs">{lastReadChapter()}</span>
-            </div> */}
+            <div className="flex flex-col pb-4">
+              <span className='text-xs'>{pct}%</span>
+              <span className='text-xs'>lanjut nonton</span>
+            </div>
           </div>
         </div>
       </div>
-      <Progress value={pct} className="h-2" />
+      <Progress value={pct} className="h-1 rounded-none" />
     </Link>
   )
 }
@@ -106,8 +106,8 @@ function BookCard({ activity }) {
   const redirect = data?.redirect_path || "#"
 
   return (
-    <Link href={redirect}>
-      <div className={`flex-none w-[220px] h-[100px] cursor-pointer hover:border hover:border-primary`}>
+    <Link href={redirect} className='shadow-md rounded border border-accent overflow-hidden group hover:border-primary'>
+      <div className={`flex-none w-[220px] h-[100px]`}>
         <div className="flex flex-row gap-2 h-full">
           <div className="relative flex-none">
             <img
@@ -122,14 +122,14 @@ function BookCard({ activity }) {
           <div className="flex flex-col justify-between">
             <p className="text-xs leading-1 line-clamp-2">{title}</p>
 
-            {/* <div className="flex flex-col pb-4">
-              <span className="text-xs">{props.anime.latest_episode !== 0 ? `ep ${props.anime.latest_episode}` : "Read"}</span>
-              <span className="text-xs">{lastReadChapter()}</span>
-            </div> */}
+            <div className="flex flex-col pb-4">
+              <span className='text-xs'>{progressLabel(current, max)}</span>
+              <span className='text-xs'>lanjut baca</span>
+            </div>
           </div>
         </div>
       </div>
-      <Progress value={pct} className="h-2" />
+      <Progress value={pct} className="h-1 rounded-none" />
     </Link>
   )
 }
@@ -157,6 +157,8 @@ export default function ActivityBar() {
   const [refreshing, setRefreshing] = useState(false)
 
   const fetchActivities = useCallback(async () => {
+    if (ytkiddAPI.GenAuthToken() === "") { return }
+
     try {
       setLoading((prev) => prev && true)
       setRefreshing((prev) => !prev && !loading ? true : prev)
@@ -186,16 +188,17 @@ export default function ActivityBar() {
 
   return (
     <div className=''>
-      <div className='flex justify-between items-center'>
-        <h1 className={`text-xl mb-2 font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+      <div className='flex justify-between items-center mb-3'>
+        <span className={`text-2xl flex items-center gap-2`}>
+          <GalleryHorizontalEnd />
           Aktivitas Ku
-        </h1>
+        </span>
         <Link href="/activity">
           <Button size="sm" variant="outline">semua aktivitas</Button>
         </Link>
       </div>
 
-      <div className="w-full flex items-center gap-2 overflow-auto">
+      <div className="w-full flex items-center gap-4 overflow-auto py-2">
         {loading ? (
           <div>sedang memuat...</div>
         ) : hasItems ? (

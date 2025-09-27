@@ -21,7 +21,7 @@ export default function App({ Component, pageProps }) {
     <>
       <Head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <title>Ca Bocil</title>
+        <title>CaBocil</title>
       </Head>
 
       <CookiesProvider defaultSetOptions={{ path: '/' }} />

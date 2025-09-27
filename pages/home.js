@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import { BookIcon, Heart, Joystick, Puzzle, Tv } from 'lucide-react';
+import { BookIcon, Brain, CheckCheck, Heart, Joystick, NotebookPen, Puzzle, Tv } from 'lucide-react';
 import ActivityBar from '@/components/ActivityBar';
 
 export default function Home() {
@@ -25,32 +25,38 @@ export default function Home() {
   }, [resolvedTheme])
 
   return (
-    <div>
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-        <header className="flex items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-3">
-            <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Halo Teman Teman! 👋
-            </h1>
-          </div>
-
-          <div></div>
-        </header>
-
-        <p className={`mb-8 text-lg sm:text-xl max-w-2xl ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-          Selamat datang di cabocil.com, silahkan pilih aktivitas yang ingin kamu lakukan hari ini!
-        </p>
-
-        <div className='mb-8'>
-          <ActivityBar />
+    <div className="w-full max-w-[1024px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            Selamat Datang Di CaBocil! 👋
+          </h1>
         </div>
 
-        {/* Menu Cards */}
-        <nav aria-label="Main" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div></div>
+      </div>
+
+      <div className='mb-8'>
+        <ActivityBar />
+      </div>
+
+      {/* Menu Cards */}
+      <div className='mb-8'>
+        <div className='flex justify-between items-center mb-3'>
+          <span className={`text-2xl flex items-center gap-2`}>
+            <CheckCheck />
+            Menu
+          </span>
+          {/* <Link href="/activity">
+            <Button size="sm" variant="outline">semua aktivitas</Button>
+          </Link> */}
+        </div>
+
+        <div className="flex flex-wrap gap-6">
           <MenuCard
             href="/tv"
-            label="Televisi Anak"
-            emoji={<Tv size={40} />}
+            label="TV Anak"
+            emoji={<Tv size={26} />}
             gradient="from-fuchsia-500 via-rose-400 to-amber-300"
             isDark={isDark}
             blurb="Kartun dan video untuk anak anak."
@@ -58,8 +64,8 @@ export default function Home() {
 
           <MenuCard
             href="/books"
-            label="Waktunya Membaca"
-            emoji={<BookIcon size={40} />}
+            label="Buku Anak"
+            emoji={<BookIcon size={26} />}
             gradient="from-sky-500 via-cyan-400 to-emerald-300"
             isDark={isDark}
             blurb="Kisah dan petualangan untuk dibaca."
@@ -67,8 +73,8 @@ export default function Home() {
 
           <MenuCard
             href="/workbooks"
-            label="Belajar dan Berlatih"
-            emoji={<Puzzle size={40} />}
+            label="Lembar Kerja"
+            emoji={<NotebookPen size={26} />}
             gradient="from-violet-500 via-indigo-400 to-blue-300"
             isDark={isDark}
             blurb="Latihan dan soal soal untuk dikerjakan."
@@ -76,20 +82,20 @@ export default function Home() {
 
           <MenuCard
             href="/games"
-            label="Permainan Seru"
-            emoji={<Joystick size={40} />}
-            gradient="from-violet-500 via-indigo-400 to-blue-300"
+            label="Permainan"
+            emoji={<Joystick size={26} />}
+            gradient="from-violet-500 via-yellow-400 to-amber-300"
             isDark={isDark}
             blurb="Permainan untuk melatih logika anak."
           />
-        </nav>
-
-        <footer className="mt-10 flex items-center justify-center gap-2 text-sm">
-          <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Made with</span>
-          <span aria-hidden><Heart className='text-red-500' size={16} /></span>
-          <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>for your kids</span>
-        </footer>
+        </div>
       </div>
+
+      <footer className="flex items-center justify-center gap-2 text-sm">
+        <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Made with</span>
+        <span aria-hidden><Heart className='text-red-500' size={16} /></span>
+        <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>for your kids</span>
+      </footer>
     </div>
   )
 }
@@ -98,21 +104,17 @@ function MenuCard({ href, label, emoji, gradient, isDark, blurb }) {
   return (
     <Link href={href} className="group">
       <div
-        className={`relative h-44 sm:h-48 rounded-3xl p-5 shadow-xl transition-all active:scale-[0.99] overflow-hidden border ${
+        className={`relative h-36 w-36 rounded-3xl p-4 shadow-xl transition-all active:scale-[0.99] hover:scale-[1.03] overflow-hidden border ${
           isDark
             ? 'bg-slate-800 border-white/10 hover:bg-slate-700'
             : 'bg-white/70 border-white hover:bg-white'
         }`}
       >
-        {/* colorful ribbon */}
-        <div className={`absolute -top-16 -right-16 h-40 w-40 rotate-45 rounded-3xl blur-2xl opacity-70 bg-gradient-to-br ${gradient}`} />
+        <div className={`absolute -top-16 -right-16 h-32 w-32 rotate-45 rounded-3xl blur-2xl opacity-70 bg-gradient-to-br ${gradient}`} />
 
-        <div className="relative z-10 flex h-full items-start justify-between">
-          <div>
-            <div className="" aria-hidden>{emoji}</div>
-            <h3 className={`mt-3 text-2xl sm:text-2xl font-extrabold ${isDark ? 'text-white' : 'text-slate-900'}`}>{label}</h3>
-            <p className={`mt-1 text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{blurb}</p>
-          </div>
+        <div className="relative flex flex-col h-full items-center justify-center">
+          <div>{emoji}</div>
+          <h3 className={`text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>{label}</h3>
         </div>
       </div>
     </Link>

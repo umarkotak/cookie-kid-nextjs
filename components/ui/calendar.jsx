@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import {
   ChevronDownIcon,
@@ -22,7 +24,7 @@ function Calendar({
   const defaultClassNames = getDefaultClassNames()
 
   return (
-    (<DayPicker
+    <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
@@ -66,7 +68,7 @@ function Calendar({
           "has-focus:border-ring border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] relative rounded-md border",
           defaultClassNames.dropdown_root
         ),
-        dropdown: cn("absolute inset-0 opacity-0", defaultClassNames.dropdown),
+        dropdown: cn("bg-popover absolute inset-0 opacity-0", defaultClassNames.dropdown),
         caption_label: cn("select-none font-medium", captionLayout === "label"
           ? "text-sm"
           : "[&>svg]:text-muted-foreground flex h-8 items-center gap-1 rounded-md pl-2 pr-1 text-sm [&>svg]:size-3.5", defaultClassNames.caption_label),
@@ -119,17 +121,17 @@ function Calendar({
         DayButton: CalendarDayButton,
         WeekNumber: ({ children, ...props }) => {
           return (
-            (<td {...props}>
+            <td {...props}>
               <div
                 className="flex size-[--cell-size] items-center justify-center text-center">
                 {children}
               </div>
-            </td>)
+            </td>
           );
         },
         ...components,
       }}
-      {...props} />)
+      {...props} />
   );
 }
 
@@ -147,7 +149,7 @@ function CalendarDayButton({
   }, [modifiers.focused])
 
   return (
-    (<Button
+    <Button
       ref={ref}
       variant="ghost"
       size="icon"
@@ -166,7 +168,7 @@ function CalendarDayButton({
         defaultClassNames.day,
         className
       )}
-      {...props} />)
+      {...props} />
   );
 }
 

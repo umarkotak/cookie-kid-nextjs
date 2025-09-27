@@ -104,6 +104,8 @@ export default function AppLayout({ children }) {
   }
 
   function BreadcrumbsButton() {
+    if (!pathName) { return null }
+
     // back link
     if (pathName.startsWith("/watch")) {
       return <Link href="/tv"><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>

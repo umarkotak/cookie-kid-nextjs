@@ -28,18 +28,8 @@ export default function AppLayout({ children }) {
   }, [resolvedTheme])
 
   const pathName = usePathname()
-  const {
-    state,
-    open,
-    setOpen,
-    openMobile,
-    setOpenMobile,
-    isMobile,
-    toggleSidebar,
-  } = useSidebar()
+  const { state, open, setOpen, openMobile, setOpenMobile, isMobile, toggleSidebar } = useSidebar()
 
-  const [backLink, setBackLink] = useState("")
-  const [shouldStick, setShouldStick] = useState(true)
   const [padMain, setPadMain] = useState(true)
   const [showSidebarTrigger, setShowSidebarTrigger] = useState(true)
 
@@ -58,19 +48,8 @@ export default function AppLayout({ children }) {
       setOpen(true)
     }
 
-    // back link
-    if (pathName.startsWith("/watch")) {
-      setBackLink("/tv")
-    } else if (pathName.includes("/books") && pathName.includes("/read")) {
-      setBackLink("/books")
-    } else if (pathName.includes("/workbooks") && pathName.includes("/read")) {
-      setBackLink("/workbooks")
-    } else {
-      setBackLink("")
-    }
-
     // add padding on content / not
-    if (["/home","/activity","/games"].includes(pathName)) {
+    if (["/home","/activity","/games","/subscription","/subscription/package"].includes(pathName)) {
       setPadMain(false)
     } else {
       setPadMain(true)
@@ -113,7 +92,7 @@ export default function AppLayout({ children }) {
       }
 
     } catch (e) {
-      // Logout()
+      Logout()
       toast.error(`error ${e}`)
     }
   }
@@ -124,17 +103,36 @@ export default function AppLayout({ children }) {
     router.reload()
   }
 
+  function BreadcrumbsButton() {
+    // back link
+    if (pathName.startsWith("/watch")) {
+      return <Link href="/tv"><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>
+    }
+
+    if (pathName.includes("/books") && pathName.includes("/read")) {
+      return <Link href="/books"><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>
+    }
+
+    if (pathName.includes("/workbooks") && pathName.includes("/read")) {
+      return <Link href="/workbooks"><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>
+    }
+
+    if (pathName.includes("/games/")) {
+      return <Link href="/games"><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>
+    }
+
+    return <Link href={pathName}><Button size="smv2" variant="ghost">{pathName}</Button></Link>
+  }
+
   return (
     <>
       <AppSidebar userData={userData} isAdmin={isAdmin} />
 
       <div className={`${!isMobile ? open ? "w-[calc(100%-13rem)]": "w-[calc(100%-3rem)]" : "w-full"}`}>
-        <header className={`${shouldStick ? "sticky top-0" : ""} flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-40 backdrop-blur-lg bg-[hsl(43,100%,97%)] dark:bg-[hsl(240,10%,10%)] bg-opacity-80 dark:bg-opacity-80 py-3 pb-2 px-3 border-none`}>
+        <header className={`sticky top-0 flex justify-between shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 z-40 backdrop-blur-lg bg-[hsl(43,100%,97%)] dark:bg-[hsl(240,10%,10%)] bg-opacity-80 dark:bg-opacity-80 py-3 pb-2 px-3 border-none`}>
           <div className="flex items-center gap-2">
             {showSidebarTrigger && <SidebarTrigger />}
-            { backLink && backLink !== "" &&
-              <Link href={backLink}><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>
-            }
+            <BreadcrumbsButton />
           </div>
           <div className="flex items-center gap-2">
             { userData.guid

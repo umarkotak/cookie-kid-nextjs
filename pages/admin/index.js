@@ -55,10 +55,6 @@ export default function Admin() {
               <BookIcon />
               Manage Books
             </Button></Link>
-            <Link href="/admin/comfy_ui/gallery"><Button variant="outline">
-              <ImageIcon />
-              ComfyUI Gallery
-            </Button></Link>
             <Link href="/admin/channels"><Button variant="outline">
               <TvIcon />
               Manage Channels

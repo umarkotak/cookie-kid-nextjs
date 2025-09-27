@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
@@ -26,13 +27,19 @@ const items = [
 
 const adminItems = [
   { key: "admin-item-1", title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-  { key: "admin-item-2", title: "Channels", url: "/admin/channels", icon: TvIcon },
   { key: "admin-item-4", title: "Books", url: "/admin/books", icon: Book },
-  { key: "admin-item-5", title: "ComfyUI Gallery", url: "/admin/comfy_ui/gallery", icon: ImageIcon },
+  { key: "admin-item-2", title: "Channels", url: "/admin/channels", icon: TvIcon },
 ]
 
 export function AppSidebar({userData, isAdmin}) {
   const pathName = usePathname()
+  const { state, open, setOpen, openMobile, setOpenMobile, isMobile, toggleSidebar } = useSidebar()
+
+  function handleClickSidebarItem() {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
 
   return (
     <Sidebar
@@ -66,7 +73,7 @@ export function AppSidebar({userData, isAdmin}) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            <SidebarMenuItem >
+            <SidebarMenuItem onClick={()=>handleClickSidebarItem()}>
               <SidebarMenuButton asChild isActive={`${pathName}`.startsWith("/home")}>
                 <Link href="/home">
                   <Home />
@@ -74,7 +81,7 @@ export function AppSidebar({userData, isAdmin}) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarMenuItem >
+            <SidebarMenuItem onClick={()=>handleClickSidebarItem()}>
               <SidebarMenuButton asChild isActive={`${pathName}`.startsWith("/activity")}>
                 <Link href="/activity">
                   <GalleryHorizontalEnd />
@@ -90,7 +97,7 @@ export function AppSidebar({userData, isAdmin}) {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.key}>
+                <SidebarMenuItem key={item.key} onClick={()=>handleClickSidebarItem()}>
                   <SidebarMenuButton asChild isActive={`${pathName}`.startsWith(item.url)}>
                     <Link href={item.url}>
                       <item.icon />
@@ -111,7 +118,7 @@ export function AppSidebar({userData, isAdmin}) {
             <SidebarGroupContent>
               <SidebarMenu>
                 {adminItems.map((item) => (
-                  <SidebarMenuItem key={item.key}>
+                  <SidebarMenuItem key={item.key} onClick={()=>handleClickSidebarItem()}>
                     <SidebarMenuButton asChild isActive={`${pathName}` === item.url}>
                       <Link href={item.url}>
                         <item.icon />

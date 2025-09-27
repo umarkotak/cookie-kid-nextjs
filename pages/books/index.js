@@ -499,7 +499,7 @@ export default function Books() {
               <HoverCard>
                 <HoverCardTrigger asChild>
                   <Link
-                    href={`/workbooks/${oneBook.slug}/read?page=1`}
+                    href={`/books/${oneBook.slug}/read?page=1`}
                     key={oneBook.id}
                     className="group block"
                   >
@@ -520,7 +520,7 @@ export default function Books() {
                         </div> */}
                         {oneBook.is_free && <div class="absolute top-0 right-0 w-24 h-24 overflow-hidden">
                           <div
-                            class="absolute top-3 right-[-73px] rotate-45 bg-accent text-white text-center text-xs font-semibold w-48 py-1 shadow-md"
+                            class="absolute top-3 right-[-73px] rotate-45 bg-accent text-center text-xs font-semibold w-48 py-1 shadow-md"
                           >
                             FREE
                           </div>

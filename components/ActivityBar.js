@@ -68,8 +68,8 @@ function VideoCard({ activity }) {
   const redirect = data?.redirect_path
 
   return (
-    <Link href={redirect} className='shadow-md rounded border border-accent overflow-hidden group hover:border-primary'>
-      <div className={`flex-none w-[220px] h-[100px]`}>
+    <Link href={redirect} className='flex-none shadow-md rounded border border-accent overflow-hidden group hover:border-primary'>
+      <div className={`w-[220px] h-[100px]`}>
         <div className="flex flex-row gap-2 h-full">
           <div className="relative flex-none">
             <img
@@ -106,8 +106,8 @@ function BookCard({ activity }) {
   const redirect = data?.redirect_path || "#"
 
   return (
-    <Link href={redirect} className='shadow-md rounded border border-accent overflow-hidden group hover:border-primary'>
-      <div className={`flex-none w-[220px] h-[100px]`}>
+    <Link href={redirect} className='flex-none shadow-md rounded border border-accent overflow-hidden group hover:border-primary'>
+      <div className={`w-[220px] h-[100px]`}>
         <div className="flex flex-row gap-2 h-full">
           <div className="relative flex-none">
             <img

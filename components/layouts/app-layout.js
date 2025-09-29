@@ -49,7 +49,7 @@ export default function AppLayout({ children }) {
     }
 
     // add padding on content / not
-    if (["/home","/activity","/games","/subscription","/subscription/package"].includes(pathName)) {
+    if (["/home","/activity","/games","/subscription","/subscription/package","/games/maze"].includes(pathName)) {
       setPadMain(false)
     } else {
       setPadMain(true)

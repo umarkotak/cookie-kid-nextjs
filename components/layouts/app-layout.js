@@ -42,6 +42,7 @@ export default function AppLayout({ children }) {
       || pathName.startsWith("/games/flowchart")
       || (pathName.includes("/books") && pathName.includes("/read"))
       || (pathName.includes("/workbooks") && pathName.includes("/read"))
+      || pathName.includes("/games/golf")
     ) {
       setOpen(false)
     } else {
@@ -49,7 +50,7 @@ export default function AppLayout({ children }) {
     }
 
     // add padding on content / not
-    if (["/home","/activity","/games","/subscription","/subscription/package","/games/maze"].includes(pathName)) {
+    if (["/home","/activity","/games","/subscription","/subscription/package","/games/maze","/games/golf"].includes(pathName)) {
       setPadMain(false)
     } else {
       setPadMain(true)

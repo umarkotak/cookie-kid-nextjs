@@ -1,7 +1,7 @@
 class YtkiddAPI {
   constructor() {
     if (typeof(window) !== "undefined" && window.location.protocol === "https:") {
-      this.Host = "https://ytkidd-api-m4.cloudflare-avatar-id-1.site"
+      this.Host = "https://cabocil-api.cabocil.com"
 
       // production
       this.SnapJSUrl = "https://app.midtrans.com/snap/snap.js"
@@ -11,7 +11,7 @@ class YtkiddAPI {
       // this.SnapJSUrl = "https://app.sandbox.midtrans.com/snap/snap.js"
       // this.SnapClientKey = "SB-Mid-client-XwRH_ygkgDPjcIO8"
     } else {
-      this.Host = "https://ytkidd-api-m4.cloudflare-avatar-id-1.site"
+      this.Host = "https://cabocil-api.cabocil.com"
       // this.Host = "http://localhost:33000"
 
       // production

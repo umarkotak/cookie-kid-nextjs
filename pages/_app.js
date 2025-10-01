@@ -22,6 +22,25 @@ export default function App({ Component, pageProps }) {
       <Head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <title>CaBocil</title>
+
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <meta name="description" content="Aplikasi untuk anak" />
+
+        <meta itemProp="name" content="CaBocil" />
+        <meta itemProp="description" content="Aplikasi untuk anak" />
+        <meta itemProp="image" content="https://cabocil.com/images/cookie_kid_logo_circle.png" />
+
+        <meta name="og:url" content="https://cabocil.com/" />
+        <meta name="og:type" content="website" />
+        <meta name="og:title" content="CaBocil" />
+        <meta name="og:description" content="Aplikasi untuk anak" />
+        <meta name="og:image" content="https://cabocil.com/images/cookie_kid_logo_circle.png" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="CaBocil" />
+        <meta name="twitter:description" content="Aplikasi untuk anak" />
+        <meta name="twitter:image" content="https://cabocil.com/images/cookie_kid_logo_circle.png" />
       </Head>
 
       <CookiesProvider defaultSetOptions={{ path: '/' }} />

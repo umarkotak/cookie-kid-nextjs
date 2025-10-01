@@ -39,6 +39,38 @@ const GAME_LIST = [
     label: "Bantu Mengisi Air",
     mode: "external",
   },
+  {
+    key: "/games/level-devil",
+    link: `https://13acae8c-ec6a-4823-b1a2-8ea20cea56e7.poki-gdn.com/28edc61e-5dd6-478a-a970-edee95166353/index.html`,
+    image: "/images/game_ico_car.png",
+    icon: <GlassWater size={24} />,
+    label: "Lewati Rintangan",
+    mode: "external",
+  },
+  {
+    key: "/games/sticker-puzzle",
+    link: `https://bab7ec00-983f-439a-b675-651d7ec0d929.poki-gdn.com/9e742cc1-656c-4a44-8434-f587cbda16f7/index.html`,
+    image: "/images/game_ico_car.png",
+    icon: <GlassWater size={24} />,
+    label: "Tempel Sticker",
+    mode: "external",
+  },
+  {
+    key: "/games/mine-fun",
+    link: `https://c89f4abe-5041-497b-8705-986b6f3b748c.poki-gdn.com/ba4762ff-008e-4bdf-a664-2412b2699f4a/index.html`,
+    image: "/images/game_ico_car.png",
+    icon: <GlassWater size={24} />,
+    label: "Mine Fun",
+    mode: "external",
+  },
+  {
+    key: "/games/drive-mad",
+    link: `https://f9564e4e-ef25-4e4b-ba67-cb11a1576bbd.poki-gdn.com/d2d1c9d9-8f98-450b-9eee-0d612f13b315/index.html`,
+    image: "/images/game_ico_car.png",
+    icon: <GlassWater size={24} />,
+    label: "Drive Mad",
+    mode: "external",
+  },
 ]
 
 export default function Page() {

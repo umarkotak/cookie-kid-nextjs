@@ -1,6 +1,6 @@
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { BrickWall, CarIcon, FlowerIcon, Gamepad2, GlassWater, LandPlot, Puzzle, StickerIcon, UserRoundCogIcon, UsersRoundIcon } from 'lucide-react'
+import { BoltIcon, BrickWall, Calculator, CarIcon, CatIcon, FlowerIcon, Gamepad2, GlassWater, HouseIcon, LandPlot, Puzzle, StickerIcon, UserRoundCogIcon, UsersRoundIcon } from 'lucide-react'
 
 const GAME_LIST = [
   {
@@ -69,6 +69,46 @@ const GAME_LIST = [
     image: "/images/game_ico_mobilmuter.png",
     icon: <CarIcon size={24} />,
     label: "Mobilan",
+    mode: "external",
+  },
+  {
+    key: "/games/aritmathic",
+    link: `https://5947565b-1eae-4602-9e05-690e54616659.poki-gdn.com/117b8be4-5bb5-46eb-9311-394db8c17cb8/index.html`,
+    image: "/images/game_ico_aritmath.png",
+    icon: <Calculator size={24} />,
+    label: "Hitung Cepat",
+    mode: "external",
+  },
+  {
+    key: "/games/potion",
+    link: `https://a1561333-1cb3-4d20-8013-4b82e3424f9f.poki-gdn.com/6fcd6282-bc97-4390-846e-684099d8cefc/index.html`,
+    image: "/images/game_ico_potion.png",
+    icon: <Calculator size={24} />,
+    label: "Campur Ramuan",
+    mode: "external",
+  },
+  {
+    key: "/games/house_renovation",
+    link: `https://70f6a8bd-45e6-416e-92df-e5e613f93177.poki-gdn.com/fb4a7fdf-0199-4b60-8801-22587ff1507b/index.html`,
+    image: "/images/game_ico_house_renov.png",
+    icon: <HouseIcon size={24} />,
+    label: "Hias Rumah",
+    mode: "external",
+  },
+  {
+    key: "/games/cat_pizza",
+    link: `https://f221e1d1-dcbd-496f-b713-93fb45e4ce63.poki-gdn.com/b8b86622-c2e5-4361-97a5-664ffb9c309d/index.html`,
+    image: "/images/game_ico_cat_pizza.png",
+    icon: <CatIcon size={24} />,
+    label: "Kucing Pizza",
+    mode: "external",
+  },
+  {
+    key: "/games/bolt",
+    link: `https://a04d8c0d-0a34-4649-b0ce-3ea5bd1618d9.poki-gdn.com/53f01d07-58ac-416b-9d10-4581adedd415/index.html`,
+    image: "/images/game_ico_bolt.png",
+    icon: <BoltIcon size={24} />,
+    label: "Lepas Baut",
     mode: "external",
   },
 ]

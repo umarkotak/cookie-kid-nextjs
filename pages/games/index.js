@@ -1,6 +1,6 @@
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { BoltIcon, BrickWall, Calculator, CarIcon, CatIcon, FlowerIcon, Gamepad2, GlassWater, HouseIcon, LandPlot, Puzzle, StickerIcon, UserRoundCogIcon, UsersRoundIcon } from 'lucide-react'
+import { BatteryCharging, Beaker, BeefIcon, BoltIcon, BotIcon, BrickWall, Calculator, CarIcon, Cat, CatIcon, Circle, CircleAlert, FlowerIcon, Gamepad2, GlassWater, HouseIcon, LandPlot, Pencil, Puzzle, StickerIcon, Truck, UserCircle, UserRoundCogIcon, UsersRoundIcon } from 'lucide-react'
 
 const GAME_LIST = [
   {
@@ -83,7 +83,7 @@ const GAME_LIST = [
     key: "/games/potion",
     link: `https://a1561333-1cb3-4d20-8013-4b82e3424f9f.poki-gdn.com/6fcd6282-bc97-4390-846e-684099d8cefc/index.html`,
     image: "/images/game_ico_potion.png",
-    icon: <Calculator size={24} />,
+    icon: <GlassWater size={24} />,
     label: "Campur Ramuan",
     mode: "external",
   },
@@ -109,6 +109,94 @@ const GAME_LIST = [
     image: "/images/game_ico_bolt.png",
     icon: <BoltIcon size={24} />,
     label: "Lepas Baut",
+    mode: "external",
+  },
+  {
+    key: "/games/join_ball",
+    link: `https://9e5f77e7-dfdc-436c-b0f0-72110597c6be.poki-gdn.com/85ceb0c3-857b-4f54-8cb3-92f566c9c6e9/index.html`,
+    image: "/images/game_ico_join_ball.png",
+    icon: <Circle size={24} />,
+    label: "Gabung Bola",
+    mode: "external",
+  },
+  {
+    key: "/games/grandpa_journey",
+    link: `https://0acb9046-4240-47bd-8665-5d7301c3e505.poki-gdn.com/29ea5794-2562-421a-a4ae-8df29fd13764/index.html`,
+    image: "/images/game_ico_grandpa_journey.png",
+    icon: <UserCircle size={24} />,
+    label: "Kakek Petualang",
+    mode: "external",
+  },
+  {
+    key: "/games/experiment",
+    link: `https://5dd2dbe9-015f-11ea-ad56-9cb6d0d995f7.poki-gdn.com/ea812d4b-ec98-4d24-b156-d6b05ed47805/index.html`,
+    image: "/images/game_ico_experiment.png",
+    icon: <Beaker size={24} />,
+    label: "Eksperimen",
+    mode: "external",
+  },
+  {
+    key: "/games/truck_road",
+    link: `https://5dd342e9-015f-11ea-ad56-9cb6d0d995f7.poki-gdn.com/5ac6e947-d9d7-44f8-ab8e-4551da68097c/index.html`,
+    image: "/images/game_ico_truck_road.png",
+    icon: <Truck size={24} />,
+    label: "Jalan Truck",
+    mode: "external",
+  },
+  {
+    key: "/games/bee_attack",
+    link: `https://3f097c83-3fbf-41bd-a947-ed32ddb63c1b.poki-gdn.com/3ba585d0-4628-4974-88db-ce19fffe0601/index.html`,
+    image: "/images/game_ico_bee_attack.png",
+    icon: <BeefIcon size={24} />,
+    label: "Serangan Lebah",
+    mode: "external",
+  },
+  {
+    key: "/games/find_cat",
+    link: `https://8e810ce6-b8c4-4fe4-9dcc-6c8bbee84eeb.poki-gdn.com/32266d08-7f96-463d-a636-a6ed6ceaf51a/index.html`,
+    image: "/images/game_ico_find_cat.png",
+    icon: <Cat size={24} />,
+    label: "Cari Kucing",
+    mode: "external",
+  },
+  {
+    key: "/games/paper_block",
+    link: `https://463debf3-4770-43da-abab-073a893dafaa.poki-gdn.com/20038a99-2480-4097-979e-2302fd277632/index.html`,
+    image: "/images/game_ico_paper_block.png",
+    icon: <Puzzle size={24} />,
+    label: "Susun Balok",
+    mode: "external",
+  },
+  {
+    key: "/games/electric",
+    link: `https://200d12f0-8c5f-4fad-bbc0-328704cb83d5.poki-gdn.com/ef21fb68-e330-4914-99cc-f09772928fa4/index.html`,
+    image: "/images/game_ico_electric.png",
+    icon: <BatteryCharging size={24} />,
+    label: "Sambung Kabel",
+    mode: "external",
+  },
+  {
+    key: "/games/pull_robot",
+    link: `https://c7eea996-4017-4e5a-8b19-7acc5cc56695.poki-gdn.com/9496412e-0370-41c8-bc78-4bf15591b9eb/index.html`,
+    image: "/images/game_ico_pull_robot.png",
+    icon: <BotIcon size={24} />,
+    label: "Tarik Robot",
+    mode: "external",
+  },
+  {
+    key: "/games/roll_ball",
+    link: `https://a8ff451f-35dc-411a-bb28-d41dd5becc91.poki-gdn.com/715c718b-3d82-4b09-b5f0-8c779c68c73f/index.html`,
+    image: "/images/game_ico_roll_ball.png",
+    icon: <CircleAlert size={24} />,
+    label: "Bola Muter",
+    mode: "external",
+  },
+  {
+    key: "/games/long_cat",
+    link: `https://948d3db9-a37d-4625-88aa-40c92f815ef7.poki-gdn.com/ab76b2b6-db04-412e-82c6-1b9b89d6cc87/index.html`,
+    image: "/images/game_ico_long_cat.png",
+    icon: <Cat size={24} />,
+    label: "Kucing Panjang",
     mode: "external",
   },
 ]

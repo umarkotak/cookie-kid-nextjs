@@ -1,6 +1,6 @@
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { BrickWall, FlowerIcon, Gamepad2, GlassWater, LandPlot, Puzzle } from 'lucide-react'
+import { BrickWall, CarIcon, FlowerIcon, Gamepad2, GlassWater, LandPlot, Puzzle, StickerIcon, UserRoundCogIcon, UsersRoundIcon } from 'lucide-react'
 
 const GAME_LIST = [
   {
@@ -27,48 +27,48 @@ const GAME_LIST = [
   {
     key: "/games/golf",
     link: "/games/golf",
-    image: "/images/game_ico_flappybird.png",
+    image: "/images/game_ico_golf.png",
     icon: <LandPlot size={24} />,
     label: "Golf"
   },
   {
     key: "/games/happy-glass",
     link: `https://5cac4523-71ea-476e-8acc-a6cb9c25cc06.poki-gdn.com/2719f5f7-a059-44f1-860d-2e8e1c70b9fd/index.html?country=ID&ccpaApplies=0&url_referrer=https%3A%2F%2Fpoki.com%2F&tag=pg-ac4e68e34b97424608f5f2170b1a77c9559f8393&site_id=74&iso_lang=id&poki_url=https%3A%2F%2Fpoki.com%2Fid%2Fg%2Fhappy-glass&hoist=yes&nonPersonalized=n&cloudsavegames=n&familyFriendly=n&categories=7%2C34%2C37%2C72%2C400%2C1013%2C1140%2C1143%2C1190&special_condition=landing&game_id=5cac4523-71ea-476e-8acc-a6cb9c25cc06&game_version_id=2719f5f7-a059-44f1-860d-2e8e1c70b9fd&inspector=0&csp=1","onPoki":true,"onKids":false,"isLocal":false,"gameID":"5cac4523-71ea-476e-8acc-a6cb9c25cc06`,
-    image: "/images/game_ico_car.png",
+    image: "/images/game_ico_water.png",
     icon: <GlassWater size={24} />,
-    label: "Bantu Mengisi Air",
+    label: "Isi Air",
     mode: "external",
   },
   {
     key: "/games/level-devil",
     link: `https://13acae8c-ec6a-4823-b1a2-8ea20cea56e7.poki-gdn.com/28edc61e-5dd6-478a-a970-edee95166353/index.html`,
-    image: "/images/game_ico_car.png",
-    icon: <GlassWater size={24} />,
-    label: "Lewati Rintangan",
+    image: "/images/game_ico_rintangan.png",
+    icon: <UsersRoundIcon size={24} />,
+    label: "Rintangan",
     mode: "external",
   },
   {
     key: "/games/sticker-puzzle",
     link: `https://bab7ec00-983f-439a-b675-651d7ec0d929.poki-gdn.com/9e742cc1-656c-4a44-8434-f587cbda16f7/index.html`,
-    image: "/images/game_ico_car.png",
-    icon: <GlassWater size={24} />,
+    image: "/images/game_ico_sticker.png",
+    icon: <StickerIcon size={24} />,
     label: "Tempel Sticker",
     mode: "external",
   },
   {
     key: "/games/mine-fun",
     link: `https://c89f4abe-5041-497b-8705-986b6f3b748c.poki-gdn.com/ba4762ff-008e-4bdf-a664-2412b2699f4a/index.html`,
-    image: "/images/game_ico_car.png",
-    icon: <GlassWater size={24} />,
-    label: "Mine Fun",
+    image: "/images/game_ico_parkour.png",
+    icon: <UserRoundCogIcon size={24} />,
+    label: "Parkour",
     mode: "external",
   },
   {
     key: "/games/drive-mad",
     link: `https://f9564e4e-ef25-4e4b-ba67-cb11a1576bbd.poki-gdn.com/d2d1c9d9-8f98-450b-9eee-0d612f13b315/index.html`,
-    image: "/images/game_ico_car.png",
-    icon: <GlassWater size={24} />,
-    label: "Drive Mad",
+    image: "/images/game_ico_mobilmuter.png",
+    icon: <CarIcon size={24} />,
+    label: "Mobilan",
     mode: "external",
   },
 ]
@@ -94,7 +94,7 @@ export default function Page() {
             <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
               <img
                 src={game.image}
-                className='w-full rounded-lg shadow-sm'
+                className='rounded-lg shadow-sm object-contain w-full h-full'
               />
               <h1 className='text-xl flex gap-1 items-center justify-center'>{game.icon} {game.label}</h1>
             </div>
@@ -103,7 +103,7 @@ export default function Page() {
             <div className='flex flex-col gap-2 border shadow-sm p-2 rounded-lg'>
               <img
                 src={game.image}
-                className='w-full rounded-lg shadow-sm'
+                className='rounded-lg shadow-sm object-contain w-full h-full'
               />
               <h1 className='text-xl flex gap-1 items-center justify-center'>{game.icon} {game.label}</h1>
             </div>

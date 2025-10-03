@@ -1,7 +1,4 @@
-
-
 import Utils from '@/models/Utils'
-import Link from 'next/link'
 
 export default function WordPill({word}) {
   return (

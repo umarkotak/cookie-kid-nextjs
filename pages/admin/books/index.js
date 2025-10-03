@@ -271,25 +271,9 @@ export default function Books() {
 
   return (
     <main className="">
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>
-            <div className="flex justify-between items-center">
-              <div>Manage Books</div>
-              <div className="flex gap-1 items-center">
-                <pre>
-                  {JSON.stringify(uploadBookStatus)}
-                </pre>
-                <Link href="/admin/books/add"><Button size="sm"><PlusIcon />Add Book</Button></Link>
-              </div>
-            </div>
-          </CardTitle>
-        </CardHeader>
-      </Card>
-
-      <div className="flex flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-none w-[240px]">
-          <Card className="sticky top-14 p-3 w-full flex flex-col gap-4">
+          <Card className="sticky top-14 p-3 w-full flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span>Pencarian</span>
               <Button size="smv2" onClick={applyFilters}>
@@ -423,13 +407,12 @@ export default function Books() {
         </div>
 
         <div className="flex-1">
-          {/* Books Grid - Modern Tokopedia-style layout */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
             {bookList.map((oneBook) => (
               <HoverCard>
                 <HoverCardTrigger asChild>
                   <Link
-                    href={`/books/${oneBook.slug}/read?page=1`}
+                    href={`/${oneBook.type === "book" ? "books" : "workbooks"}/${oneBook.slug}/read?page=1`}
                     key={oneBook.id}
                     className="group block"
                   >
@@ -441,29 +424,14 @@ export default function Books() {
                           alt={`Cover of ${oneBook.title}`}
                           loading="lazy"
                         />
-                        {/* <div
-                          className={`absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-semibold text-white border border-accent ${
-                            oneBook.is_free ? 'bg-emerald-500' : 'bg-blue-500'
-                          }`}
-                        >
-                          {oneBook.is_free ? 'FREE' : 'PREMIUM'}
-                        </div> */}
                         <div className="absolute top-2 right-2">
                           <div className="flex items-center justify-end gap-1">
-                            <Button variant="outline" size="smv2">{oneBook.is_free ? "FREE" : "PREMIUM"}</Button>
-
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="icon_sm"><MoreHorizontal /></Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent className="w-56">
                                 <DropdownMenuGroup>
-                                  <Link href={`/${oneBook.type === "default" ? "books" : "books"}/${oneBook.slug}/read?page=1`}>
-                                    <DropdownMenuItem>
-                                      read
-                                      <DropdownMenuShortcut><Eye size={14} /></DropdownMenuShortcut>
-                                    </DropdownMenuItem>
-                                  </Link>
                                   <Link href={`/admin/books/${oneBook.id}/edit`}>
                                     <DropdownMenuItem>
                                       edit
@@ -484,8 +452,12 @@ export default function Books() {
                   </Link>
                 </HoverCardTrigger>
                 <HoverCardContent className="w-80">
-                  <div className="flex justify-between gap-4">
-                    {oneBook.title}
+                  <div className="flex flex-col gap-3">
+                    <span className="text-sm">{oneBook.title}</span>
+
+                    <pre className="text-xs bg-accent p-1 rounded overflow-auto">
+                      {JSON.stringify(oneBook, " ", "  ")}
+                    </pre>
                   </div>
                 </HoverCardContent>
               </HoverCard>
@@ -507,7 +479,17 @@ export default function Books() {
           )}
         </div>
 
-        <div className="flex-none w-[240px]">
+        <div className="flex-none w-[240px] flex">
+          <Card className="sticky top-14 p-3 w-full flex flex-col gap-3">
+            <Link href="/admin/books/add"><Button size="sm" className="w-full"><PlusIcon />Add Book</Button></Link>
+
+            <div>
+              <span className="text-sm">Upload Status:</span>
+              <pre className="text-xs bg-accent p-1 rounded">
+                {JSON.stringify(uploadBookStatus, " ", "  ")}
+              </pre>
+            </div>
+          </Card>
         </div>
       </div>
     </main>

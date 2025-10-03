@@ -15,6 +15,7 @@ import { LoadingSpinner } from "@/components/ui/spinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "react-toastify";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 export default function Books() {
   const [bookList, setBookList] = useState([]);
@@ -287,7 +288,7 @@ export default function Books() {
       </Card>
 
       <div className="flex flex-row gap-3">
-        <div className="hidden md:block w-[240px]">
+        <div className="flex-none w-[240px]">
           <Card className="sticky top-14 p-3 w-full flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <span>Pencarian</span>
@@ -346,7 +347,7 @@ export default function Books() {
               </Popover>
             </div>
 
-            <div>
+            <div className="flex flex-col gap-3 bg-accent p-1 rounded">
               {tagOptions.map((tagGroup) => (
                 <div key={tagGroup.name}>
                   <Label>{tagGroup.name}</Label>
@@ -425,66 +426,69 @@ export default function Books() {
           {/* Books Grid - Modern Tokopedia-style layout */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
             {bookList.map((oneBook) => (
-              <div key={oneBook.id} className="group block">
-                <div className="bg-white hover:shadow-lg transition-shadow duration-200 rounded-lg overflow-hidden">
-                  {/* Square Image Container */}
-                  <div className="relative aspect-square overflow-hidden bg-gray-100">
-                    <img
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                      src={oneBook.cover_file_url}
-                      alt={`Cover of ${oneBook.title}`}
-                      loading="lazy"
-                    />
-                    <div className="absolute top-2 right-2">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button variant="outline" size="smv2">{oneBook.is_free ? "FREE" : "PREMIUM"}</Button>
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <Link
+                    href={`/books/${oneBook.slug}/read?page=1`}
+                    key={oneBook.id}
+                    className="group block"
+                  >
+                    <div className="flex h-full flex-col rounded-lg border border-slate-200 bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1 overflow-hidden group-hover:shadow-md group-hover:shadow-accent">
+                      <div className="relative aspect-[2/3] overflow-hidden">
+                        <img
+                          className="h-full w-full object-fit transition-transform duration-300"
+                          src={oneBook.cover_file_url}
+                          alt={`Cover of ${oneBook.title}`}
+                          loading="lazy"
+                        />
+                        {/* <div
+                          className={`absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-semibold text-white border border-accent ${
+                            oneBook.is_free ? 'bg-emerald-500' : 'bg-blue-500'
+                          }`}
+                        >
+                          {oneBook.is_free ? 'FREE' : 'PREMIUM'}
+                        </div> */}
+                        <div className="absolute top-2 right-2">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button variant="outline" size="smv2">{oneBook.is_free ? "FREE" : "PREMIUM"}</Button>
 
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="icon_sm"><MoreHorizontal /></Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className="w-56">
-                            <DropdownMenuGroup>
-                              <Link href={`/${oneBook.type === "default" ? "books" : "books"}/${oneBook.slug}/read?page=1`}>
-                                <DropdownMenuItem>
-                                  read
-                                  <DropdownMenuShortcut><Eye size={14} /></DropdownMenuShortcut>
-                                </DropdownMenuItem>
-                              </Link>
-                              <Link href={`/admin/books/${oneBook.id}/edit`}>
-                                <DropdownMenuItem>
-                                  edit
-                                  <DropdownMenuShortcut><Pencil size={14} /></DropdownMenuShortcut>
-                                </DropdownMenuItem>
-                              </Link>
-                              <DropdownMenuItem onClick={()=>DeleteBook(oneBook.id)}>
-                                delete
-                                <DropdownMenuShortcut><Trash size={14} /></DropdownMenuShortcut>
-                              </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon_sm"><MoreHorizontal /></Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="w-56">
+                                <DropdownMenuGroup>
+                                  <Link href={`/${oneBook.type === "default" ? "books" : "books"}/${oneBook.slug}/read?page=1`}>
+                                    <DropdownMenuItem>
+                                      read
+                                      <DropdownMenuShortcut><Eye size={14} /></DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+                                  </Link>
+                                  <Link href={`/admin/books/${oneBook.id}/edit`}>
+                                    <DropdownMenuItem>
+                                      edit
+                                      <DropdownMenuShortcut><Pencil size={14} /></DropdownMenuShortcut>
+                                    </DropdownMenuItem>
+                                  </Link>
+                                  <DropdownMenuItem onClick={()=>DeleteBook(oneBook.id)}>
+                                    delete
+                                    <DropdownMenuShortcut><Trash size={14} /></DropdownMenuShortcut>
+                                  </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
                       </div>
                     </div>
+                  </Link>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="flex justify-between gap-4">
+                    {oneBook.title}
                   </div>
-
-                  {/* Book Info */}
-                  <div className="p-3">
-                    <h3 className="text-sm text-gray-900 line-clamp-2 leading-tight font-medium group-hover:text-blue-600 transition-colors">
-                      {oneBook.title}
-                    </h3>
-
-                    <div className="mt-2 flex items-center justify-between">
-                      {/* <span className="text-xs text-gray-500">Author</span> */}
-                      <div className="flex items-center gap-1">
-                        <div className="text-xs bg-blue-50 text-gray-800 p-0.5">{oneBook.type}</div>
-                        <div className="text-xs bg-blue-50 text-gray-800 p-0.5">{oneBook.tags[0]}</div>
-                        {/* <span className="text-xs text-gray-600">4.5</span> */}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </HoverCardContent>
+              </HoverCard>
             ))}
           </div>
 
@@ -501,6 +505,9 @@ export default function Books() {
               </div>
             </div>
           )}
+        </div>
+
+        <div className="flex-none w-[240px]">
         </div>
       </div>
     </main>

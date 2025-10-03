@@ -1,6 +1,6 @@
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { BatteryCharging, Beaker, BeefIcon, BoltIcon, BotIcon, BrickWall, Calculator, CarIcon, Cat, CatIcon, Circle, CircleAlert, FlowerIcon, Gamepad2, GlassWater, HouseIcon, LandPlot, Pencil, Puzzle, StickerIcon, Truck, UserCircle, UserRoundCogIcon, UsersRoundIcon } from 'lucide-react'
+import { Apple, BatteryCharging, Beaker, BeefIcon, BoltIcon, BotIcon, BrickWall, Calculator, CarIcon, Cat, CatIcon, Circle, CircleAlert, FlipHorizontal, FlowerIcon, Gamepad2, GlassWater, HouseIcon, LandPlot, LayoutTemplate, Orbit, Pencil, Plane, Puzzle, StickerIcon, Truck, UserCircle, UserRoundCogIcon, UsersRoundIcon, Waypoints, Workflow } from 'lucide-react'
 
 const GAME_LIST = [
   {
@@ -197,6 +197,62 @@ const GAME_LIST = [
     image: "/images/game_ico_long_cat.png",
     icon: <Cat size={24} />,
     label: "Kucing Panjang",
+    mode: "external",
+  },
+  {
+    key: "/games/subway_surfer",
+    link: `https://5dd312fa-015f-11ea-ad56-9cb6d0d995f7.poki-gdn.com/93b4ccd7-2b04-4957-b45a-9a72ea6ac37b/index.html`,
+    image: "/images/game_ico_subway_surfer.png",
+    icon: <Orbit size={24} />,
+    label: "Subway Surfer",
+    mode: "external",
+  },
+  {
+    key: "/games/temple_run",
+    link: `https://84938be4-42ce-42a8-9968-2f5f2a7618d8.poki-gdn.com/f2e6056e-ac6f-4d61-bec9-5618e79105e7/index.html`,
+    image: "/images/game_ico_temple_run.png",
+    icon: <LayoutTemplate size={24} />,
+    label: "Temple Run",
+    mode: "external",
+  },
+  {
+    key: "/games/parkir_pesawat",
+    link: `https://7e485857-686e-47f6-9588-1dacf536421b.poki-gdn.com/50466593-30d4-4334-b6e7-5e8fa4edd663/index.html`,
+    image: "/images/game_ico_parkir_pesawat.png",
+    icon: <Plane size={24} />,
+    label: "Parkir Pesawat",
+    mode: "external",
+  },
+  {
+    key: "/games/cari_perbedaan",
+    link: `https://d8798ee2-832d-4bf3-ac24-c382277e4cc8.poki-gdn.com/df5daac5-d8e7-4b74-9148-32cd7f6e97e9/index.html`,
+    image: "/images/game_ico_cari_perbedaan.png",
+    icon: <FlipHorizontal size={24} />,
+    label: "Cari Perbedaan",
+    mode: "external",
+  },
+  {
+    key: "/games/penuhi_garis",
+    link: `https://2e2e403f-ad56-4703-a76b-9433d2df1252.poki-gdn.com/094a93d2-101f-416d-b6da-9478c11d561b/index.html`,
+    image: "/images/game_ico_penuhi_garis.png",
+    icon: <Waypoints size={24} />,
+    label: "Penuhi Garis",
+    mode: "external",
+  },
+  {
+    key: "/games/onet",
+    link: `https://b64d219a-899f-4888-92f5-36530e6e03b0.poki-gdn.com/85b45a86-5654-4a58-b398-41836d5359d0/index.html`,
+    image: "/images/game_ico_onet.png",
+    icon: <Workflow size={24} />,
+    label: "Onet",
+    mode: "external",
+  },
+  {
+    key: "/games/dadish",
+    link: `https://6302746e-9013-4c31-afb0-a7ef4517cabe.poki-gdn.com/ca4c19a6-c085-43b0-ade4-918a8e04ee93/index.html`,
+    image: "/images/game_ico_dadish.png",
+    icon: <Apple size={24} />,
+    label: "Dadish",
     mode: "external",
   },
 ]

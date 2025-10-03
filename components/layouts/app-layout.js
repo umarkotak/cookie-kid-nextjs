@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation"
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, LogInIcon } from "lucide-react"
+import { ChevronLeft, LogInIcon, RefreshCcw } from "lucide-react"
 import Link from "next/link"
 import { useTheme } from "next-themes"
 import ytkiddAPI from '@/apis/ytkidApi';
@@ -50,7 +50,11 @@ export default function AppLayout({ children }) {
     }
 
     // add padding on content / not
-    if (["/home","/activity","/games","/subscription","/subscription/package","/games/maze","/games/golf"].includes(pathName)) {
+    if (
+      ["/home","/activity","/games","/subscription","/subscription/package","/games/maze","/games/golf"].includes(pathName)
+      || (pathName.includes("/books") && pathName.includes("/read"))
+      || (pathName.includes("/workbooks") && pathName.includes("/read"))
+    ) {
       setPadMain(false)
     } else {
       setPadMain(true)
@@ -109,19 +113,19 @@ export default function AppLayout({ children }) {
 
     // back link
     if (pathName.startsWith("/watch")) {
-      return <Link href="/tv"><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>
+      return <Link href="/tv"><Button size="smv2" variant="outline"><ChevronLeft size={8} /> back</Button></Link>
     }
 
     if (pathName.includes("/books") && pathName.includes("/read")) {
-      return <Link href="/books"><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>
+      return <Link href="/books"><Button size="smv2" variant="outline"><ChevronLeft size={8} /> back</Button></Link>
     }
 
     if (pathName.includes("/workbooks") && pathName.includes("/read")) {
-      return <Link href="/workbooks"><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>
+      return <Link href="/workbooks"><Button size="smv2" variant="outline"><ChevronLeft size={8} /> back</Button></Link>
     }
 
     if (pathName.includes("/games/")) {
-      return <Link href="/games"><Button size="smv2" variant="ghost"><ChevronLeft size={8} /> back</Button></Link>
+      return <Link href="/games"><Button size="smv2" variant="outline"><ChevronLeft size={8} /> back</Button></Link>
     }
 
     return <Link href={pathName}><Button size="smv2" variant="ghost">{pathName}</Button></Link>
@@ -138,6 +142,9 @@ export default function AppLayout({ children }) {
             <BreadcrumbsButton />
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon_sm" onClick={() => window.location.reload()}>
+              <RefreshCcw />
+            </Button>
             { userData.guid
               ? <UserDropdown userData={userData} />
               : <Link href="/sign_in"><Button size="smv2" variant="outline"><LogInIcon size={4} /> sign in</Button></Link>

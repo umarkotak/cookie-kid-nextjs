@@ -254,9 +254,9 @@ export default function Read() {
         <div className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert"> Kamu harus berlangganan CaBocil premium untuk mengakses buku ini. <Link href="/subscription/package" className="underline">Berlangganan Sekarang</Link>.</div>
       }
 
-      {!loadingComplete && <div className="bg-gray-200 h-1">
+      {!loadingComplete && <div className="bg-gray-200 h-1.5">
         <div
-          className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+          className="bg-blue-600 h-full transition-all duration-300 ease-out"
           style={{ width: `${(visibleItems?.length / bookDetail.contents?.length) * 100}%` }}
         ></div>
       </div>}

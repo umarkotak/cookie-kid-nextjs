@@ -149,24 +149,24 @@ export default function Read() {
 
   return(
     <main className="">
-      {errNeedSubscription &&
-        <div className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert"> Kamu harus berlangganan CaBocil premium untuk mengakses buku ini. <Link href="/subscription/package" className="underline">Berlangganan Sekarang</Link>.</div>
-      }
-
-      {!loadingComplete && <div className="bg-gray-200 h-1">
-        <div
-          className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
-          style={{ width: `${(visibleItems?.length / bookDetail.contents?.length) * 100}%` }}
-        ></div>
-      </div>}
-
       <div
         className={`bg-background ${isFullscreen ? `
           fixed top-0 left-0 w-full h-screen z-50
         ` : `
-          h-[calc(100vh-70px)] max-h-[calc(100vh-70px)] overflow-hidden
+          h-[calc(100vh-48px)] overflow-hidden
         `}`}
       >
+        {errNeedSubscription &&
+          <div className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert"> Kamu harus berlangganan CaBocil premium untuk mengakses buku ini. <Link href="/subscription/package" className="underline">Berlangganan Sekarang</Link>.</div>
+        }
+
+        {!loadingComplete && <div className="bg-gray-200 h-1.5">
+          <div
+            className="bg-blue-600 h-full transition-all duration-300 ease-out"
+            style={{ width: `${(visibleItems?.length / bookDetail.contents?.length) * 100}%` }}
+          ></div>
+        </div>}
+
         <div className="relative h-full">
           {visibleItems && visibleItems.map((page, index) => (
             <div
@@ -174,7 +174,7 @@ export default function Read() {
               className={`relative w-full h-full ${activePage.image_file_url === page.image_file_url ? "block" : "hidden"}`}
             >
               <div
-                className={`border border-foreground shadow-md ${isFullscreen ? `
+                className={`shadow-md ${isFullscreen ? `
                   object-contain absolute top-0 left-0 w-full h-screen
                 ` : `
                   mx-auto h-full

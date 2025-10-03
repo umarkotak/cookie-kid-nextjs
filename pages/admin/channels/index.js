@@ -72,37 +72,26 @@ export default function Channels() {
   }
 
   return (
-    <div className='flex flex-col gap-4'>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Manage Channels</span>
-            <Link href="/admin/channels/add">
-              <Button size="sm" variant="default"><PlusIcon />Add Channel</Button>
-            </Link>
-          </CardTitle>
-        </CardHeader>
-      </Card>
+    <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex-none w-[240px]">
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6 gap-x-5 gap-y-8">
-        {channelList.map((oneChannel) => (
-          <Card key={oneChannel.id} className="hover:bg-accent">
-            <Link href={`/admin/channels/${oneChannel.id}/edit`}>
-              <CardHeader className="p-4">
+      </div>
+
+      <div className="flex-1">
+        <div className="grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+          {channelList.map((oneChannel) => (
+            <Card key={oneChannel.id} className="p-4">
+              <Link href={`/channels/${oneChannel.id}`} className='group'>
                 <div className='flex items-center gap-3'>
-                    <Avatar className="h-20 w-20">
-                      <AvatarImage src={oneChannel.image_url}/>
-                      <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
-                    </Avatar>
-                  <div>
-                    <span>{oneChannel.name}</span>
-                    <small className="">{oneChannel.string_tags}</small>
-                  </div>
+                  <Avatar className="h-14 w-14 group-hover:scale-105">
+                    <AvatarImage src={oneChannel.image_url}/>
+                    <AvatarFallback><img src="/images/cookie_kid_logo_circle.png" /></AvatarFallback>
+                  </Avatar>
+                  <span className='group-hover:text-amber-600'>{oneChannel.name}</span>
+                  <small className="">{oneChannel.string_tags}</small>
                 </div>
-              </CardHeader>
-            </Link>
-            <CardContent className="p-4">
-              <div className='flex items-center justify-end'>
+              </Link>
+              <div className="flex justify-end mt-3">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline">action</Button>
@@ -119,9 +108,17 @@ export default function Channels() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-            </CardContent>
-          </Card>
-        ))}
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-none w-[240px]">
+        <Card className="sticky top-14 p-3 w-full flex flex-col gap-3">
+          <Link href="/admin/channels/add">
+            <Button size="sm" variant="default" className="w-full"><PlusIcon />Add Channel</Button>
+          </Link>
+        </Card>
       </div>
     </div>
   )

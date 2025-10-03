@@ -10,7 +10,7 @@ export default function BookCard({oneBook}) {
     <div>
       <HoverCard>
         <HoverCardTrigger asChild>
-          <Link
+          <a
             href={`/${oneBook.type === "book" ? "books" : "workbooks"}/${oneBook.slug}/read?page=1`}
             key={oneBook.id}
             className="group block"
@@ -39,7 +39,7 @@ export default function BookCard({oneBook}) {
                 </div>}
               </div>
             </div>
-          </Link>
+          </a>
         </HoverCardTrigger>
         <HoverCardContent className="w-80">
           <div className="flex flex-col gap-3">
